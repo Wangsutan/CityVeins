@@ -15,7 +15,7 @@
 
 依赖模块：
 - pandas: 数据处理和保存
-- utils.poi_processor: 得分计算和统计生成工具
+- utils.poi_analysis: 得分计算和统计生成工具
 - config: 项目配置文件
 
 使用示例:
@@ -32,7 +32,7 @@ from typing import Dict, List, Any, Optional, Tuple
 
 # 把项目根目录加入 sys.path，确保能导入所需模块
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sources.utils.poi.poi_processor import calculate_weighted_score
+from sources.utils.poi.poi_analysis import calculate_weighted_score
 from sources.utils.file.file_handler import save_category_stats
 from sources.utils.file.weight_loader import load_weight_config
 from config import WEIGHT_FILE

@@ -14,7 +14,7 @@ import sys
 sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-from sources.utils.poi.poi_processor import (
+from sources.utils.poi.poi_analysis import (
     calculate_weighted_score,
     generate_score_report,
 )

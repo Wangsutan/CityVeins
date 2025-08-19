@@ -2,8 +2,8 @@
 住宅区数据获取模块
 
 该模块负责从高德地图API获取指定行政区内的所有住宅区（小区和公寓等）数据。
-通过网格切分的方式将大区域划分为小网格，逐个网格获取POI数据，避免单次
-请求区域过大导致数据不完整。
+通过网格切分的方式将大区域划分为小网格，逐个网格获取POI数据，
+避免单次请求区域过大导致数据不完整。
 
 功能：
 1. 创建带重试和限速机制的HTTP会话，防止API请求频率过高
@@ -55,6 +55,7 @@ def grid_split(
 
     该函数将给定的多边形区域切分为一系列小网格，用于分批获取POI数据。
     网格切分可以避免单次请求区域过大导致API返回数据不完整的问题。
+    注意：这种方法容易导致多余覆盖，如需更精准的住宅区数据，还需手动检查。
 
     Args:
         polygon (Polygon): 要切分的多边形区域，通常是行政区边界
@@ -108,6 +109,7 @@ def search_in_rect(
     """
     url: str = "https://restapi.amap.com/v5/place/polygon"  # 高德地图POI搜索API
     # 将矩形坐标转换为字符串格式
+    # [:-1]的作用是去除多边形顶点列表中重复的闭合点
     coords: str = ",".join(f"{x},{y}" for x, y in rect.exterior.coords[:-1])
     page: int = 1
 
@@ -179,7 +181,6 @@ def main(district: str = "田家庵区") -> None:
     boundary: Polygon
     try:
         boundary = get_boundary(district)
-        records: List[Dict[str, Any]] = []
     except ValueError as e:
         print(f"错误: {str(e)}")
         return
@@ -188,8 +189,13 @@ def main(district: str = "田家庵区") -> None:
         return
 
     # 遍历所有网格，获取住宅区POI数据
+    records: List[Dict[str, Any]] = []
+    cell: Polygon
     for cell in tqdm(list(grid_split(boundary)), desc="网格"):
-        # 住宅类POI类型代码：120300(住宅小区)、120200(住宅区)、120100(地名地址信息)
+        # 住宅类POI类型代码：
+        # 120100(商务住宅大类-产业园区中类-产业园区小类)
+        # 120200(商务住宅大类-楼宇中类-楼宇相关小类)
+        # 120300(商务住宅大类-住宅区中类-住宅区小类)
         for p in search_in_rect(cell, "120300|120200|120100", ""):
             records.append(p)
 

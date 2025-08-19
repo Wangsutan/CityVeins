@@ -23,29 +23,41 @@ from utils.poi.poi_filter import filter_poi_types, build_category_hierarchy
 def markdown_to_html(markdown_file: str, output_file: str = None) -> bool:
     """
     将Markdown文件转换为HTML格式
-    
+
     Args:
         markdown_file (str): Markdown文件路径
         output_file (str, optional): 输出HTML文件路径，如果不提供则在Markdown文件所在目录生成同名HTML文件
-        
+
     Returns:
         bool: 转换是否成功
     """
     # 检查pandoc是否可用
     try:
-        subprocess.run(["pandoc", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        subprocess.run(
+            ["pandoc", "--version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+        )
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("错误：未找到pandoc命令，无法进行Markdown到HTML的转换。")
         print("请安装pandoc：https://pandoc.org/installing.html")
         return False
-        
+
     # 确定输出文件路径，默认在Markdown文件所在目录生成同名HTML文件
     if not output_file:
         output_file = os.path.splitext(markdown_file)[0] + ".html"
-        
+
     try:
         # 使用pandoc转换Markdown到HTML
-        cmd = ["pandoc", markdown_file, "-o", output_file, "--standalone", "--css=https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"]
+        cmd = [
+            "pandoc",
+            markdown_file,
+            "-o",
+            output_file,
+            "--standalone",
+            "--css=https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css",
+        ]
         subprocess.run(cmd, check=True)
         print(f"已成功将 {markdown_file} 转换为 {output_file}")
         return True
@@ -54,7 +66,9 @@ def markdown_to_html(markdown_file: str, output_file: str = None) -> bool:
         return False
 
 
-def generate_markdown_report(residential_id: str, stats_dir: str, community_name: str = None) -> str:
+def generate_markdown_report(
+    residential_id: str, stats_dir: str, community_name: str = None
+) -> str:
     """
     生成Markdown格式的评估报告
 
@@ -227,7 +241,9 @@ def main():
         default=None,
     )
     parser.add_argument("--output", help="输出文件路径", default=None)
-    parser.add_argument("--no-html", action="store_true", help="不生成HTML文件，只生成Markdown文件")
+    parser.add_argument(
+        "--no-html", action="store_true", help="不生成HTML文件，只生成Markdown文件"
+    )
     parser.add_argument("--open", action="store_true", help="生成HTML文件后自动打开")
 
     args = parser.parse_args()
@@ -241,11 +257,13 @@ def main():
     community_name = None
     try:
         # 尝试从POI数据文件中获取住宅区名称
-        poi_file = os.path.join(os.path.dirname(args.stats_dir), f"poi_{args.residential_id}.csv")
+        poi_file = os.path.join(
+            os.path.dirname(args.stats_dir), f"poi_{args.residential_id}.csv"
+        )
         if os.path.exists(poi_file):
             poi_df = pd.read_csv(poi_file)
-            if '住宅区名称' in poi_df.columns:
-                community_name = poi_df['住宅区名称'].iloc[0]  # 取第一个住宅区名称
+            if "住宅区名称" in poi_df.columns:
+                community_name = poi_df["住宅区名称"].iloc[0]  # 取第一个住宅区名称
                 print(f"已从CSV文件读取到社区名称: {community_name}")
             else:
                 print("警告：CSV文件中未找到'住宅区名称'列")
@@ -255,7 +273,9 @@ def main():
         print(f"警告：无法从CSV文件读取住宅区名称: {str(e)}")
 
     # 生成Markdown报告
-    report = generate_markdown_report(args.residential_id, args.stats_dir, community_name)
+    report = generate_markdown_report(
+        args.residential_id, args.stats_dir, community_name
+    )
 
     # 确定Markdown输出文件路径
     if args.output:
@@ -270,12 +290,12 @@ def main():
         f.write(report)
 
     print(f"Markdown评估报告已生成: {md_file}")
-    
+
     # 如果没有指定不生成HTML文件，则默认生成HTML文件
     if not args.no_html:
         # 确定HTML输出文件路径
         html_file = os.path.splitext(md_file)[0] + ".html"
-        
+
         # 转换Markdown到HTML
         success = markdown_to_html(md_file, html_file)
         if success:
@@ -293,8 +313,6 @@ def main():
                 except Exception as e:
                     print(f"无法自动打开HTML文件: {str(e)}")
     return
-
-
 
 
 if __name__ == "__main__":

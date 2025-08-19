@@ -83,15 +83,15 @@ digraph CityVeins {
 
         "poi_analyzer" [label="get_batch_residential_poi.py
 分析POI处理结果"];
-        "poi_processor" [label="utils/poi_processor.py
+        "poi_analysis" [label="utils/poi_analysis.py
 POI数据处理与统计"];
         "processed_poi" [shape=cylinder, label="处理后的POI数据", fillcolor=lightblue, style=filled];
 
         "poi_data" -> "poi_analyzer";
         "processing_summary" -> "poi_analyzer";
         "failed_records" -> "poi_analyzer";
-        "poi_data" -> "poi_processor";
-        "poi_processor" -> "processed_poi";
+        "poi_data" -> "poi_analysis";
+        "poi_analysis" -> "processed_poi";
     }
 
     subgraph cluster_4 {
