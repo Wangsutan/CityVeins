@@ -1,4 +1,3 @@
-
 """
 批量获取住宅区POI数据（修复版）
 
@@ -30,6 +29,7 @@ from config import RESIDENTIAL_OUT
 from utils.file.key_loader import load_key
 from utils.poi.poi_filter import filter_poi_types
 
+
 def main():
     # 设置命令行参数解析
     parser = argparse.ArgumentParser(description="批量获取住宅区POI数据")
@@ -37,10 +37,15 @@ def main():
     # 获取行政区名称
     district = "田家庵区"
 
-    parser.add_argument("--input-file", help="输入CSV文件路径", 
-                       default=RESIDENTIAL_OUT(district))
-    parser.add_argument("--limit", type=int, default=10, 
-                       help="限制处理的记录数量，默认为10条。设置为0或负数表示处理所有记录")
+    parser.add_argument(
+        "--input-file", help="输入CSV文件路径", default=RESIDENTIAL_OUT(district)
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="限制处理的记录数量，默认为10条。设置为0或负数表示处理所有记录",
+    )
 
     args = parser.parse_args()
 
@@ -49,7 +54,7 @@ def main():
     output_dir = os.path.join(project_root, "output")
     os.makedirs(output_dir, exist_ok=True)
     print(f"确保输出目录存在: {output_dir}")
-    
+
     # 确保POI子目录存在
     poi_dir = os.path.join(output_dir, "poi")
     os.makedirs(poi_dir, exist_ok=True)
@@ -87,15 +92,14 @@ def main():
 
         try:
             # 调用单个住宅区POI获取脚本，只传递住宅区ID
-            script_path = os.path.join(project_root, "sources", "get_single_residential_poi_fixed.py")
-            cmd = [
-                "python", 
-                script_path,
-                residential_id
-            ]
+            script_path = os.path.join(
+                project_root, "sources", "get_single_residential_poi_fixed.py"
+            )
+            cmd = ["python", script_path, residential_id]
 
             # 使用subprocess运行脚本
             import subprocess
+
             result = subprocess.run(cmd, capture_output=True, text=True)
 
             if result.returncode == 0:
@@ -113,6 +117,7 @@ def main():
     print(f"总记录数: {len(df)}")
     print(f"成功: {success_count} ({success_count/len(df)*100:.1f}%)")
     print(f"失败: {fail_count} ({fail_count/len(df)*100:.1f}%)")
+
 
 if __name__ == "__main__":
     main()

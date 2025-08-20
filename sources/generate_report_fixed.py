@@ -60,7 +60,8 @@ def markdown_to_html(markdown_file: str, output_file: str = None) -> bool:
             output_file,
             "--standalone",
             "--css=https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css",
-            "--metadata", f"title={title}",
+            "--metadata",
+            f"title={title}",
         ]
         subprocess.run(cmd, check=True)
         print(f"已成功将 {markdown_file} 转换为 {output_file}")

@@ -40,9 +40,7 @@ from sources.utils.file.file_handler import save_category_stats
 from calculate_single_score import main as score_single_main
 
 
-def process_single_residential(
-    file_path: str, residential_id: str
-) -> Dict[str, Any]:
+def process_single_residential(file_path: str, residential_id: str) -> Dict[str, Any]:
     """
     处理单个住宅区的POI数据
 
@@ -83,7 +81,7 @@ def process_single_residential(
                 "total_score": 0,
                 "poi_count": 0,
                 "stats_dir": stats_dir,
-                "error": error_data.get("error", "未知错误")
+                "error": error_data.get("error", "未知错误"),
             }
         return {
             "residential_id": residential_id,

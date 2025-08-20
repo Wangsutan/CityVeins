@@ -17,6 +17,7 @@
 python get_single_residential_poi_fixed.py B0J2DUYF0J
 python get_single_residential_poi_fixed.py B0J2DUYF0J 淮南职业技术学院 洞山西路2号
 """
+
 import requests
 import pandas as pd
 from tqdm import tqdm
@@ -50,6 +51,7 @@ POI_WEIGHT_THRESHOLD: float = 0.4
 FILTER_CATEGORY: bool = True
 FILTER_SUBCATEGORY: bool = False
 FILTER_SMALLCATEGORY: bool = False
+
 
 def load_poi_types() -> (
     Tuple[List[str], Set[str], Dict[str, Dict[str, Union[str, float]]]]
@@ -95,6 +97,7 @@ def load_poi_types() -> (
             filter_smallcategory=False,
         )
     return filtered_types, kept_categories, type_mapping
+
 
 def get_pois(
     lng: float, lat: float, poi_type: str, max_retries: int = 3
@@ -155,6 +158,7 @@ def get_pois(
             time.sleep(2)  # 失败后等待更长时间
     return pois
 
+
 def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str, str]:
     """
     从CSV文件中获取住宅区的经纬度坐标
@@ -168,7 +172,15 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
         address (str): 住宅区地址
     """
     # 尝试从各个行政区的住宅区文件中查找
-    districts = ['田家庵区', '大通区', '谢家集区', '八公山区', '潘集区', '凤台县', '寿县']
+    districts = [
+        "田家庵区",
+        "大通区",
+        "谢家集区",
+        "八公山区",
+        "潘集区",
+        "凤台县",
+        "寿县",
+    ]
 
     for district in districts:
         csv_file = os.path.join(DATA_DIR, "residential", f"residential_{district}.csv")
@@ -176,10 +188,15 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
             try:
                 df = pd.read_csv(csv_file)
                 # 查找匹配的住宅区
-                match = df[df['id'] == residential_id]
+                match = df[df["id"] == residential_id]
                 if not match.empty:
                     row = match.iloc[0]
-                    return float(row['lng']), float(row['lat']), row['name'], row.get('address', '')
+                    return (
+                        float(row["lng"]),
+                        float(row["lat"]),
+                        row["name"],
+                        row.get("address", ""),
+                    )
             except Exception as e:
                 print(f"读取住宅区文件 {csv_file} 失败: {str(e)}")
 
@@ -190,8 +207,10 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
 
     # 如果找到了名称和地址但没有经纬度，尝试通过地址解析获取经纬度
     from sources.utils import geocode
+
     lng, lat = geocode(address)
     return lng, lat, name, address
+
 
 def main(residential_id: str, name: str = None, address: str = None) -> None:
     """
@@ -234,6 +253,7 @@ def main(residential_id: str, name: str = None, address: str = None) -> None:
         if name and address:
             # 如果提供了名称和地址，尝试通过地址解析获取经纬度
             from sources.utils import geocode
+
             lng, lat = geocode(address)
         else:
             # 否则从CSV文件中直接读取经纬度
@@ -433,6 +453,7 @@ def main(residential_id: str, name: str = None, address: str = None) -> None:
 
         # 清理临时目录
         import shutil
+
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
 
@@ -461,11 +482,13 @@ def main(residential_id: str, name: str = None, address: str = None) -> None:
         print(f"处理失败[{residential_id}]: {str(e)}")
         # 清理临时目录
         import shutil
+
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
         # 删除可能不完整的输出文件
         if os.path.exists(output_file):
             os.remove(output_file)
+
 
 def parse_args():
     """解析命令行参数"""
@@ -498,6 +521,7 @@ python get_single_residential_poi_fixed.py B0J2DUYF0J --threshold=0.5""",
         help="设置权重阈值，0.0-1.0之间的浮点数 (默认: 0.4)",
     )
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     # 解析命令行参数

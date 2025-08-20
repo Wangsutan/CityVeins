@@ -313,34 +313,38 @@ def generate_score_report(
 def generate_summary_report(all_results, output_file):
     """
     生成批量处理住宅区的汇总报告
-    
+
     Args:
         all_results (list): 所有住宅区的处理结果列表
         output_file (str): 输出文件路径
     """
     import pandas as pd
-    
+
     # 创建DataFrame
     df = pd.DataFrame(all_results)
-    
+
     # 按得分降序排序
     if "total_score" in df.columns:
         df = df.sort_values(by="total_score", ascending=False)
-    
+
     # 保存到CSV文件
     df.to_csv(output_file, index=False, encoding="utf-8-sig")
     print(f"汇总报告已保存: {output_file}")
-    
+
     # 打印TOP10和BOTTOM10
     if "total_score" in df.columns and "residential_id" in df.columns:
         # TOP10
         print("\nTOP10住宅区得分排名:")
         top10 = df.head(10)[["residential_id", "total_score", "poi_count"]]
         for idx, row in top10.iterrows():
-            print(f"{idx+1}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})")
-        
+            print(
+                f"{idx+1}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
+            )
+
         # BOTTOM10
         print("\nBOTTOM10住宅区得分排名:")
         bottom10 = df.tail(10)[["residential_id", "total_score", "poi_count"]]
         for idx, row in bottom10.iterrows():
-            print(f"{len(df)-9+idx}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})")
+            print(
+                f"{len(df)-9+idx}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
+            )
