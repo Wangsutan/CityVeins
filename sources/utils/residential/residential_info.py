@@ -20,7 +20,7 @@ from config import RESIDENTIAL_OUT
 
 def get_residential_info(
     residential_id: str, district: str = "田家庵区"
-) -> Tuple[Optional[str], Optional[str]]:
+) -> Tuple[Optional[str], Optional[str], Optional[float], Optional[float]]:
     """
     从住宅区数据文件中获取指定ID的住宅区信息
 
@@ -29,7 +29,7 @@ def get_residential_info(
         district (str): 行政区名称，默认为"田家庵区"
 
     Returns:
-        tuple: (住宅区名称, 住宅区地址) 或 (None, None) 如果未找到
+        tuple: (住宅区名称, 住宅区地址, 经度, 纬度) 或 (None, None, None, None) 如果未找到
     """
     try:
         # 尝试从多个可能的位置查找住宅区数据文件
@@ -55,18 +55,20 @@ def get_residential_info(
 
         if not residential_file:
             print("未找到住宅区数据文件")
-            return None, None
+            return None, None, None, None
 
         df = pd.read_csv(residential_file)
         residential = df[df["id"] == residential_id]
 
         if residential.empty:
             print(f"未找到ID为 {residential_id} 的住宅区")
-            return None, None
+            return None, None, None, None
 
         name = residential.iloc[0]["name"]
         address = residential.iloc[0].get("address", "")
-        return name, address
+        lng = residential.iloc[0].get("lng", None)
+        lat = residential.iloc[0].get("lat", None)
+        return name, address, lng, lat
     except Exception as e:
         print(f"获取住宅区信息失败: {str(e)}")
-        return None, None
+        return None, None, None, None

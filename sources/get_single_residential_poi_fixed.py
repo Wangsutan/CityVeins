@@ -1,45 +1,41 @@
 """
 获取单个住宅区15分钟生活圈全量POI数据
-
 该模块负责获取单个住宅区周边指定半径内的所有POI数据, 基于高德地图API和分类体系。
 支持全量POI类型获取, 并将结果保存为CSV和JSON格式, 便于后续处理和分析。
-
 功能：
-1. 地址转坐标：将住宅区地址转换为经纬度坐标
+1. 直接从CSV文件读取住宅区经纬度坐标
 2. POI分类体系加载：从配置文件加载POI分类体系和权重信息
 3. 周边POI获取：获取指定半径内所有类型的POI数据
 4. 数据格式化与保存：将获取的POI数据格式化并保存为CSV和JSON文件
-
 依赖模块：
 - requests: HTTP请求库, 用于调用高德地图API
 - pandas: 数据处理和保存
 - tqdm: 进度条显示
 - utils.key_loader: API密钥加载工具
 - config: 项目配置文件
-
 使用示例:
-python get_single_residential_poi.py B0J2DUYF0J
-python get_single_residential_poi.py B0J2DUYF0J 淮南职业技术学院 洞山西路2号
+python get_single_residential_poi_fixed.py B0J2DUYF0J
+python get_single_residential_poi_fixed.py B0J2DUYF0J 淮南职业技术学院 洞山西路2号
 """
-
 import requests
 import pandas as pd
 from tqdm import tqdm
 import time
 import sys
 import os
-from sources.utils.poi.poi_dedup import dedup_poi_file
-import os
 import json
 import argparse
 from typing import Dict, List, Any, Optional, Tuple, Set, Union
 
+# 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# 导入项目模块
+from utils.poi.poi_dedup import dedup_poi_file
 from config import *
-from sources.utils.file.key_loader import load_key
-from sources.utils.poi.poi_filter import filter_poi_types
-from sources.utils import geocode
-from sources.utils.residential import get_residential_info
+from utils.file.key_loader import load_key
+from utils.poi.poi_filter import filter_poi_types
+from utils.residential import get_residential_info
 
 # 配置参数
 GAODE_KEY: str = load_key(KEY_FILE)
@@ -55,34 +51,29 @@ FILTER_CATEGORY: bool = True
 FILTER_SUBCATEGORY: bool = False
 FILTER_SMALLCATEGORY: bool = False
 
-
 def load_poi_types() -> (
     Tuple[List[str], Set[str], Dict[str, Dict[str, Union[str, float]]]]
 ):
     """
     加载POI分类体系并过滤POI类型
-
     从CSV文件中加载POI分类体系和权重信息, 使用poi_filter模块进行过滤。
     根据FILTER_LOW_WEIGHT_POI开关和POI_WEIGHT_THRESHOLD阈值，过滤掉低权重的POI类型。
     动态调整特定类别的权重，将汽车服务、汽车销售、汽车维修、摩托车服务、生活服务（除了邮局和物流速递）、住宿服务和餐饮服务的权重调低到0.3以下。
     先判断大类，大类如果权重低，就不再考虑其中的小类。
-
     处理流程：
     1. 使用poi_filter模块过滤POI类型
     2. 获取过滤后的POI类型列表和保留的大类集合
     3. 获取POI类型映射
-
     Returns:
-        tuple: (filtered_types, kept_categories, type_mapping)
-            filtered_types (list): 过滤后的POI类型代码列表，用于查询
-            kept_categories (set): 保留的大类集合
-            type_mapping (dict): POI类型编码到分类信息的映射字典
+    tuple: (filtered_types, kept_categories, type_mapping)
+    filtered_types (list): 过滤后的POI类型代码列表，用于查询
+    kept_categories (set): 保留的大类集合
+    type_mapping (dict): POI类型编码到分类信息的映射字典
     """
     # 使用poi_filter模块过滤POI类型
     filtered_types: List[str]
     kept_categories: Set[str]
     type_mapping: Dict[str, Dict[str, Union[str, float]]]
-
     # 根据FILTER_LOW_WEIGHT_POI设置是否进行筛选
     if FILTER_LOW_WEIGHT_POI:
         # 如果需要过滤低权重POI，则使用权重阈值
@@ -103,19 +94,15 @@ def load_poi_types() -> (
             filter_subcategory=False,
             filter_smallcategory=False,
         )
-
     return filtered_types, kept_categories, type_mapping
-
 
 def get_pois(
     lng: float, lat: float, poi_type: str, max_retries: int = 3
 ) -> List[Dict[str, Any]]:
     """
     获取指定类型的所有POI
-
     通过高德地图周边搜索API, 获取指定坐标点周围指定半径内某一类型的所有POI数据。
     支持分页获取, 确保获取所有符合条件的POI。
-
     处理流程：
     1. 构建API请求参数
     2. 循环获取每一页的POI数据
@@ -123,23 +110,19 @@ def get_pois(
     4. 将POI数据添加到结果列表
     5. 如果返回的POI数量少于请求的数量, 说明已经是最后一页, 退出循环
     6. 增加页码并短暂等待后继续获取下一页
-
     Args:
-        lng (float): 中心点经度
-        lat (float): 中心点纬度
-        poi_type (str): POI类型代码
-        max_retries (int): 最大重试次数，默认为3
-
+    lng (float): 中心点经度
+    lat (float): 中心点纬度
+    poi_type (str): POI类型代码
+    max_retries (int): 最大重试次数，默认为3
     Returns:
-        list[dict]: POI数据列表, 每个元素是一个包含POI信息的字典
-
+    list[dict]: POI数据列表, 每个元素是一个包含POI信息的字典
     Raises:
-        Exception: 当获取POI数据失败且超过最大重试次数时抛出异常
+    Exception: 当获取POI数据失败且超过最大重试次数时抛出异常
     """
     pois: List[Dict[str, Any]] = []
     page: int = 1
     retry_count: int = 0
-
     while True:
         try:
             url: str = "https://restapi.amap.com/v3/place/around"
@@ -153,64 +136,91 @@ def get_pois(
             }
             resp: requests.Response = requests.get(url, params=params, timeout=10)
             resp_json: Dict[str, Any] = resp.json()
-
             if resp_json.get("status") != "1":
                 raise Exception(f"API返回错误: {resp_json.get('info', '未知错误')}")
-
             page_pois: List[Dict[str, Any]] = resp_json.get("pois", [])
             pois.extend(page_pois)
             if len(page_pois) < 25:
                 break
-
             page += 1
             retry_count = 0  # 重置重试计数
             time.sleep(0.1)
-
         except Exception as e:
             retry_count += 1
             if retry_count >= max_retries:
                 raise Exception(f"获取POI数据失败 (类型: {poi_type}): {str(e)}")
-
             print(
                 f"获取POI数据失败 (类型: {poi_type}), 重试 {retry_count}/{max_retries}: {str(e)}"
             )
             time.sleep(2)  # 失败后等待更长时间
-
     return pois
 
+def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str, str]:
+    """
+    从CSV文件中获取住宅区的经纬度坐标
+    Args:
+        residential_id (str): 住宅区ID
+    Returns:
+        tuple: (lng, lat, name, address)
+        lng (float): 经度
+        lat (float): 纬度
+        name (str): 住宅区名称
+        address (str): 住宅区地址
+    """
+    # 尝试从各个行政区的住宅区文件中查找
+    districts = ['田家庵区', '大通区', '谢家集区', '八公山区', '潘集区', '凤台县', '寿县']
 
-def main(residential_id: str, name: str, address: str) -> None:
+    for district in districts:
+        csv_file = os.path.join(DATA_DIR, "residential", f"residential_{district}.csv")
+        if os.path.exists(csv_file):
+            try:
+                df = pd.read_csv(csv_file)
+                # 查找匹配的住宅区
+                match = df[df['id'] == residential_id]
+                if not match.empty:
+                    row = match.iloc[0]
+                    return float(row['lng']), float(row['lat']), row['name'], row.get('address', '')
+            except Exception as e:
+                print(f"读取住宅区文件 {csv_file} 失败: {str(e)}")
+
+    # 如果没有找到，尝试从residential_info函数获取
+    name, address = get_residential_info(residential_id)
+    if name is None or address is None:
+        raise ValueError(f"未找到住宅区ID: {residential_id}")
+
+    # 如果找到了名称和地址但没有经纬度，尝试通过地址解析获取经纬度
+    from sources.utils import geocode
+    lng, lat = geocode(address)
+    return lng, lat, name, address
+
+def main(residential_id: str, name: str = None, address: str = None) -> None:
     """
     主处理函数
-
     获取指定住宅区周边的所有POI数据, 并保存为CSV和JSON格式。
     按优先级抓取POI数据：优先抓取小类，其次中类，最后大类。
     支持断点续传，失败的类别会被删除。
-
     处理流程：
     1. 创建输出目录和临时目录
     2. 加载POI分类体系
-    3. 将住宅区地址转换为经纬度坐标
+    3. 从CSV文件中获取住宅区经纬度坐标
     4. 按优先级（小类->中类->大类）获取POI数据
     5. 格式化POI数据, 添加分类信息和权重
     6. 将结果保存为CSV和JSON格式文件
     7. 处理异常情况, 失败时删除可能不完整的文件
-
     Args:
-        residential_id (str): 住宅区ID
-        name (str): 住宅区名称
-        address (str): 住宅区地址
-
+    residential_id (str): 住宅区ID
+    name (str): 住宅区名称 (可选)
+    address (str): 住宅区地址 (可选)
     Returns:
-        None: 结果直接保存到文件
+    None: 结果直接保存到文件
     """
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    # 确保输出目录存在
+    poi_dir = os.path.join(OUTPUT_DIR, "poi")
+    os.makedirs(poi_dir, exist_ok=True)
     # 创建临时目录用于存储每个类别的POI数据
-    temp_dir: str = os.path.join(OUTPUT_DIR, f"temp_{residential_id}")
+    temp_dir: str = os.path.join(poi_dir, f"temp_{residential_id}")
     os.makedirs(temp_dir, exist_ok=True)
-
-    output_file: str = os.path.join(OUTPUT_DIR, f"poi_{residential_id}.csv")
-
+    output_file: str = os.path.join(poi_dir, f"poi_{residential_id}.csv")
     try:
         # 加载POI分类体系并过滤POI类型
         filtered_types: List[str]
@@ -218,9 +228,18 @@ def main(residential_id: str, name: str, address: str) -> None:
         type_mapping: Dict[str, Dict[str, Union[str, float]]]
         filtered_types, kept_categories, type_mapping = load_poi_types()
 
+        # 从CSV文件中获取住宅区经纬度坐标
         lng: float
         lat: float
-        lng, lat = geocode(address)
+        if name and address:
+            # 如果提供了名称和地址，尝试通过地址解析获取经纬度
+            from sources.utils import geocode
+            lng, lat = geocode(address)
+        else:
+            # 否则从CSV文件中直接读取经纬度
+            lng, lat, name, address = get_residential_coordinates(residential_id)
+
+        print(f"找到住宅区: {name}, 经度: {lng}, 纬度: {lat}")
 
         # 按优先级分类POI类型：小类 -> 中类 -> 大类
         smallcategory_types = []
@@ -250,7 +269,13 @@ def main(residential_id: str, name: str, address: str) -> None:
                     subcategory_to_smallcategories[subcategory] = set()
                 subcategory_to_smallcategories[subcategory].add(smallcategory)
 
-            # 分类POI类型
+        # 分类POI类型
+        for type_code in filtered_types:
+            type_info = type_mapping.get(type_code, {})
+            category = type_info.get("大类", "")
+            subcategory = type_info.get("中类", "")
+            smallcategory = type_info.get("小类", "")
+
             if smallcategory:
                 smallcategory_types.append(type_code)
             elif subcategory:
@@ -343,7 +368,6 @@ def main(residential_id: str, name: str, address: str) -> None:
 
         # 进度条显示
         pbar: tqdm = tqdm(all_types, desc=f"获取POI: {name[:15]}")
-
         for type_code in pbar:
             type_info: Dict[str, Union[str, float]] = type_mapping.get(type_code, {})
             type_name = (
@@ -388,7 +412,6 @@ def main(residential_id: str, name: str, address: str) -> None:
                 else:
                     # 不创建空文件，只记录成功处理
                     success_count += 1
-
             except Exception as e:
                 print(f"\n处理POI类型 {type_code} ({type_name}) 失败: {str(e)}")
                 # 删除可能存在的临时文件
@@ -410,7 +433,6 @@ def main(residential_id: str, name: str, address: str) -> None:
 
         # 清理临时目录
         import shutil
-
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
 
@@ -429,25 +451,21 @@ def main(residential_id: str, name: str, address: str) -> None:
                 print(f"POI数据去重失败: {str(e)}")
 
             # 同时保存JSON格式以便后续处理
-            json_file: str = os.path.join(OUTPUT_DIR, f"poi_{residential_id}.json")
+            json_file: str = os.path.join(poi_dir, f"poi_{residential_id}.json")
             with open(json_file, "w", encoding="utf-8") as f:
                 json.dump(records, f, ensure_ascii=False, indent=2)
             print(f"同时生成JSON格式: {json_file}")
-
         else:
             print(f"⚠️ 未找到POI数据: {name}")
-
     except Exception as e:
         print(f"处理失败[{residential_id}]: {str(e)}")
         # 清理临时目录
         import shutil
-
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
         # 删除可能不完整的输出文件
         if os.path.exists(output_file):
             os.remove(output_file)
-
 
 def parse_args():
     """解析命令行参数"""
@@ -455,13 +473,12 @@ def parse_args():
         description="获取单个住宅区15分钟生活圈全量POI数据",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""示例:
-  python get_single_residential_poi.py B0J2DUYF0J
-  python get_single_residential_poi.py B0J2DUYF0J 淮南职业技术学院 洞山西路2号
-  python get_single_residential_poi.py B0J2DUYF0J --no-filter
-  python get_single_residential_poi.py B0J2DUYF0J --filter-level=subcategory
-  python get_single_residential_poi.py B0J2DUYF0J --threshold=0.5""",
+python get_single_residential_poi_fixed.py B0J2DUYF0J
+python get_single_residential_poi_fixed.py B0J2DUYF0J 淮南职业技术学院 洞山西路2号
+python get_single_residential_poi_fixed.py B0J2DUYF0J --no-filter
+python get_single_residential_poi_fixed.py B0J2DUYF0J --filter-level=subcategory
+python get_single_residential_poi_fixed.py B0J2DUYF0J --threshold=0.5""",
     )
-
     parser.add_argument("residential_id", help="住宅区ID")
     parser.add_argument("name", nargs="?", help="住宅区名称 (可选)")
     parser.add_argument("address", nargs="?", help="住宅区地址 (可选)")
@@ -480,9 +497,7 @@ def parse_args():
         default=0.4,
         help="设置权重阈值，0.0-1.0之间的浮点数 (默认: 0.4)",
     )
-
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     # 解析命令行参数
@@ -509,15 +524,8 @@ if __name__ == "__main__":
 
     # 获取住宅区信息
     residential_id = args.residential_id
-    if args.name and args.address:
-        # 命令行提供了名称和地址
-        name, address = args.name, args.address
-    else:
-        # 只提供ID的情况，从数据文件中查找名称和地址
-        name, address = get_residential_info(residential_id)
-        if name is None or address is None:
-            sys.exit(1)
-        print(f"找到住宅区: {name}, 地址: {address}")
+    name = args.name
+    address = args.address
 
     # 调用主函数
     main(residential_id, name, address)

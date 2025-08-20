@@ -1,8 +1,10 @@
 """
 住宅区15分钟生活圈加权得分计算模块
 
-该模块负责计算住宅区15分钟生活圈的加权得分，基于POI数据和权重配置文件，
-提供大类、中类和小类的详细统计分析。支持CSV和JSON格式的POI数据输入，
+该模块负责计算住宅区15分钟生活圈的加权得分，
+基于POI数据和权重配置文件，
+提供大类、中类和小类的详细统计分析。
+支持CSV和JSON格式的POI数据输入，
 并生成详细的统计报告和Markdown格式的评估报告。
 
 功能：
@@ -33,14 +35,14 @@ from typing import Dict, List, Any, Optional, Tuple
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import *
 from sources.utils.file.weight_loader import load_weight_config
-from sources.utils.poi.poi_analyzer import generate_summary_report
+from sources.utils.poi.poi_analysis import generate_summary_report
 from sources.utils.file.file_handler import save_category_stats
 from calculate_single_score import main as score_single_main
 
 
 def process_single_residential(
     file_path: str, residential_id: str
-) -> Tuple[float, int]:
+) -> Dict[str, Any]:
     """
     处理单个住宅区的POI数据
 
@@ -71,6 +73,18 @@ def process_single_residential(
             summary: Dict[str, Any] = json.load(f)
         return summary
     else:
+        # 检查是否有错误文件
+        error_file: str = os.path.join(stats_dir, "error.json")
+        if os.path.exists(error_file):
+            with open(error_file, "r", encoding="utf-8") as f:
+                error_data: Dict[str, Any] = json.load(f)
+            return {
+                "residential_id": residential_id,
+                "total_score": 0,
+                "poi_count": 0,
+                "stats_dir": stats_dir,
+                "error": error_data.get("error", "未知错误")
+            }
         return {
             "residential_id": residential_id,
             "total_score": 0,
