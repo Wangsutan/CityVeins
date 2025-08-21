@@ -26,9 +26,8 @@ import sys
 import os
 from typing import Dict, Any, List, Optional, Union, Final, Callable
 
+
 # 获取项目根目录
-# 当前文件路径: /home/wst/Desktop/CityVeins/sources/utils/poi/get_district_boundary.py
-# 需要获取: /home/wst/Desktop/CityVeins/
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
@@ -126,7 +125,12 @@ def get_district_boundary(
                 for point in part.split(";"):
                     lng: float
                     lat: float
-                    lng, lat = map(float, point.split(","))
+                    point_parts = point.split(",")
+                    if len(point_parts) >= 2:
+                        lng, lat = float(point_parts[0]), float(point_parts[1])
+                    else:
+                        print(f"警告：位置格式不正确: {point}")
+                        continue
                     coords.append((lng, lat))
                 if coords:  # 确保不是空列表
                     coordinates.append(coords)

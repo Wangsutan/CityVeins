@@ -8,14 +8,14 @@ import time
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Set, Final, Union
 
 
 def make_session(
     total_retries: int = 5,
     backoff_factor: float = 1,
-    status_forcelist: Optional[list] = None,
-    allowed_methods: Optional[set] = None,
+    status_forcelist: Optional[List[int]] = None,
+    allowed_methods: Optional[Set[str]] = None,
     raise_on_status: bool = False,
 ) -> requests.Session:
     """
@@ -36,24 +36,24 @@ def make_session(
         requests.Session: 配置好重试策略的会话对象
     """
     if status_forcelist is None:
-        status_forcelist = [500, 502, 503, 504]
+        status_forcelist: List[int] = [500, 502, 503, 504]
 
     if allowed_methods is None:
-        allowed_methods = {"GET"}
+        allowed_methods: Set[str] = {"GET"}
 
-    retry = Retry(
+    retry: Retry = Retry(
         total=total_retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
         allowed_methods=allowed_methods,
         raise_on_status=raise_on_status,
     )
-    adapter = HTTPAdapter(max_retries=retry)
-    s = requests.Session()
+    adapter: HTTPAdapter = HTTPAdapter(max_retries=retry)
+    s: requests.Session = requests.Session()
     s.mount("https://", adapter)
     s.mount("http://", adapter)
     # 全局限速标记
-    s.last_req = 0.0
+    s.last_req: float = 0.0
     return s
 
 
@@ -65,7 +65,7 @@ class RateLimitedSession:
     至少间隔指定的时间，避免API请求频率过高导致被限流。
     """
 
-    def __init__(self, min_interval: float = 0.2, **session_kwargs):
+    def __init__(self, min_interval: float = 0.2, **session_kwargs: Any) -> None:
         """
         初始化限速会话
 
@@ -73,10 +73,10 @@ class RateLimitedSession:
             min_interval (float): 两次请求之间的最小间隔时间（秒），默认为0.2秒
             **session_kwargs: 传递给make_session的参数
         """
-        self.session = make_session(**session_kwargs)
-        self.min_interval = min_interval
+        self.session: requests.Session = make_session(**session_kwargs)
+        self.min_interval: float = min_interval
 
-    def get(self, url: str, **kwargs) -> requests.Response:
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
         """
         带限速的GET请求
 
@@ -89,7 +89,7 @@ class RateLimitedSession:
         Returns:
             requests.Response: HTTP响应对象
         """
-        elapsed = time.time() - self.session.last_req
+        elapsed: float = time.time() - self.session.last_req
         if elapsed < self.min_interval:
             time.sleep(self.min_interval - elapsed)
 
@@ -97,11 +97,11 @@ class RateLimitedSession:
         if "timeout" not in kwargs:
             kwargs["timeout"] = 15
 
-        resp = self.session.get(url, **kwargs)
+        resp: requests.Response = self.session.get(url, **kwargs)
         self.session.last_req = time.time()
         return resp
 
-    def post(self, url: str, **kwargs) -> requests.Response:
+    def post(self, url: str, **kwargs: Any) -> requests.Response:
         """
         带限速的POST请求
 
@@ -114,7 +114,7 @@ class RateLimitedSession:
         Returns:
             requests.Response: HTTP响应对象
         """
-        elapsed = time.time() - self.session.last_req
+        elapsed: float = time.time() - self.session.last_req
         if elapsed < self.min_interval:
             time.sleep(self.min_interval - elapsed)
 
@@ -122,6 +122,6 @@ class RateLimitedSession:
         if "timeout" not in kwargs:
             kwargs["timeout"] = 15
 
-        resp = self.session.post(url, **kwargs)
+        resp: requests.Response = self.session.post(url, **kwargs)
         self.session.last_req = time.time()
         return resp

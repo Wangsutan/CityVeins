@@ -114,7 +114,6 @@ dmypy.json
 *.pfx
 secrets/
 keys/
-config.py
 credentials.json
 api_keys.txt
 .env
@@ -123,18 +122,19 @@ api_keys.txt
 
 # 生成的数据
 output/
-*.csv
-*.json
-*.xlsx
-*.xls
-*.html
-*.pdf
-data/
 logs/
 temp/
 tmp/
 *.tmp
 *.temp
+
+# 排除特定数据目录，但保留重要配置文件
+data/residential/
+data/key/
+# 保留以下配置文件
+!data/poi_code/
+!data/poi_weights/
+!data/adcode/
 
 # IDE
 .vscode/

@@ -6,13 +6,13 @@
 import sys
 import os
 import pandas as pd
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Optional, Final
 
 # 添加项目根目录到Python路径
-project_root = os.path.dirname(
+PROJECT_ROOT: Final[str] = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-sys.path.insert(0, project_root)
+sys.path.insert(0, PROJECT_ROOT)
 
 try:
     from config import (
@@ -25,13 +25,13 @@ try:
     )
 except ImportError:
     # 如果无法导入config，使用默认路径
-    DATA_DIR = os.path.join(project_root, "data")
-    WEIGHT_FILE = os.path.join(DATA_DIR, "poi_weights", "高德POI_加权.csv")
+    DATA_DIR: Final[str] = os.path.join(PROJECT_ROOT, "data")
+    WEIGHT_FILE: Final[str] = os.path.join(DATA_DIR, "poi_weights", "高德POI_加权.csv")
 
 
 def load_weight_config(
     weight_file: str = WEIGHT_FILE,
-) -> Dict[str, Union[Dict[str, Union[str, float]], float]]:
+) -> Optional[Dict[str, Union[Dict[str, Union[str, float]], float]]]:
     """
     加载权重配置
 
@@ -40,21 +40,21 @@ def load_weight_config(
     处理流程：
     1. 读取权重配置CSV文件
     2. 遍历每一行，提取POI类型和权重值
-    3. 优先使用客制化权重，如果客制化权重为空或不存在，则使用权重评分
+    3. 优先使用客制化权重，如果客制化权重为空或不存在，则使用权重
     4. 构建POI类型到权重的映射字典
 
     Args:
         weight_file (str): 权重配置文件路径，CSV格式
 
     Returns:
-        dict: POI类型到权重的映射字典，键为POI类型，值为对应的权重值
+        Optional[dict]: POI类型到权重的映射字典，键为POI类型，值为对应的权重值，如果加载失败则返回None
     """
     df: pd.DataFrame = pd.read_csv(weight_file)
     weight_map: Dict[str, Union[Dict[str, Union[str, float]], float]] = {}
 
     for _, row in df.iterrows():
         poi_type: str = str(row["NEW_TYPE"])
-        # 优先使用客制化权重，如果没有则使用权重评分
+        # 优先使用客制化权重，如果没有则使用权重
         custom_weight: Union[float, None] = row.get("客制化权重", None)
         default_weight: float = float(row["权重"])
         weight: float = custom_weight if pd.notna(custom_weight) else default_weight

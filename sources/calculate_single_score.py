@@ -19,8 +19,12 @@
 - config: 项目配置文件
 
 使用示例:
-python calculate_single_score.py poi_xxxxx.csv
-输出: stats_poi_xxxxx/score_xxxxx.csv + 各类统计文件
+    python calculate_single_score.py poi_xxxxx.csv
+    输出: stats_poi_xxxxx/score_xxxxx.csv + 各类统计文件
+
+作者: CityVeins团队
+版本: 1.0
+日期: 2023-08-21
 """
 
 import os
@@ -28,7 +32,7 @@ import sys
 import pandas as pd
 import argparse
 import json
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Union
 
 # 把项目根目录加入 sys.path，确保能导入所需模块
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -44,6 +48,9 @@ COL_MAP: Dict[str, str] = {
     "POI中类": "POI中类",
     "POI小类": "POI小类",
 }
+
+# ---------- 类型别名定义 ----------
+StatsDict = Dict[str, Union[str, int, float, List[Any]]]
 
 
 def main(poi_path: str, stats_dir: Optional[str] = None) -> None:
@@ -61,11 +68,16 @@ def main(poi_path: str, stats_dir: Optional[str] = None) -> None:
     6. 生成汇总JSON文件
 
     Args:
-        poi_path (str): POI文件路径
+        poi_path (str): POI文件路径，支持CSV和JSON格式
         stats_dir (str, optional): 统计目录路径，如果为None则自动创建
 
     Returns:
         None: 结果直接保存到文件
+
+    Raises:
+        FileNotFoundError: 当POI文件不存在时
+        ValueError: 当POI文件格式不正确时
+        Exception: 处理过程中的其他错误
     """
     # 检查POI文件是否存在
     if not os.path.exists(poi_path):
@@ -74,11 +86,12 @@ def main(poi_path: str, stats_dir: Optional[str] = None) -> None:
 
     # 从文件路径提取住宅区ID
     base_name: str = os.path.basename(poi_path)
+    residential_id: str
     if base_name.startswith("poi_") and base_name.endswith(".csv"):
-        residential_id: str = base_name[4:-4]
+        residential_id = base_name[4:-4]
     else:
         # 如果文件名不符合预期格式，使用整个文件名（不含扩展名）作为ID
-        residential_id: str = os.path.splitext(base_name)[0]
+        residential_id = os.path.splitext(base_name)[0]
 
     # 创建统计目录
     if stats_dir is None:
@@ -104,18 +117,18 @@ def main(poi_path: str, stats_dir: Optional[str] = None) -> None:
         )
 
         # 从category_stats中提取大类、中类和小类的统计信息
-        big_category = category_stats[category_stats["类型"] == "大类"]
-        mid_category = category_stats[category_stats["类型"] == "中类"]
-        small_category = category_stats[category_stats["类型"] == "小类"]
+        big_category: pd.DataFrame = category_stats[category_stats["类型"] == "大类"]
+        mid_category: pd.DataFrame = category_stats[category_stats["类型"] == "中类"]
+        small_category: pd.DataFrame = category_stats[category_stats["类型"] == "小类"]
 
         # 保存得分结果
         score_file: str = os.path.join(stats_dir, f"score_{residential_id}.csv")
-        score_data: Dict[str, List[Any]] = {
+        score_data: StatsDict = {
             "住宅区ID": [residential_id],
             "加权总分": [total_score],
             "POI总数": [poi_count],
         }
-        pd.DataFrame(score_data).to_csv(score_file, index=False, encoding="utf-8-sig")
+        pd.DataFrame(score_data).to_csv(score_file, index=False, encoding="utf-8")
         print(f"得分结果已保存: {score_file}")
 
         # 保存分类统计
@@ -161,10 +174,12 @@ def main(poi_path: str, stats_dir: Optional[str] = None) -> None:
 
 if __name__ == "__main__":
     # 创建命令行参数解析器
-    parser = argparse.ArgumentParser(description="计算单个住宅区15分钟生活圈得分")
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="计算单个住宅区15分钟生活圈得分"
+    )
     parser.add_argument("poi_path", help="POI文件路径")
     parser.add_argument("--stats-dir", help="统计目录路径")
-    args = parser.parse_args()
+    args: argparse.Namespace = parser.parse_args()
 
     # 调用主函数
     main(args.poi_path, args.stats_dir)

@@ -8,13 +8,13 @@ import time
 import sys, os
 import argparse
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Final, Callable, Union
 
 # 获取项目根目录
-project_root = os.path.dirname(
+PROJECT_ROOT: Final[str] = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-sys.path.insert(0, project_root)
+sys.path.insert(0, PROJECT_ROOT)
 
 # 尝试导入config
 try:
@@ -30,25 +30,29 @@ try:
     )
 except ImportError:
     # 如果导入失败，手动设置配置变量
-    ROOT_DIR = project_root
-    DATA_DIR = os.path.join(ROOT_DIR, "data")
-    OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
-    KEY_FILE = os.path.join(ROOT_DIR, "data", "key", "key.txt")
-    WEIGHT_FILE = os.path.join(ROOT_DIR, "data", "poi_weights", "高德POI_加权.csv")
-    POI_CODE_FILE = os.path.join(
+    ROOT_DIR: Final[str] = PROJECT_ROOT
+    DATA_DIR: Final[str] = os.path.join(ROOT_DIR, "data")
+    OUTPUT_DIR: Final[str] = os.path.join(ROOT_DIR, "output")
+    KEY_FILE: Final[str] = os.path.join(ROOT_DIR, "data", "key", "key.txt")
+    WEIGHT_FILE: Final[str] = os.path.join(
+        ROOT_DIR, "data", "poi_weights", "高德POI_加权.csv"
+    )
+    POI_CODE_FILE: Final[str] = os.path.join(
         ROOT_DIR, "data", "poi_code", "高德POI分类与编码（中英文）_V1.06_20230208.csv"
     )
-    RESIDENTIAL_OUT = lambda d: os.path.join(
+    RESIDENTIAL_OUT: Callable[[str], str] = lambda d: os.path.join(
         ROOT_DIR, "data", "residential", f"residential_{d}.csv"
     )
-    POI_OUT = lambda rid: os.path.join(ROOT_DIR, "output", "poi", f"poi_{rid}.csv")
+    POI_OUT: Callable[[str], str] = lambda rid: os.path.join(
+        ROOT_DIR, "output", "poi", f"poi_{rid}.csv"
+    )
 
 # 尝试导入key_loader
 try:
     from ..file.key_loader import load_key
 except (ImportError, ValueError):
     # 如果相对导入失败，尝试直接导入key_loader模块
-    key_loader_path = os.path.join(project_root, "sources", "utils", "file")
+    key_loader_path: str = os.path.join(PROJECT_ROOT, "sources", "utils", "file")
     if key_loader_path not in sys.path:
         sys.path.append(key_loader_path)
     try:
@@ -70,7 +74,7 @@ except (ImportError, ValueError):
             return key
 
 
-GAODE_KEY = load_key(KEY_FILE)
+GAODE_KEY: str = load_key(KEY_FILE)
 
 
 def get_pois(
@@ -93,13 +97,13 @@ def get_pois(
         }
 
         try:
-            response = requests.get(url, params=params, timeout=10)
+            response: requests.Response = requests.get(url, params=params, timeout=10)
             resp: Dict[str, Any] = response.json()
 
             # 检查API响应状态
             if resp.get("status") != "1":
-                error_info = resp.get("info", "未知错误")
-                error_code = resp.get("infocode", "无错误代码")
+                error_info: str = resp.get("info", "未知错误")
+                error_code: str = resp.get("infocode", "无错误代码")
 
                 # 检查特定错误代码
                 if error_code == "10001":  # 无效的KEY
@@ -125,7 +129,7 @@ def get_pois(
                     break
 
             # 成功获取数据
-            current_pois = resp.get("pois", [])
+            current_pois: List[Dict[str, Any]] = resp.get("pois", [])
             if not current_pois:
                 print(f"提示: 第 {page} 页没有返回POI数据")
                 break
@@ -159,7 +163,9 @@ def get_pois(
 
 if __name__ == "__main__":
     # 设置命令行参数解析
-    parser = argparse.ArgumentParser(description="POI数据获取工具")
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="POI数据获取工具"
+    )
     parser.add_argument("lng", type=float, help="中心点经度")
     parser.add_argument("lat", type=float, help="中心点纬度")
     parser.add_argument("poi_type", help="POI类型代码")
@@ -169,7 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", help="输出文件路径(可选)")
     parser.add_argument("--json", action="store_true", help="以JSON格式输出结果")
 
-    args = parser.parse_args()
+    args: argparse.Namespace = parser.parse_args()
 
     try:
         # 获取POI数据
@@ -177,7 +183,9 @@ if __name__ == "__main__":
         print(f"POI类型: {args.poi_type}")
         print(f"搜索半径: {args.radius}米")
 
-        pois = get_pois(args.lng, args.lat, args.poi_type, args.radius)
+        pois: List[Dict[str, Any]] = get_pois(
+            args.lng, args.lat, args.poi_type, args.radius
+        )
 
         print(f"找到 {len(pois)} 个POI")
 
@@ -197,13 +205,18 @@ if __name__ == "__main__":
                     # 简单的CSV格式输出
                     f.write("名称,类型,地址,经度,纬度,距离")
                     for poi in pois:
-                        name = poi.get("name", "").replace(",", "，")
-                        poi_type = poi.get("type", "").replace(",", "，")
-                        address = poi.get("address", "").replace(",", "，")
-                        location = poi.get("location", ",").split(",")
-                        lng_poi = location[0] if len(location) > 0 else ""
-                        lat_poi = location[1] if len(location) > 1 else ""
-                        distance = poi.get("distance", "")
+                        name: str = poi.get("name", "").replace(",", "，")
+                        poi_type: str = poi.get("type", "").replace(",", "，")
+                        address: str = poi.get("address", "").replace(",", "，")
+                        location: str = poi.get("location", ",")
+                        location_parts: List[str] = location.split(",")
+                        lng_poi: str = (
+                            location_parts[0] if len(location_parts) > 0 else ""
+                        )
+                        lat_poi: str = (
+                            location_parts[1] if len(location_parts) > 1 else ""
+                        )
+                        distance: str = poi.get("distance", "")
                         f.write(
                             f"{name},{poi_type},{address},{lng_poi},{lat_poi},{distance}"
                         )
@@ -218,10 +231,10 @@ if __name__ == "__main__":
             print(f"{'序号':<4}{'名称':<20}{'类型':<15}{'地址':<25}{'距离(米)':<10}")
             print("-" * 80)
             for i, poi in enumerate(pois[:10]):
-                name = poi.get("name", "")[:19]  # 限制名称长度
-                poi_type = poi.get("type", "")[:14]  # 限制类型长度
-                address = poi.get("address", "")[:24]  # 限制地址长度
-                distance = poi.get("distance", "")
+                name: str = poi.get("name", "")[:19]  # 限制名称长度
+                poi_type: str = poi.get("type", "")[:14]  # 限制类型长度
+                address: str = poi.get("address", "")[:24]  # 限制地址长度
+                distance: str = poi.get("distance", "")
                 print(f"{i+1:<4}{name:<20}{poi_type:<15}{address:<25}{distance:<10}")
 
             if len(pois) > 10:

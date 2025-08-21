@@ -60,7 +60,6 @@ def load_poi_types() -> (
     加载POI分类体系并过滤POI类型
     从CSV文件中加载POI分类体系和权重信息, 使用poi_filter模块进行过滤。
     根据FILTER_LOW_WEIGHT_POI开关和POI_WEIGHT_THRESHOLD阈值，过滤掉低权重的POI类型。
-    动态调整特定类别的权重，将汽车服务、汽车销售、汽车维修、摩托车服务、生活服务（除了邮局和物流速递）、住宿服务和餐饮服务的权重调低到0.3以下。
     先判断大类，大类如果权重低，就不再考虑其中的小类。
     处理流程：
     1. 使用poi_filter模块过滤POI类型
@@ -161,7 +160,8 @@ def get_pois(
 
 def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str, str]:
     """
-    从CSV文件中获取住宅区的经纬度坐标
+    获取住宅区的经纬度坐标
+    尝试从多个来源获取住宅区信息，优先从CSV文件读取，如果没有则尝试从API获取
     Args:
         residential_id (str): 住宅区ID
     Returns:
@@ -182,6 +182,12 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
         "寿县",
     ]
 
+    # 确保residential目录存在
+    residential_dir = os.path.join(DATA_DIR, "residential")
+    if not os.path.exists(residential_dir):
+        os.makedirs(residential_dir, exist_ok=True)
+        print(f"创建住宅区数据目录: {residential_dir}")
+
     for district in districts:
         csv_file = os.path.join(DATA_DIR, "residential", f"residential_{district}.csv")
         if os.path.exists(csv_file):
@@ -201,15 +207,60 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
                 print(f"读取住宅区文件 {csv_file} 失败: {str(e)}")
 
     # 如果没有找到，尝试从residential_info函数获取
-    name, address = get_residential_info(residential_id)
-    if name is None or address is None:
-        raise ValueError(f"未找到住宅区ID: {residential_id}")
+    try:
+        name, address = get_residential_info(residential_id)
+        if name is None or address is None:
+            raise ValueError("无法获取住宅区信息")
+    except Exception as e:
+        print(f"获取住宅区信息失败: {str(e)}")
+        # 如果通过residential_info也无法获取，尝试使用高德API直接搜索
+        print(
+            f"无法通过常规方式获取住宅区信息，尝试通过高德API直接搜索ID: {residential_id}"
+        )
+        try:
+            # 使用高德POI详情API获取住宅区信息
+            url = "https://restapi.amap.com/v3/place/detail"
+            params = {"key": GAODE_KEY, "id": residential_id}
+            response = requests.get(url, params=params, timeout=10)
+            result = response.json()
+
+            if (
+                result.get("status") == "1"
+                and "pois" in result
+                and len(result["pois"]) > 0
+            ):
+                poi_data = result["pois"][0]
+                name = poi_data.get("name", "")
+                address = poi_data.get("address", "")
+                location = poi_data.get("location", "")
+
+                if location:
+                    location_parts = location.split(",")
+                    if len(location_parts) >= 2:
+                        lng, lat = float(location_parts[0]), float(location_parts[1])
+                    else:
+                        print(f"警告：位置格式不正确: {location}")
+                        raise ValueError(f"位置格式不正确: {location}")
+                    print(
+                        f"通过高德API成功获取住宅区信息: {name}, {address}, {lng}, {lat}"
+                    )
+                    return lng, lat, name, address
+            else:
+                raise ValueError(f"高德API未找到住宅区ID: {residential_id}")
+        except Exception as e:
+            print(f"通过高德API获取住宅区信息失败: {str(e)}")
+            raise ValueError(f"无法获取住宅区ID: {residential_id} 的信息")
 
     # 如果找到了名称和地址但没有经纬度，尝试通过地址解析获取经纬度
-    from sources.utils import geocode
+    try:
+        from sources.utils import geocode
 
-    lng, lat = geocode(address)
-    return lng, lat, name, address
+        lng, lat = geocode(address)
+        print(f"通过地址解析成功获取经纬度: {lng}, {lat}")
+        return lng, lat, name, address
+    except Exception as e:
+        print(f"地址解析失败: {str(e)}")
+        raise ValueError(f"无法获取住宅区ID: {residential_id} 的经纬度信息")
 
 
 def main(residential_id: str, name: str = None, address: str = None) -> None:
@@ -221,7 +272,7 @@ def main(residential_id: str, name: str = None, address: str = None) -> None:
     处理流程：
     1. 创建输出目录和临时目录
     2. 加载POI分类体系
-    3. 从CSV文件中获取住宅区经纬度坐标
+    3. 获取住宅区经纬度坐标（从CSV文件或API获取）
     4. 按优先级（小类->中类->大类）获取POI数据
     5. 格式化POI数据, 添加分类信息和权重
     6. 将结果保存为CSV和JSON格式文件
@@ -247,17 +298,35 @@ def main(residential_id: str, name: str = None, address: str = None) -> None:
         type_mapping: Dict[str, Dict[str, Union[str, float]]]
         filtered_types, kept_categories, type_mapping = load_poi_types()
 
-        # 从CSV文件中获取住宅区经纬度坐标
+        # 获取住宅区经纬度坐标
         lng: float
         lat: float
         if name and address:
             # 如果提供了名称和地址，尝试通过地址解析获取经纬度
-            from sources.utils import geocode
+            try:
+                from sources.utils import geocode
 
-            lng, lat = geocode(address)
+                lng, lat = geocode(address)
+                print(f"通过提供的地址解析获取经纬度: {lng}, {lat}")
+            except Exception as e:
+                print(f"地址解析失败: {str(e)}，尝试通过住宅区ID获取坐标")
+                # 如果地址解析失败，尝试通过住宅区ID获取坐标
+                coords_result = get_residential_coordinates(residential_id)
+                if coords_result is not None:
+                    lng, lat, name, address = coords_result
+                else:
+                    raise ValueError("无法获取住宅区坐标")
         else:
-            # 否则从CSV文件中直接读取经纬度
-            lng, lat, name, address = get_residential_coordinates(residential_id)
+            # 否则尝试从CSV文件或API获取经纬度
+            try:
+                coords_result = get_residential_coordinates(residential_id)
+                if coords_result is not None:
+                    lng, lat, name, address = coords_result
+                else:
+                    raise ValueError("无法获取住宅区坐标")
+            except ValueError as e:
+                print(f"获取住宅区坐标失败: {str(e)}")
+                raise
 
         print(f"找到住宅区: {name}, 经度: {lng}, 纬度: {lat}")
 

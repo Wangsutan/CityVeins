@@ -23,14 +23,18 @@
 - tqdm: 进度条显示
 
 使用示例:
-python calculate_batch_scores.py output/poi data/poi_weights/高德POI_客制化权重.csv output/stats/住宅区得分汇总.csv
+    python calculate_batch_scores.py output/poi data/poi_weights/高德POI_客制化权重.csv output/stats/住宅区得分汇总.csv
+
+作者: CityVeins团队
+版本: 1.0
+日期: 2023-08-21
 """
 
 import os
 import sys
+import json
 from tqdm import tqdm
-import sys, os
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Union
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import *
@@ -47,11 +51,19 @@ def process_single_residential(file_path: str, residential_id: str) -> Dict[str,
     调用calculate_single_score模块处理单个住宅区的POI数据，并返回处理结果。
 
     Args:
-        file_path (str): POI文件路径
-        residential_id (str): 住宅区ID
+        file_path (str): POI文件路径，支持CSV和JSON格式
+        residential_id (str): 住宅区ID，用于标识特定的住宅区
 
     Returns:
-        dict: 包含处理结果的字典，包括得分、POI数量和统计目录等信息
+        Dict[str, Any]: 包含处理结果的字典，包括以下键：
+            - residential_id (str): 住宅区ID
+            - total_score (float): 加权总分
+            - poi_count (int): POI数量
+            - stats_dir (str): 统计目录路径
+            - error (str, optional): 错误信息，仅在处理失败时存在
+
+    Raises:
+        Exception: 处理过程中的其他错误
     """
     # 创建统计目录
     stats_dir: str = os.path.join(
@@ -65,8 +77,6 @@ def process_single_residential(file_path: str, residential_id: str) -> Dict[str,
     # 读取生成的统计文件
     summary_file: str = os.path.join(stats_dir, "summary.json")
     if os.path.exists(summary_file):
-        import json
-
         with open(summary_file, "r", encoding="utf-8") as f:
             summary: Dict[str, Any] = json.load(f)
         return summary
@@ -105,6 +115,14 @@ def main(
         weight_file (str, optional): 权重配置文件路径，默认为WEIGHT_FILE
         output_file (str, optional): 输出文件路径，默认为OUTPUT_DIR/住宅区得分汇总.csv
         residential_ids (list, optional): 指定要处理的住宅区ID列表，如果为None则处理所有住宅区
+
+    Returns:
+        None: 结果直接保存到文件
+
+    Raises:
+        FileNotFoundError: 当POI目录不存在时
+        ValueError: 当权重配置文件格式不正确时
+        Exception: 处理过程中的其他错误
     """
     # 设置默认参数
     if poi_dir is None:
@@ -120,7 +138,7 @@ def main(
     print(f"已加载 {len(weight_map)} 种POI类型的权重配置")
 
     # 获取POI文件列表
-    poi_files: List[str] = []
+    poi_files: List[Tuple[str, str]] = []
     if residential_ids:
         # 如果指定了住宅区ID列表，只处理这些ID对应的文件
         for residential_id in residential_ids:
@@ -144,8 +162,6 @@ def main(
 
     # 处理每个住宅区的POI数据
     all_results: List[Dict[str, Any]] = []
-    file_path: str
-    residential_id: str
     for file_path, residential_id in tqdm(poi_files, desc="计算得分"):
         try:
             result: Dict[str, Any] = process_single_residential(

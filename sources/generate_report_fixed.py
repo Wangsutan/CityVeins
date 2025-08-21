@@ -50,8 +50,13 @@ def markdown_to_html(markdown_file: str, output_file: str = None) -> bool:
 
     try:
         # 使用pandoc转换Markdown到HTML
-        # 从文件名提取标题
-        title = os.path.splitext(os.path.basename(output_file))[0]
+        # 从文件名提取标题，并去掉可能包含的ID
+        filename = os.path.basename(output_file)
+        title = os.path.splitext(filename)[0]
+
+        # 如果标题中包含下划线，可能是"社区名_评估报告"格式，去掉后面的"_评估报告"
+        if "_" in title:
+            title = title.split("_")[0]
         # 使用pandoc转换Markdown到HTML，添加标题参数
         cmd = [
             "pandoc",
@@ -157,7 +162,7 @@ def generate_markdown_report(
     # 使用社区名称或住宅区ID作为标题
     display_name = community_name if community_name else residential_id
     # 生成Markdown报告
-    report = f"""# {display_name} 15分钟生活圈评估报告
+    report = f"""# {display_name} 15 分钟生活圈评估报告
 
 ## 评估概况
 
@@ -236,7 +241,7 @@ def generate_markdown_report(
     return report
 
 
-def main():
+def main() -> None:
     """主函数"""
     parser = argparse.ArgumentParser(description="生成住宅区15分钟生活圈评估报告")
     parser.add_argument("residential_id", help="住宅区ID")
@@ -288,7 +293,11 @@ def main():
         if not md_file.endswith(".md"):
             md_file = os.path.splitext(md_file)[0] + ".md"
     else:
-        md_file = os.path.join(args.stats_dir, f"{args.residential_id}_评估报告.md")
+        # 使用社区名称作为文件名，如果没有社区名称则使用ID
+        if community_name:
+            md_file = os.path.join(args.stats_dir, f"{community_name}_评估报告.md")
+        else:
+            md_file = os.path.join(args.stats_dir, f"{args.residential_id}_评估报告.md")
 
     # 写入Markdown报告文件
     with open(md_file, "w", encoding="utf-8") as f:

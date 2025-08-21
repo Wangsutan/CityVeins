@@ -7,13 +7,13 @@ import pandas as pd
 import numpy as np
 import json
 import sys, os
-from typing import Dict, List, Tuple, Union, Any, Optional
+from typing import Dict, List, Tuple, Union, Any, Optional, Final
 
 
 class NumpyEncoder(json.JSONEncoder):
     """自定义JSON编码器，用于处理numpy类型"""
 
-    def default(self, obj: Any) -> Any:
+    def default(self, obj: Any) -> Union[int, float, List, Any]:
         if isinstance(
             obj,
             (
@@ -38,9 +38,10 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-sys.path.insert(
-    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT: Final[str] = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
+sys.path.insert(0, PROJECT_ROOT)
 from ..file.file_handler import save_category_stats
 
 
@@ -147,7 +148,7 @@ def calculate_weighted_score(
             df[col] = 0
 
     # 根据POI类型映射权重
-    def get_weight(poi_type):
+    def get_weight(poi_type: Union[str, int, float]) -> float:
         # 将POI类型转换为字符串
         poi_type_str = str(poi_type)
         # 首先尝试直接获取权重值（为了向后兼容）
@@ -310,7 +311,9 @@ def generate_score_report(
         json.dump(summary, f, ensure_ascii=False, indent=2, cls=NumpyEncoder)
 
 
-def generate_summary_report(all_results, output_file):
+def generate_summary_report(
+    all_results: List[Dict[str, Any]], output_file: str
+) -> None:
     """
     生成批量处理住宅区的汇总报告
 
@@ -321,7 +324,7 @@ def generate_summary_report(all_results, output_file):
     import pandas as pd
 
     # 创建DataFrame
-    df = pd.DataFrame(all_results)
+    df: pd.DataFrame = pd.DataFrame(all_results)
 
     # 按得分降序排序
     if "total_score" in df.columns:
@@ -335,7 +338,9 @@ def generate_summary_report(all_results, output_file):
     if "total_score" in df.columns and "residential_id" in df.columns:
         # TOP10
         print("\nTOP10住宅区得分排名:")
-        top10 = df.head(10)[["residential_id", "total_score", "poi_count"]]
+        top10: pd.DataFrame = df.head(10)[
+            ["residential_id", "total_score", "poi_count"]
+        ]
         for idx, row in top10.iterrows():
             print(
                 f"{idx+1}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
@@ -343,7 +348,9 @@ def generate_summary_report(all_results, output_file):
 
         # BOTTOM10
         print("\nBOTTOM10住宅区得分排名:")
-        bottom10 = df.tail(10)[["residential_id", "total_score", "poi_count"]]
+        bottom10: pd.DataFrame = df.tail(10)[
+            ["residential_id", "total_score", "poi_count"]
+        ]
         for idx, row in bottom10.iterrows():
             print(
                 f"{len(df)-9+idx}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"

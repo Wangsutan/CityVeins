@@ -6,10 +6,10 @@
 import pandas as pd
 import json
 import os
-from typing import Dict, List, Any, Union
+from typing import Dict, List, Any, Union, Optional, Final
 
 
-def read_poi_file(poi_file: str) -> pd.DataFrame:
+def read_poi_file(poi_file: str) -> Optional[pd.DataFrame]:
     """
     读取POI文件（支持CSV和JSON格式）
 
@@ -19,7 +19,7 @@ def read_poi_file(poi_file: str) -> pd.DataFrame:
         poi_file (str): POI文件路径，支持CSV和JSON格式
 
     Returns:
-        pandas.DataFrame: 包含POI数据的DataFrame
+        Optional[pandas.DataFrame]: 包含POI数据的DataFrame，如果读取失败则返回None
 
     Raises:
         ValueError: 当文件格式不支持时抛出此异常
@@ -28,7 +28,7 @@ def read_poi_file(poi_file: str) -> pd.DataFrame:
         return pd.read_csv(poi_file)
     elif poi_file.endswith(".json"):
         with open(poi_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
+            data: Any = json.load(f)
             return pd.DataFrame(data)
     else:
         raise ValueError(f"不支持的文件格式: {poi_file}")
@@ -85,10 +85,10 @@ def save_category_stats(
     )
 
     # 保存CSV格式
-    csv_file = os.path.join(output_dir, f"stats_{residential_id}.csv")
+    csv_file: Final[str] = os.path.join(output_dir, f"stats_{residential_id}.csv")
     all_stats.to_csv(csv_file, index=False, encoding="utf-8")
 
     # 保存JSON格式
-    json_file = os.path.join(output_dir, f"stats_{residential_id}.json")
+    json_file: Final[str] = os.path.join(output_dir, f"stats_{residential_id}.json")
     with open(json_file, "w", encoding="utf-8") as f:
         json.dump(all_stats.to_dict("records"), f, ensure_ascii=False, indent=2)

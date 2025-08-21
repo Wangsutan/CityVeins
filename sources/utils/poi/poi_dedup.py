@@ -63,5 +63,5 @@ def dedup_poi_file(
         Path(out_path) if out_path else in_path.with_stem(f"{in_path.stem}_unique")
     )
     df = dedup_poi_csv(str(in_path), **kwargs)
-    df.to_csv(out_path, index=False, encoding="utf-8-sig")
+    df.to_csv(out_path, index=False, encoding="utf-8")
     print(f"去重完成 → {out_path}")

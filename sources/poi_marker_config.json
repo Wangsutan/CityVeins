@@ -1,0 +1,72 @@
+{
+    "default_colors": [
+      "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
+      "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
+      "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000",
+      "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080"
+    ],
+    "types": {
+      "餐饮服务":   {"color": "#FF5722", "marker": "餐饮"},
+      "美食":       {"color": "#FF5722", "marker": "美食"},
+      "餐厅":       {"color": "#FF5722", "marker": "餐厅"},
+      "小吃":       {"color": "#FF5722", "marker": "小吃"},
+      "咖啡厅":     {"color": "#795548", "marker": "咖啡"},
+      "茶馆":       {"color": "#795548", "marker": "茶馆"},
+      "酒吧":       {"color": "#3F51B5", "marker": "酒吧"},
+  
+      "购物服务":   {"color": "#E91E63", "marker": "购物"},
+      "商场":       {"color": "#E91E63", "marker": "商场"},
+      "超市":       {"color": "#E91E63", "marker": "超市"},
+      "便利店":     {"color": "#E91E63", "marker": "便利店"},
+      "市场":       {"color": "#E91E63", "marker": "市场"},
+  
+      "生活服务":   {"color": "#009688", "marker": "生活"},
+      "银行":       {"color": "#009688", "marker": "银行"},
+      "ATM":        {"color": "#009688", "marker": "ATM"},
+      "邮局":       {"color": "#009688", "marker": "邮局"},
+      "药店":       {"color": "#009688", "marker": "药店"},
+      "医院":       {"color": "#F44336", "marker": "医院"},
+      "诊所":       {"color": "#F44336", "marker": "诊所"},
+  
+      "住宿服务":   {"color": "#673AB7", "marker": "住宿"},
+      "酒店":       {"color": "#673AB7", "marker": "酒店"},
+      "宾馆":       {"color": "#673AB7", "marker": "宾馆"},
+      "旅馆":       {"color": "#673AB7", "marker": "旅馆"},
+      "民宿":       {"color": "#673AB7", "marker": "民宿"},
+  
+      "交通设施服务": {"color": "#2196F3", "marker": "交通"},
+      "地铁站":     {"color": "#2196F3", "marker": "地铁"},
+      "公交站":     {"color": "#2196F3", "marker": "公交"},
+      "火车站":     {"color": "#2196F3", "marker": "火车"},
+      "机场":       {"color": "#2196F3", "marker": "机场"},
+      "停车场":     {"color": "#2196F3", "marker": "停车"},
+  
+      "风景名胜":   {"color": "#4CAF50", "marker": "风景"},
+      "公园":       {"color": "#4CAF50", "marker": "公园"},
+      "景点":       {"color": "#4CAF50", "marker": "景点"},
+      "博物馆":     {"color": "#4CAF50", "marker": "博物馆"},
+      "动物园":     {"color": "#4CAF50", "marker": "动物园"},
+      "水族馆":     {"color": "#4CAF50", "marker": "水族馆"},
+  
+      "教育文化":   {"color": "#FF9800", "marker": "教育"},
+      "学校":       {"color": "#FF9800", "marker": "学校"},
+      "大学":       {"color": "#FF9800", "marker": "大学"},
+      "图书馆":     {"color": "#FF9800", "marker": "图书馆"},
+      "书店":       {"color": "#FF9800", "marker": "书店"},
+  
+      "运动健身":   {"color": "#00BCD4", "marker": "运动"},
+      "健身房":     {"color": "#00BCD4", "marker": "健身房"},
+      "体育馆":     {"color": "#00BCD4", "marker": "体育馆"},
+      "游泳馆":     {"color": "#00BCD4", "marker": "游泳馆"},
+  
+      "休闲娱乐":   {"color": "#9C27B0", "marker": "休闲"},
+      "电影院":     {"color": "#9C27B0", "marker": "电影院"},
+      "KTV":        {"color": "#9C27B0", "marker": "KTV"},
+      "网吧":       {"color": "#9C27B0", "marker": "网吧"},
+      "游戏厅":     {"color": "#9C27B0", "marker": "游戏厅"},
+  
+      "政府机构":   {"color": "#607D8B", "marker": "政府"},
+      "派出所":     {"color": "#607D8B", "marker": "派出所"},
+      "法院":       {"color": "#607D8B", "marker": "法院"}
+    }
+  }

@@ -1,14 +1,20 @@
 # CityVeins GUI应用使用说明
 
-CityVeins GUI是一个基于PyQt开发的图形用户界面应用，用于调用CityVeins后端功能，包括获取POI数据、计算得分、生成报告等。
+CityVeins GUI是一个基于PyQt5开发的图形用户界面应用，用于调用CityVeins后端功能，包括获取POI数据、计算得分、生成报告等。该应用为15分钟生活圈评估系统提供了直观易用的操作界面，使用户无需编写代码即可完成整个评估流程。
 
 ## 安装依赖
 
 在运行GUI应用之前，需要安装以下依赖：
 
 ```bash
-pip install pyqt5 pandas
+pip install pyqt5 pandas tqdm requests
 ```
+
+此外，生成HTML报告需要安装pandoc工具：
+- Ubuntu/Debian: `sudo apt-get install pandoc`
+- CentOS/RHEL: `sudo yum install pandoc`
+- macOS: `brew install pandoc`
+- Windows: 从 [pandoc官网](https://pandoc.org/installing.html) 下载安装
 
 ## 运行GUI应用
 
@@ -17,6 +23,8 @@ pip install pyqt5 pandas
 ```bash
 python sources/run_gui.py
 ```
+
+运行成功后，将显示CityVeins GUI主窗口，包含三个主要功能选项卡：获取POI数据、计算得分和生成报告。
 
 ## 功能说明
 
@@ -57,6 +65,8 @@ python sources/run_gui.py
 
 点击"生成报告"按钮后，系统将生成Markdown格式的评估报告，并根据需要转换为HTML格式。
 
+报告生成完成后，您可以使用界面上的"打开Markdown"和"打开HTML"按钮直接查看生成的报告文件。
+
 ## 使用流程
 
 1. **获取POI数据**：
@@ -84,12 +94,29 @@ python sources/run_gui.py
 
 2. 确保权重配置文件`data/poi_weights/高德POI_加权.csv`存在且格式正确。
 
-3. 生成HTML报告需要安装pandoc工具：
-   - Ubuntu/Debian: `sudo apt-get install pandoc`
-   - CentOS/RHEL: `sudo yum install pandoc`
-   - macOS: `brew install pandoc`
-   - Windows: 从 [pandoc官网](https://pandoc.org/installing.html) 下载安装
+3. 系统会对获取的POI数据进行去重处理，基于POI名称、经度和纬度的组合作为唯一标识，确保计分和报告基于去重后的数据。
 
 4. 在执行耗时操作时，GUI应用会显示进度条，请耐心等待操作完成。
 
 5. 如果操作失败，请查看日志输出区域中的错误信息，以便排查问题。
+
+## 常见问题
+
+### Q: 为什么界面显示"too many values to unpack (expected 2)"错误？
+A: 这通常是由于位置数据格式不正确导致的。系统已修复此问题，但如果仍然遇到，请检查高德API返回的位置数据格式。
+
+### Q: 为什么计分和报告生成的结果与预期不符？
+A: 请确保系统使用的是去重后的POI数据进行计分。系统会自动检查并优先使用去重后的数据文件（文件名包含"_unique"后缀）。
+
+### Q: 如何批量处理多个住宅区？
+A: 您可以使用命令行工具`calculate_batch_scores.py`进行批量处理，具体使用方法请参考该文件的文档。
+
+## 技术支持
+
+如果您在使用过程中遇到问题，请检查：
+1. 网络连接是否正常
+2. API密钥是否有效
+3. 输入数据格式是否正确
+4. 依赖库是否完整安装
+
+如需更多帮助，请联系开发团队。

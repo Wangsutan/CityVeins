@@ -30,13 +30,13 @@ from utils.file.key_loader import load_key
 from utils.poi.poi_filter import filter_poi_types
 
 
-def main():
+def main(district="田家庵区"):
     # 设置命令行参数解析
     parser = argparse.ArgumentParser(description="批量获取住宅区POI数据")
 
-    # 获取行政区名称
-    district = "田家庵区"
-
+    parser.add_argument(
+        "--district", default=district, help="行政区名称，默认为田家庵区"
+    )
     parser.add_argument(
         "--input-file", help="输入CSV文件路径", default=RESIDENTIAL_OUT(district)
     )
@@ -48,6 +48,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # 获取行政区名称
+    district = args.district
+
+    # 更新输入文件路径，如果用户没有指定
+    if not args.input_file or args.input_file == RESIDENTIAL_OUT("田家庵区"):
+        args.input_file = RESIDENTIAL_OUT(district)
 
     # 确保输出目录存在
     # 注意：get_single_residential_poi_fixed.py会自动在其OUTPUT_DIR下创建poi子目录
@@ -120,4 +127,29 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # 解析命令行参数
+    parser = argparse.ArgumentParser(description="批量获取住宅区POI数据")
+    parser.add_argument(
+        "--district", default="田家庵区", help="行政区名称，默认为田家庵区"
+    )
+    parser.add_argument("--input-file", help="输入CSV文件路径")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="限制处理的记录数量，默认为10条。设置为0或负数表示处理所有记录",
+    )
+
+    args = parser.parse_args()
+
+    # 获取行政区名称
+    district = args.district
+
+    # 更新输入文件路径，如果用户没有指定
+    if not args.input_file:
+        from config import RESIDENTIAL_OUT
+
+        args.input_file = RESIDENTIAL_OUT(district)
+
+    # 调用主函数
+    main(district)

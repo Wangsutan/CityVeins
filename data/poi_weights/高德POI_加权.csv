@@ -1,0 +1,916 @@
+序号,NEW_TYPE,大类,中类,小类,Big Category,Mid Category,Sub Category,权重,评价规则
+1,10000,汽车服务,汽车服务相关,汽车服务相关,Auto Service,Automobile Service Related,Automobile Service Related,0.29,基础服务
+2,10100,汽车服务,加油站,加油站,Auto Service,Filling Station,Filling Station,0.29,基础服务
+3,10101,汽车服务,加油站,中国石化,Auto Service,Filling Station,Sinopec,0.29,知名品牌
+4,10102,汽车服务,加油站,中国石油,Auto Service,Filling Station,PetroChina,0.29,知名品牌
+5,10103,汽车服务,加油站,壳牌,Auto Service,Filling Station,Shell,0.29,国际品牌
+6,10104,汽车服务,加油站,美孚,Auto Service,Filling Station,Mobil,0.29,国际品牌
+7,10105,汽车服务,加油站,加德士,Auto Service,Filling Station,Caltex,0.29,普通品牌
+8,10107,汽车服务,加油站,东方,Auto Service,Filling Station,FEOSO,0.29,普通品牌
+9,10108,汽车服务,加油站,中石油碧辟,Auto Service,Filling Station,BP PetroChina,0.29,合资品牌
+10,10109,汽车服务,加油站,中石化碧辟,Auto Service,Filling Station,BP Sinopec,0.29,合资品牌
+11,10110,汽车服务,加油站,道达尔,Auto Service,Filling Station,TOTAL,0.29,国际品牌
+12,10111,汽车服务,加油站,埃索,Auto Service,Filling Station,ESSO,0.29,国际品牌
+13,10112,汽车服务,加油站,中化道达尔,Auto Service,Filling Station,TOTAL-SINOCHEM,0.29,合资品牌
+14,10200,汽车服务,其它能源站,其它能源站,Auto Service,Other Energy Station,Other Energy Station,0.29,基础服务
+15,10300,汽车服务,加气站,加气站,Auto Service,Filling Station,Filling Station,0.29,基础服务
+16,10400,汽车服务,汽车养护/装饰,汽车养护,Auto Service,Automobile Maintenance/Decoration,Automobile Maintenance,0.29,基础服务
+17,10401,汽车服务,汽车养护/装饰,加水站,Auto Service,Automobile Maintenance/Decoration,Add Water Station,0.2,低频需求
+18,10500,汽车服务,洗车场,洗车场,Auto Service,Car Wash,Car Wash,0.29,基础服务
+19,10600,汽车服务,汽车俱乐部,汽车俱乐部,Auto Service,Automobile Club,Automobile Club,0.2,低频需求
+20,10700,汽车服务,汽车救援,汽车救援,Auto Service,Automobile Rescue,Automobile Rescue,0.29,应急服务
+21,10800,汽车服务,汽车配件销售,汽车配件销售,Auto Service,Automobile Parts Sales,Automobile Parts Sales,0.29,基础服务
+22,10900,汽车服务,汽车租赁,汽车租赁,Auto Service,Automobile Rental,Automobile Rental,0.29,便利服务
+23,10901,汽车服务,汽车租赁,汽车租赁还车,Auto Service,Automobile Rental,Rent-a-Car Return,0.29,低频需求
+24,11000,汽车服务,二手车交易,二手车交易,Auto Service,Used Automobile Dealer,Used Automobile Dealer,0.2,低频需求
+25,11100,汽车服务,充电站,充电站,Auto Service,Charging Station,Charging Station,0.29,新兴需求
+26,11101,汽车服务,换电站,换电站,Auto Service,Battery Change Station,Battery Change Station,0.29,新兴需求
+27,11102,汽车服务,充电站,充换电站,Auto Service,Charging and Power Swapping Station,Charging and Power Swapping Station,0.29,新兴需求
+28,11103,汽车服务,充电站,专用充电站,Auto Service,Dedicated Charging Station,Dedicated Charging Station,0.29,新兴需求
+29,20000,汽车销售,汽车销售,汽车销售,Auto Dealers,Automobile Sales,Automobile Sales,0.29,低频需求
+30,20100,汽车销售,大众特约销售,大众销售,Auto Dealers,Volkswagen Franchised Sales,Volkswagen Sales,0.29,知名品牌
+31,20101,汽车销售,大众特约销售,上海大众销售,Auto Dealers,Volkswagen Franchised Sales,Shanghai Volkswagen Sales,0.29,合资品牌
+32,20102,汽车销售,大众特约销售,一汽-大众销售,Auto Dealers,Volkswagen Franchised Sales,FAW-Volkswagen Sales,0.29,合资品牌
+33,20103,汽车销售,大众特约销售,斯柯达销售,Auto Dealers,Volkswagen Franchised Sales,Skoda Sales,0.29,普通品牌
+34,20104,汽车销售,大众特约销售,进口大众销售,Auto Dealers,Volkswagen Franchised Sales,Import Volkswagen Sales,0.29,进口品牌
+35,20105,汽车销售,大众特约销售,宾利销售,Auto Dealers,Volkswagen Franchised Sales,Bentley Sales,0.29,奢侈品牌
+36,20106,汽车销售,大众特约销售,兰博基尼销售,Auto Dealers,Volkswagen Franchised Sales,Lamborghini Sales,0.29,奢侈品牌
+37,20200,汽车销售,本田特约销售,本田销售,Auto Dealers,Honda Franchised Sales,Honda Sales,0.29,知名品牌
+38,20201,汽车销售,本田特约销售,广汽本田销售,Auto Dealers,Honda Franchised Sales,GAC Honda Sales,0.29,合资品牌
+39,20202,汽车销售,本田特约销售,东风本田销售,Auto Dealers,Honda Franchised Sales,Dongfeng Honda Sales,0.29,合资品牌
+40,20203,汽车销售,本田特约销售,本田讴歌销售,Auto Dealers,Honda Franchised Sales,Acura Sales,0.29,高端品牌
+41,20300,汽车销售,奥迪特约销售,上汽-大众奥迪销售,Auto Dealers,Audi Franchised Sales,SAIC-Audi Sales,0.29,豪华品牌
+42,20301,汽车销售,奥迪特约销售,一汽-大众奥迪销售,Auto Dealers,Audi Franchised Sales,FAW-Audi Sales,0.29,豪华品牌
+43,20400,汽车销售,通用特约销售,通用销售,Auto Dealers,General Motors Franchised Sales,General Motors Sales,0.29,知名品牌
+44,20401,汽车销售,通用特约销售,凯迪拉克销售,Auto Dealers,General Motors Franchised Sales,Cadillac Sales,0.29,豪华品牌
+45,20402,汽车销售,通用特约销售,别克销售,Auto Dealers,General Motors Franchised Sales,Buick Sales,0.29,中高端品牌
+46,20403,汽车销售,通用特约销售,雪佛兰销售,Auto Dealers,General Motors Franchised Sales,Chevrolet Sales,0.29,普通品牌
+47,20404,汽车销售,通用特约销售,欧宝销售,Auto Dealers,General Motors Franchised Sales,Opel Sales,0.29,普通品牌
+48,20405,汽车销售,通用特约销售,萨博销售,Auto Dealers,General Motors Franchised Sales,Saab Sales,0.29,衰退品牌
+49,20406,汽车销售,通用特约销售,沃克斯豪尔销售,Auto Dealers,General Motors Franchised Sales,Vauxhall Sales,0.29,地域品牌
+50,20407,汽车销售,通用特约销售,土星销售,Auto Dealers,General Motors Franchised Sales,Saturn Sales,0.29,衰退品牌
+51,20408,汽车销售,通用特约销售,大宇销售,Auto Dealers,General Motors Franchised Sales,Daewoo Sales,0.29,衰退品牌
+52,20600,汽车销售,宝马特约销售,宝马销售,Auto Dealers,BMW Franchised Sales,BMW Sales,0.29,豪华品牌
+53,20601,汽车销售,宝马特约销售,宝马MINI销售,Auto Dealers,BMW Franchised Sales,BMW MINI Sales,0.29,个性品牌
+54,20602,汽车销售,宝马特约销售,劳斯莱斯销售,Auto Dealers,BMW Franchised Sales,Rolls-Royce Sales,0.29,奢侈品牌
+55,20700,汽车销售,日产特约销售,日产销售,Auto Dealers,Nissan Franchised Sales,Nissan Sales,0.29,知名品牌
+56,20701,汽车销售,日产特约销售,东风日产销售,Auto Dealers,Nissan Franchised Sales,Dongfeng Nissan Sales,0.29,合资品牌
+57,20702,汽车销售,日产特约销售,郑州日产销售,Auto Dealers,Nissan Franchised Sales,Zhengzhou Nissan Sales,0.29,普通品牌
+58,20703,汽车销售,日产特约销售,英菲尼迪销售,Auto Dealers,Nissan Franchised Sales,Infiniti Sales,0.29,豪华品牌
+59,20800,汽车销售,雷诺特约销售,雷诺销售,Auto Dealers,Renault Franchised Sales,Renault Sales,0.29,普通品牌
+60,20900,汽车销售,梅赛德斯-奔驰特约销售,梅赛德斯-奔驰销售,Auto Dealers,Mercedes-Benz Franchised Sales,Mercedes-Benz Sales,0.29,豪华品牌
+61,20904,汽车销售,梅赛德斯-奔驰特约销售,迈巴赫销售,Auto Dealers,Mercedes-Benz Franchised Sales,Maybach Sales,0.29,奢侈品牌
+62,20905,汽车销售,梅赛德斯-奔驰特约销售,精灵销售,Auto Dealers,Mercedes-Benz Franchised Sales,Smart Sales,0.29,个性品牌
+63,21000,汽车销售,丰田特约销售,丰田销售,Auto Dealers,Toyota Franchised Sales,Toyota Sales,0.29,知名品牌
+64,21001,汽车销售,丰田特约销售,一汽丰田销售,Auto Dealers,Toyota Franchised Sales,FAW-Toyota Sales,0.29,合资品牌
+65,21002,汽车销售,丰田特约销售,广汽丰田销售,Auto Dealers,Toyota Franchised Sales,GAC Toyota Sales,0.29,合资品牌
+66,21003,汽车销售,丰田特约销售,雷克萨斯销售,Auto Dealers,Toyota Franchised Sales,Lexus Sales,0.29,豪华品牌
+67,21004,汽车销售,丰田特约销售,大发销售,Auto Dealers,Toyota Franchised Sales,Daihatsu Sales,0.29,普通品牌
+68,21100,汽车销售,斯巴鲁特约销售,斯巴鲁销售,Auto Dealers,Subaru Franchised Sales,Subaru Sales,0.29,个性品牌
+69,21200,汽车销售,标致雪铁龙特约销售,雪铁龙销售,Auto Dealers,Peugeot Citroen Franchised Sales,Citroen Sales,0.29,普通品牌
+70,21201,汽车销售,标致雪铁龙特约销售,东风雪铁龙销售,Auto Dealers,Peugeot Citroen Franchised Sales,Dongfeng Citroen Sales,0.29,合资品牌
+71,21202,汽车销售,标致雪铁龙特约销售,东风标致销售,Auto Dealers,Peugeot Citroen Franchised Sales,Dongfeng Peugeot Sales,0.29,合资品牌
+72,21203,汽车销售,标致雪铁龙特约销售,DS销售,Auto Dealers,Peugeot Citroen,DS Sales,0.29,高端品牌
+73,21300,汽车销售,三菱特约销售,三菱销售,Auto Dealers,Mitsubishi Franchised Sales,Mitsubishi Sales,0.29,普通品牌
+74,21301,汽车销售,三菱特约销售,广汽三菱销售,Auto Dealers,Mitsubishi Franchised Sales,GAC Mitsubishi Sales,0.29,合资品牌
+75,21400,汽车销售,菲亚特约销售,菲亚特销售,Auto Dealers,Fiat Franchised Sales,Fiat Sales,0.29,普通品牌
+76,21401,汽车销售,菲亚特约销售,阿尔法-罗密欧销售,Auto Dealers,Fiat Franchised Sales,Alfa Romeo Sales,0.29,豪华品牌
+77,21500,汽车销售,法拉利特约销售,法拉利销售,Auto Dealers,Ferrari Franchised Sales,Ferrari Sales,0.29,奢侈品牌
+78,21501,汽车销售,法拉利特约销售,玛莎拉蒂销售,Auto Dealers,Ferrari Franchised Sales,Maserati Sales,0.29,奢侈品牌
+79,21600,汽车销售,现代特约销售,现代销售,Auto Dealers,Hyundai Franchised Sales,Hyundai Sales,0.29,普通品牌
+80,21601,汽车销售,现代特约销售,进口现代销售,Auto Dealers,Hyundai Franchised Sales,Import Hyundai Sales,0.29,进口品牌
+81,21602,汽车销售,现代特约销售,北京现代销售,Auto Dealers,Hyundai Franchised Sales,Beijing Hyundai Sales,0.29,合资品牌
+82,21700,汽车销售,起亚特约销售,起亚销售,Auto Dealers,KIA Franchised Sales,KIA Sales,0.29,普通品牌
+83,21701,汽车销售,起亚特约销售,进口起亚销售,Auto Dealers,KIA Franchised Sales,Import KIA Sales,0.29,进口品牌
+84,21702,汽车销售,起亚特约销售,东风悦达起亚销售,Auto Dealers,KIA Franchised Sales,Dongfeng Yueda KIA Sales,0.29,合资品牌
+85,21800,汽车销售,福特特约销售,福特销售,Auto Dealers,Ford Franchised Sales,Ford Sales,0.29,知名品牌
+86,21802,汽车销售,福特特约销售,马自达销售,Auto Dealers,Ford Franchised Sales,Mazda Sales,0.29,普通品牌
+87,21803,汽车销售,福特特约销售,林肯销售,Auto Dealers,Ford Franchised Sales,Lincoln Sales,0.29,豪华品牌
+88,21804,汽车销售,福特特约销售,水星销售,Auto Dealers,Ford Franchised Sales,Mercury Sales,0.29,衰退品牌
+89,21900,汽车销售,捷豹特约销售,捷豹销售,Auto Dealers,JAGUAR Franchised Sales,JAGUAR Sales,0.29,豪华品牌
+90,22000,汽车销售,路虎特约销售,路虎销售,Auto Dealers,Land Rover Franchised Sales,Land Rover Sales,0.29,豪华品牌
+91,22200,汽车销售,保时捷特约销售,保时捷销售,Auto Dealers,Porsche Franchised Sales,Porsche Sales,0.29,豪华品牌
+92,22200,汽车销售,东风特约销售,东风销售,Auto Dealers,DFM Franchised Sales,DFM Sales,0.29,普通品牌
+93,22300,汽车销售,吉利特约销售,吉利销售,Auto Dealers,Geely Franchised Sales,Geely Sales,0.29,国产品牌
+94,22301,汽车销售,吉利特约销售,沃尔沃汽车销售,Auto Dealers,Geely Franchised Sales,Volvo Cars Sales,0.29,豪华品牌
+95,22400,汽车销售,奇瑞特约销售,奇瑞销售,Auto Dealers,Chery Franchised Sales,Chery Sales,0.29,国产品牌
+96,22500,汽车销售,克莱斯勒特约销售,克莱斯勒销售,Auto Dealers,Chrysler Franchised Sales,Chrysler Sales,0.29,普通品牌
+97,22501,汽车销售,克莱斯勒特约销售,吉普销售,Auto Dealers,Chrysler Franchised Sales,Jeep Sales,0.29,个性品牌
+98,22502,汽车销售,克莱斯勒特约销售,道奇销售,Auto Dealers,Chrysler Franchised Sales,Dodge Sales,0.29,普通品牌
+99,22600,汽车销售,荣威销售,荣威销售,Auto Dealers,ROEWE Sales,ROEWE Sales,0.29,国产品牌
+100,22700,汽车销售,名爵销售,名爵销售,Auto Dealers,MG Sales,MG Sales,0.29,国产品牌
+101,22800,汽车销售,江淮销售,江淮销售,Auto Dealers,JAC Sales,JAC Sales,0.29,国产品牌
+102,22900,汽车销售,红旗销售,红旗销售,Auto Dealers,Hongqi Sales,Hongqi Sales,0.29,高端国产品牌
+103,23000,汽车销售,长安汽车销售,长安汽车销售,Auto Dealers,Chang'an Sales,Chang'an Sales,0.29,国产品牌
+104,23100,汽车销售,海马汽车销售,海马汽车销售,Auto Dealers,Haima Sales,Haima Sales,0.29,普通品牌
+105,23200,汽车销售,北京汽车销售,北京汽车销售,Auto Dealers,BAIC MOTOR Sales,BAIC MOTOR Sales,0.29,国产品牌
+106,23300,汽车销售,长城汽车销售,长城汽车销售,Auto Dealers,Great Wall Sales,Great Wall Sales,0.29,国产品牌
+107,23301,汽车销售,长城汽车销售,魏派汽车销售,Auto Dealers,Great Wall Sales,WEY Sales,0.29,高端国产品牌
+108,23400,汽车销售,纳智捷销售,纳智捷销售,Auto Dealers,Luxgen Sales,Luxgen Sales,0.29,普通品牌
+109,23500,汽车销售,广汽传祺销售,广汽传祺销售,Auto Dealers,GAC Trumpchi Sales,GAC Trumpchi Sales,0.29,国产品牌
+110,25000,汽车销售,货车销售,货车销售,Auto Dealers,Truck Sales,Truck Sales,0.2,低频需求
+111,25100,汽车销售,东风货车销售,东风货车销售,Auto Dealers,Dongfeng Truck Sales,Dongfeng Truck Sales,0.29,专业需求
+112,25200,汽车销售,中国重汽销售,中国重汽销售,Auto Dealers,SINOTRUK Sales,SINOTRUK Sales,0.29,专业需求
+113,25300,汽车销售,一汽解放销售,一汽解放销售,Auto Dealers,FAW Jiefang Sales,FAW Jiefang Sales,0.29,专业需求
+114,25400,汽车销售,福田卡车销售,福田卡车销售,Auto Dealers,Foton Truck Sales,Foton Truck Sales,0.29,专业需求
+115,25500,汽车销售,陕西重汽销售,陕西重汽销售,Auto Dealers,Shaanxi Heavy-duty Truck Sales,Shaanxi Heavy-duty Truck Sales,0.29,专业需求
+116,25600,汽车销售,北奔重汽销售,北奔重汽销售,Auto Dealers,Beiben Trucks Sales,Beiben Trucks Sales,0.29,专业需求
+117,25700,汽车销售,江淮货车销售,江淮货车销售,Auto Dealers,JAC Truck Sales,JAC Truck Sales,0.29,专业需求
+118,25800,汽车销售,华菱星马销售,华菱星马销售,Auto Dealers,CAMC Sales,CAMC Sales,0.29,专业需求
+119,25900,汽车销售,成都大运汽车销售,成都大运汽车销售,Auto Dealers,Chengdu Dayun Automotive Sales,Chengdu Dayun Automotive Sales,0.29,专业需求
+120,26000,汽车销售,梅赛德斯-奔驰卡车销售,梅赛德斯-奔驰卡车销售,Auto Dealers,Mercedes-Benz Truck Sales,Mercedes-Benz Truck Sales,0.29,高端专业
+121,26100,汽车销售,德国曼恩销售,德国曼恩销售,Auto Dealers,MAN Sales,MAN Sales,0.29,高端专业
+122,26200,汽车销售,斯堪尼亚销售,斯堪尼亚销售,Auto Dealers,SCANIA Sales,SCANIA Sales,0.29,高端专业
+123,26300,汽车销售,沃尔沃卡车销售,沃尔沃卡车销售,Auto Dealers,Volvo Truck Sales,Volvo Truck Sales,0.29,高端专业
+124,29900,汽车销售,观致销售,观致销售,Auto Dealers,Qoros Sales,Qoros Sales,0.29,普通品牌
+125,30000,汽车维修,汽车维修,汽车维修,Auto Repair,Automobile Repair,Automobile Repair,0.29,基础服务
+126,30100,汽车维修,汽车综合维修,汽车综合维修,Auto Repair,Automobile Comprehensive Repair,Automobile Comprehensive Repair,0.29,便利服务
+127,30200,汽车维修,大众特约维修,大众维修,Auto Repair,Volkswagen Franchised Repair,Volkswagen Repair,0.29,品牌服务
+128,30201,汽车维修,大众特约维修,上海大众维修,Auto Repair,Volkswagen Franchised Repair,Shanghai Volkswagen Repair,0.29,合资品牌
+129,30202,汽车维修,大众特约维修,一汽-大众维修,Auto Repair,Volkswagen Franchised Repair,FAW-Volkswagen Repair,0.29,合资品牌
+130,30203,汽车维修,大众特约维修,斯柯达维修,Auto Repair,Volkswagen Franchised Repair,Skoda Repair,0.29,普通品牌
+131,30204,汽车维修,大众特约维修,进口大众维修,Auto Repair,Volkswagen Franchised Repair,Import Volkswagen Repair,0.29,进口品牌
+132,30205,汽车维修,大众特约维修,宾利维修,Auto Repair,Volkswagen Franchised Repair,Bentley Repair,0.29,奢侈品牌
+133,30206,汽车维修,大众特约维修,兰博基尼维修,Auto Repair,Volkswagen Franchised Repair,Lamborghini Repair,0.29,奢侈品牌
+134,30300,汽车维修,本田特约维修,本田维修,Auto Repair,Honda Franchised Repair,Honda Repair,0.29,品牌服务
+135,30301,汽车维修,本田特约维修,广汽本田维修,Auto Repair,Honda Franchised Repair,GAC Honda Repair,0.29,合资品牌
+136,30302,汽车维修,本田特约维修,东风本田维修,Auto Repair,Honda Franchised Repair,Dongfeng Honda Repair,0.29,合资品牌
+137,30303,汽车维修,本田特约维修,本田讴歌维修,Auto Repair,Honda Franchised Repair,Acura Repair,0.29,高端品牌
+138,30400,汽车维修,奥迪特约维修,上汽-大众奥迪维修,Auto Repair,Audi Franchised Repair,SAIC_Audi Repair,0.29,豪华品牌
+139,30401,汽车维修,奥迪特约维修,一汽-大众奥迪维修,Auto Repair,Audi Franchised Repair,FAW-Audi Repair,0.29,豪华品牌
+140,30500,汽车维修,通用特约维修,通用维修,Auto Repair,General Motors Franchised Repair,General Motors Repair,0.29,品牌服务
+141,30501,汽车维修,通用特约维修,凯迪拉克维修,Auto Repair,General Motors Franchised Repair,Cadillac Repair,0.29,豪华品牌
+142,30502,汽车维修,通用特约维修,别克维修,Auto Repair,General Motors Franchised Repair,Buick Repair,0.29,中高端品牌
+143,30503,汽车维修,通用特约维修,雪佛兰维修,Auto Repair,General Motors Franchised Repair,Chevrolet Repair,0.29,普通品牌
+144,30504,汽车维修,通用特约维修,欧宝维修,Auto Repair,General Motors Franchised Repair,Opel Repair,0.29,普通品牌
+145,30505,汽车维修,通用特约维修,萨博维修,Auto Repair,General Motors Franchised Repair,Saab Repair,0.29,衰退品牌
+146,30506,汽车维修,通用特约维修,沃克斯豪尔维修,Auto Repair,General Motors Franchised Repair,Vauxhall Repair,0.29,地域品牌
+147,30507,汽车维修,通用特约维修,土星维修,Auto Repair,General Motors Franchised Repair,Saturn Repair,0.29,衰退品牌
+148,30508,汽车维修,通用特约维修,大宇维修,Auto Repair,General Motors Franchised Repair,Daewoo Repair,0.29,衰退品牌
+149,30700,汽车维修,宝马特约维修,宝马维修,Auto Repair,BMW Franchised Repair,BMW Repair,0.29,豪华品牌
+150,30701,汽车维修,宝马特约维修,宝马MINI维修,Auto Repair,BMW Franchised Repair,BMW MINI Repair,0.29,个性品牌
+151,30702,汽车维修,宝马特约维修,劳斯莱斯维修,Auto Repair,BMW Franchised Repair,Rolls-Royce Repair,0.29,奢侈品牌
+152,30800,汽车维修,日产特约维修,日产维修,Auto Repair,Nissan Franchised Repair,Nissan Repair,0.29,普通品牌
+153,30801,汽车维修,日产特约维修,英菲尼迪维修,Auto Repair,Nissan Franchised Repair,Infiniti Repair,0.29,豪华品牌
+154,30802,汽车维修,日产特约维修,东风日产维修,Auto Repair,Nissan Franchised Repair,Dongfeng Nissan Repair,0.29,合资品牌
+155,30803,汽车维修,日产特约维修,郑州日产维修,Auto Repair,Nissan Franchised Repair,Zhengzhou Nissan Repair,0.29,普通品牌
+156,30900,汽车维修,雷诺特约维修,雷诺维修,Auto Repair,Renault Franchised Repair,Renault Repair,0.29,普通品牌
+157,31000,汽车维修,梅赛德斯-奔驰特约维修,梅赛德斯-奔驰维修,Auto Repair,Mercedes-Benz Franchised Repair,Mercedes-Benz Repair,0.29,豪华品牌
+158,31004,汽车维修,梅赛德斯-奔驰特约维修,迈巴赫维修,Auto Repair,Mercedes-Benz Franchised Repair,Maybach Repair,0.29,奢侈品牌
+159,31005,汽车维修,梅赛德斯-奔驰特约维修,精灵维修,Auto Repair,Mercedes-Benz Franchised Repair,Smart Repair,0.29,个性品牌
+160,31100,汽车维修,丰田特约维修,丰田维修,Auto Repair,Toyota Franchised Repair,Toyota Repair,0.29,品牌服务
+161,31101,汽车维修,丰田特约维修,一汽丰田维修,Auto Repair,Toyota Franchised Repair,FAW-Toyota Repair,0.29,合资品牌
+162,31102,汽车维修,丰田特约维修,广汽丰田维修,Auto Repair,Toyota Franchised Repair,GAC Toyota Repair,0.29,合资品牌
+163,31103,汽车维修,丰田特约维修,雷克萨斯维修,Auto Repair,Toyota Franchised Repair,Lexus Repair,0.29,豪华品牌
+164,31104,汽车维修,丰田特约维修,大发维修,Auto Repair,Toyota Franchised Repair,Daihatsu Repair,0.29,普通品牌
+165,31200,汽车维修,斯巴鲁特约维修,斯巴鲁维修,Auto Repair,Subaru Franchised Repair,Subaru Repair,0.29,个性品牌
+166,31300,汽车维修,标致雪铁龙特约维修,雪铁龙维修,Auto Repair,Peugeot Citroen Franchised Repair,Citroen Repair,0.29,普通品牌
+167,31301,汽车维修,标致雪铁龙特约维修,东风标致维修,Auto Repair,Peugeot Citroen Franchised Repair,Dongfeng Peugeot Repair,0.29,合资品牌
+168,31302,汽车维修,标致雪铁龙特约维修,东风雪铁龙维修,Auto Repair,Peugeot Citroen Franchised Repair,Dongfeng Citroen Repair,0.29,合资品牌
+169,31303,汽车维修,标致雪铁龙特约维修,DS维修,Auto Repair,Peugeot Citroen,DS Repair,0.29,高端品牌
+170,31400,汽车维修,三菱特约维修,三菱维修,Auto Repair,Mitsubishi Franchised Repair,Mitsubishi Repair,0.29,普通品牌
+171,31401,汽车维修,三菱特约维修,广汽三菱维修,Auto Repair,Mitsubishi Franchised Repair,GAC Mitsubishi Repair,0.29,合资品牌
+172,31500,汽车维修,菲亚特特约维修,菲亚特维修,Auto Repair,Fiat Franchised Repair,Fiat Repair,0.29,普通品牌
+173,31501,汽车维修,菲亚特特约维修,阿尔法-罗密欧维修,Auto Repair,Fiat Franchised Repair,Alfa Romeo Repair,0.29,豪华品牌
+174,31600,汽车维修,法拉利特约维修,法拉利维修,Auto Repair,Ferrari Franchised Repair,Ferrari Repair,0.29,奢侈品牌
+175,31601,汽车维修,法拉利特约维修,玛莎拉蒂维修,Auto Repair,Ferrari Franchised Repair,Maserati Repair,0.29,奢侈品牌
+176,31700,汽车维修,现代特约维修,现代维修,Auto Repair,Hyundai Franchised Repair,Hyundai Repair,0.29,普通品牌
+177,31701,汽车维修,现代特约维修,进口现代维修,Auto Repair,Hyundai Franchised Repair,Import Hyundai Repair,0.29,进口品牌
+178,31702,汽车维修,现代特约维修,北京现代维修,Auto Repair,Hyundai Franchised Repair,Beijing Hyundai Repair,0.29,合资品牌
+179,31800,汽车维修,起亚特约维修,起亚维修,Auto Repair,KIA Franchised Repair,KIA Repair,0.29,普通品牌
+180,31801,汽车维修,起亚特约维修,进口起亚维修,Auto Repair,KIA Franchised Repair,Import KIA Repair,0.29,进口品牌
+181,31802,汽车维修,起亚特约维修,东风悦达起亚维修,Auto Repair,KIA Franchised Repair,Dongfeng Yueda KIA Repair,0.29,合资品牌
+182,31900,汽车维修,福特特约维修,福特维修,Auto Repair,Ford Franchised Repair,Ford Repair,0.29,品牌服务
+183,31902,汽车维修,福特特约维修,马自达维修,Auto Repair,Ford Franchised Repair,Mazda Repair,0.29,普通品牌
+184,31903,汽车维修,福特特约维修,林肯维修,Auto Repair,Ford Franchised Repair,Lincoln Repair,0.29,豪华品牌
+185,31904,汽车维修,福特特约维修,水星维修,Auto Repair,Ford Franchised Repair,Mercury Repair,0.29,衰退品牌
+186,32000,汽车维修,捷豹特约维修,捷豹维修,Auto Repair,JAGUAR Franchised Repair,JAGUAR Repair,0.29,豪华品牌
+187,32100,汽车维修,路虎特约维修,路虎维修,Auto Repair,Land Rover Franchised Repair,Land Rover Repair,0.29,豪华品牌
+188,32200,汽车维修,保时捷特约维修,保时捷维修,Auto Repair,Porsche Franchised Repair,Porsche Repair,0.29,豪华品牌
+189,32300,汽车维修,东风特约维修,东风维修,Auto Repair,DFM Franchised Repair,DFM Repair,0.29,普通品牌
+190,32400,汽车维修,吉利特约维修,吉利维修,Auto Repair,Geely Franchised Repair,Geely Repair,0.29,国产品牌
+191,32401,汽车维修,吉利特约维修,沃尔沃汽车维修,Auto Repair,Geely Franchised Repair,Volvo Cars Repair,0.29,豪华品牌
+192,32500,汽车维修,奇瑞特约维修,奇瑞维修,Auto Repair,Chery Franchised Repair,Chery Repair,0.29,国产品牌
+193,32600,汽车维修,克莱斯勒特约维修,克莱斯勒维修,Auto Repair,Chrysler Franchised Repair,Chrysler Repair,0.29,普通品牌
+194,32601,汽车维修,克莱斯勒特约维修,吉普维修,Auto Repair,Chrysler Franchised Repair,Jeep Repair,0.29,个性品牌
+195,32602,汽车维修,克莱斯勒特约维修,道奇维修,Auto Repair,Chrysler Franchised Repair,Dodge Repair,0.29,普通品牌
+196,32700,汽车维修,荣威维修,荣威维修,Auto Repair,ROEWE Repair,ROEWE Repair,0.29,国产品牌
+197,32800,汽车维修,名爵维修,名爵维修,Auto Repair,MG Repair,MG Repair,0.29,国产品牌
+198,32900,汽车维修,江淮维修,江淮维修,Auto Repair,JAC Repair,JAC Repair,0.29,国产品牌
+199,33000,汽车维修,红旗维修,红旗维修,Auto Repair,Hongqi Repair,Hongqi Repair,0.29,高端国产品牌
+200,33100,汽车维修,长安汽车维修,长安汽车维修,Auto Repair,Chang'an Repair,Chang'an Repair,0.29,国产品牌
+201,33200,汽车维修,海马汽车维修,海马汽车维修,Auto Repair,Haima Repair,Haima Repair,0.29,普通品牌
+202,33300,汽车维修,北京汽车维修,北京汽车维修,Auto Repair,BAIC MOTOR Repair,BAIC MOTOR Repair,0.29,国产品牌
+203,33400,汽车维修,长城汽车维修,长城汽车维修,Auto Repair,Great Wall Repair,Great Wall Repair,0.29,国产品牌
+204,33401,汽车维修,长城汽车维修,魏派汽车维修,Auto Repair,Great Wall Repair,WEY Repair,0.29,高端国产品牌
+205,33500,汽车维修,纳智捷维修,纳智捷维修,Auto Repair,Luxgen Repair,Luxgen Repair,0.29,普通品牌
+206,33600,汽车维修,广汽传祺维修,广汽传祺维修,Auto Repair,GAC Trumpchi Repair,GAC Trumpchi Repair,0.29,国产品牌
+207,35000,汽车维修,货车维修,货车维修,Auto Repair,Truck Repair,Truck Repair,0.2,专业需求
+208,35100,汽车维修,东风货车维修,东风货车维修,Auto Repair,Dongfeng Truck Repair,Dongfeng Truck Repair,0.29,专业需求
+209,35200,汽车维修,中国重汽维修,中国重汽维修,Auto Repair,SINOTRUK Repair,SINOTRUK Repair,0.29,专业需求
+210,35300,汽车维修,一汽解放维修,一汽解放维修,Auto Repair,FAW Jiefang Repair,FAW Jiefang Repair,0.29,专业需求
+211,35400,汽车维修,福田卡车维修,福田卡车维修,Auto Repair,Foton Truck Repair,Foton Truck Repair,0.29,专业需求
+212,35500,汽车维修,陕西重汽维修,陕西重汽维修,Auto Repair,Shaanxi Heavy-duty Truck Repair,Shaanxi Heavy-duty Truck Repair,0.29,专业需求
+213,35600,汽车维修,北奔重汽维修,北奔重汽维修,Auto Repair,Beiben Trucks Repair,Beiben Trucks Repair,0.29,专业需求
+214,35700,汽车维修,江淮货车维修,江淮货车维修,Auto Repair,JAC Truck Repair,JAC Truck Repair,0.29,专业需求
+215,35800,汽车维修,华菱星马维修,华菱星马维修,Auto Repair,CAMC Repair,CAMC Repair,0.29,专业需求
+216,35900,汽车维修,成都大运汽车维修,成都大运汽车维修,Auto Repair,Chengdu Dayun Automotive Repair,Chengdu Dayun Automotive Repair,0.29,专业需求
+217,36000,汽车维修,梅赛德斯-奔驰卡车维修,梅赛德斯-奔驰卡车维修,Auto Repair,Mercedes-Benz Truck Repair,Mercedes-Benz Truck Repair,0.29,高端专业
+218,36100,汽车维修,德国曼恩维修,德国曼恩维修,Auto Repair,MAN Repair,MAN Repair,0.29,高端专业
+219,36200,汽车维修,斯堪尼亚维修,斯堪尼亚维修,Auto Repair,SCANIA Repair,SCANIA Repair,0.29,高端专业
+220,36300,汽车维修,沃尔沃卡车维修,沃尔沃卡车维修,Auto Repair,Volvo Truck Repair,Volvo Truck Repair,0.29,高端专业
+221,39900,汽车维修,观致维修,观致维修,Auto Repair,Qoros Repair,Qoros Repair,0.29,普通品牌
+222,40000,摩托车服务,摩托车服务相关,摩托车服务相关,Motorcycle Service,Motorcycle Service Related,Motorcycle Service Related,0.2,低频需求
+223,40100,摩托车服务,摩托车销售,摩托车销售,Motorcycle Service,Motorcycle Sales,Motorcycle Sales,0.2,低频需求
+224,40101,摩托车服务,摩托车销售,宝马摩托车销售,Motorcycle Service,Motorcycle Sales,BMW Motorcycle Sales,0.29,高端品牌
+225,40200,摩托车服务,摩托车维修,摩托车维修,Motorcycle Service,Motorcycle Repair,Motorcycle Repair,0.2,低频需求
+226,40201,摩托车服务,摩托车维修,宝马摩托车维修,Motorcycle Service,Motorcycle Repair,BMW Motorcycle Repair,0.29,高端品牌
+227,50000,餐饮服务,餐饮相关场所,餐饮相关,Food & Beverages,Food & Beverages Related,Food & Beverages Related,0.29,高频需求
+228,50100,餐饮服务,中餐厅,中餐厅,Food & Beverages,Chinese Food Restaurant,Chinese Food Restaurant,0.29,高频需求
+229,50101,餐饮服务,中餐厅,综合酒楼,Food & Beverages,Chinese Food Restaurant,Complex Food,0.29,品质餐饮
+230,50102,餐饮服务,中餐厅,四川菜(川菜),Food & Beverages,Chinese Food Restaurant,Sichuan Food,0.29,受欢迎菜系
+231,50103,餐饮服务,中餐厅,广东菜(粤菜),Food & Beverages,Chinese Food Restaurant,Cantonese Food,0.29,品质餐饮
+232,50104,餐饮服务,中餐厅,山东菜(鲁菜),Food & Beverages,Chinese Food Restaurant,Shandong Food,0.29,普通菜系
+233,50105,餐饮服务,中餐厅,江苏菜,Food & Beverages,Chinese Food Restaurant,Jiangsu Food,0.29,品质餐饮
+234,50106,餐饮服务,中餐厅,浙江菜,Food & Beverages,Chinese Food Restaurant,Zhejiang Food,0.29,品质餐饮
+235,50107,餐饮服务,中餐厅,上海菜,Food & Beverages,Chinese Food Restaurant,Shanghai Food,0.29,品质餐饮
+236,50108,餐饮服务,中餐厅,湖南菜(湘菜),Food & Beverages,Chinese Food Restaurant,Hunan Food,0.29,受欢迎菜系
+237,50109,餐饮服务,中餐厅,安徽菜(徽菜),Food & Beverages,Chinese Food Restaurant,Anhui Food,0.29,普通菜系
+238,50110,餐饮服务,中餐厅,福建菜,Food & Beverages,Chinese Food Restaurant,Fujian Food,0.29,普通菜系
+239,50111,餐饮服务,中餐厅,北京菜,Food & Beverages,Chinese Food Restaurant,Beijing Food,0.29,特色菜系
+240,50112,餐饮服务,中餐厅,湖北菜(鄂菜),Food & Beverages,Chinese Food Restaurant,Hubei Food,0.29,普通菜系
+241,50113,餐饮服务,中餐厅,东北菜,Food & Beverages,Chinese Food Restaurant,Northeastern Chinese Food,0.29,受欢迎菜系
+242,50114,餐饮服务,中餐厅,云贵菜,Food & Beverages,Chinese Food Restaurant,Yunnan & Guizhou Food,0.29,特色菜系
+243,50115,餐饮服务,中餐厅,西北菜,Food & Beverages,Chinese Food Restaurant,Northwestern Chinese Food,0.29,特色菜系
+244,50116,餐饮服务,中餐厅,老字号,Food & Beverages,Chinese Food Restaurant,Traditional Brand,0.29,品质餐饮
+245,50117,餐饮服务,中餐厅,火锅店,Food & Beverages,Chinese Food Restaurant,Hotpot Restaurant,0.29,受欢迎类型
+246,50118,餐饮服务,中餐厅,特色/地方风味餐厅,Food & Beverages,Chinese Food Restaurant,Local Special Food,0.29,特色餐饮
+247,50119,餐饮服务,中餐厅,海鲜酒楼,Food & Beverages,Chinese Food Restaurant,Sea Food,0.29,品质餐饮
+248,50120,餐饮服务,中餐厅,中式素菜馆,Food & Beverages,Chinese Food Restaurant,Vegetarian Food,0.29,特色餐饮
+249,50121,餐饮服务,中餐厅,清真菜馆,Food & Beverages,Chinese Food Restaurant,Islamic Food,0.29,特色餐饮
+250,50122,餐饮服务,中餐厅,台湾菜,Food & Beverages,Chinese Food Restaurant,Taiwan Food,0.29,特色餐饮
+251,50123,餐饮服务,中餐厅,潮州菜,Food & Beverages,Chinese Food Restaurant,Chaozhou Food,0.29,特色餐饮
+252,50200,餐饮服务,外国餐厅,外国餐厅,Food & Beverages,Foreign Food Restaurant,Foreign Food Restaurant,0.29,品质餐饮
+253,50201,餐饮服务,外国餐厅,西餐厅(综合风味),Food & Beverages,Foreign Food Restaurant,Western Restaurant,0.29,品质餐饮
+254,50202,餐饮服务,外国餐厅,日本料理,Food & Beverages,Foreign Food Restaurant,Japanese Cuisine,0.29,高端餐饮
+255,50203,餐饮服务,外国餐厅,韩国料理,Food & Beverages,Foreign Food Restaurant,South Korean Cuisine,0.29,特色餐饮
+256,50204,餐饮服务,外国餐厅,法式菜品餐厅,Food & Beverages,Foreign Food Restaurant,French Food,0.29,高端餐饮
+257,50205,餐饮服务,外国餐厅,意式菜品餐厅,Food & Beverages,Foreign Food Restaurant,Italian Food,0.29,品质餐饮
+258,50206,餐饮服务,外国餐厅,泰国/越南菜品餐厅,Food & Beverages,Foreign Food Restaurant,Thai/Vietnamese Food,0.29,特色餐饮
+259,50207,餐饮服务,外国餐厅,地中海风格菜品,Food & Beverages,Foreign Food Restaurant,Mediterranean Food,0.29,品质餐饮
+260,50208,餐饮服务,外国餐厅,美式风味,Food & Beverages,Foreign Food Restaurant,American Food,0.29,普通餐饮
+261,50209,餐饮服务,外国餐厅,印度风味,Food & Beverages,Foreign Food Restaurant,Indian Food,0.29,特色餐饮
+262,50210,餐饮服务,外国餐厅,英国式菜品餐厅,Food & Beverages,Foreign Food Restaurant,British Food,0.29,特色餐饮
+263,50211,餐饮服务,外国餐厅,牛扒店(扒房),Food & Beverages,Foreign Food Restaurant,Steak House,0.29,品质餐饮
+264,50212,餐饮服务,外国餐厅,俄国菜,Food & Beverages,Foreign Food Restaurant,Russian Food,0.29,特色餐饮
+265,50213,餐饮服务,外国餐厅,葡国菜,Food & Beverages,Foreign Food Restaurant,Portuguese Food,0.29,特色餐饮
+266,50214,餐饮服务,外国餐厅,德国菜,Food & Beverages,Foreign Food Restaurant,German Food,0.29,特色餐饮
+267,50215,餐饮服务,外国餐厅,巴西菜,Food & Beverages,Foreign Food Restaurant,Brazilian Food,0.29,特色餐饮
+268,50216,餐饮服务,外国餐厅,墨西哥菜,Food & Beverages,Foreign Food Restaurant,Mexican Food,0.29,特色餐饮
+269,50217,餐饮服务,外国餐厅,其它亚洲菜,Food & Beverages,Foreign Food Restaurant,Other Asian Food,0.29,特色餐饮
+270,50300,餐饮服务,快餐厅,快餐厅,Food & Beverages,Fast Food Restaurant,Fast Food Restaurant,0.29,高频需求
+271,50301,餐饮服务,快餐厅,肯德基,Food & Beverages,Fast Food Restaurant,KFC,0.29,知名品牌
+272,50302,餐饮服务,快餐厅,麦当劳,Food & Beverages,Fast Food Restaurant,McDonald's,0.29,知名品牌
+273,50303,餐饮服务,快餐厅,必胜客,Food & Beverages,Fast Food Restaurant,Pizza Hut,0.29,知名品牌
+274,50304,餐饮服务,快餐厅,永和豆浆,Food & Beverages,Fast Food Restaurant,Yon ho,0.29,普通品牌
+275,50305,餐饮服务,快餐厅,茶餐厅,Food & Beverages,Fast Food Restaurant,Teahouse,0.29,特色餐饮
+276,50306,餐饮服务,快餐厅,大家乐,Food & Beverages,Fast Food Restaurant,Cafe de Coral,0.29,普通品牌
+277,50307,餐饮服务,快餐厅,大快活,Food & Beverages,Fast Food Restaurant,Fairwood,0.29,普通品牌
+278,50308,餐饮服务,快餐厅,美心,Food & Beverages,Fast Food Restaurant,Maxim's,0.29,品质餐饮
+279,50309,餐饮服务,快餐厅,吉野家,Food & Beverages,Fast Food Restaurant,Yoshinoya,0.29,知名品牌
+280,50310,餐饮服务,快餐厅,仙跡岩,Food & Beverages,Fast Food Restaurant,Saint's Alp Teahouse,0.29,普通品牌
+281,50311,餐饮服务,快餐厅,呷哺呷哺,Food & Beverages,Fast Food Restaurant,Xiabu Xiabu,0.29,知名品牌
+282,50400,餐饮服务,休闲餐饮场所,休闲餐饮场所,Food & Beverages,Leisure Food Restaurant,Leisure Food Restaurant,0.29,品质生活
+283,50500,餐饮服务,咖啡厅,咖啡厅,Food & Beverages,Coffee House,Coffee House,0.29,品质生活
+284,50501,餐饮服务,咖啡厅,星巴克咖啡,Food & Beverages,Coffee House,Starbucks Coffee,0.29,知名品牌
+285,50502,餐饮服务,咖啡厅,上岛咖啡,Food & Beverages,Coffee House,UBC Coffee,0.29,普通品牌
+286,50503,餐饮服务,咖啡厅,Pacific Coffee Company,Food & Beverages,Coffee House,Pacific Coffee Company,0.29,品质品牌
+287,50504,餐饮服务,咖啡厅,巴黎咖啡店,Food & Beverages,Coffee House,Paris Cafe,0.29,普通品牌
+288,50600,餐饮服务,茶艺馆,茶艺馆,Food & Beverages,Tea House,Tea House,0.29,品质生活
+289,50700,餐饮服务,冷饮店,冷饮店,Food & Beverages,Icecream Shop,Icecream Shop,0.29,普通需求
+290,50800,餐饮服务,糕饼店,糕饼店,Food & Beverages,Bakery,Bakery,0.29,普通需求
+291,50900,餐饮服务,甜品店,甜品店,Food & Beverages,Dessert House,Dessert House,0.29,品质生活
+292,60000,购物服务,购物相关场所,购物相关场所,Shopping,Shopping Related Places,Shopping Related Places,0.8,高频需求
+293,60100,购物服务,商场,商场,Shopping,Shopping Plaza,Shopping Plaza,0.85,核心商业
+294,60101,购物服务,商场,购物中心,Shopping,Shopping Plaza,Shopping Centre,0.9,核心商业
+295,60102,购物服务,商场,普通商场,Shopping,Shopping Plaza,Shops,0.75,普通商业
+296,60103,购物服务,商场,免税品店,Shopping,Shopping Plaza,Duty-free Shop,0.8,特色商业
+297,60200,购物服务,便民商店/便利店,便民商店/便利店,Shopping,Convenience Store,Convenience Store,0.75,高频需求
+298,60201,购物服务,便民商店/便利店,7-ELEVEn便利店,Shopping,Convenience Store,7-ELEVEn,0.85,知名品牌
+299,60202,购物服务,便民商店/便利店,OK便利店,Shopping,Convenience Store,Circle K,0.8,知名品牌
+300,60300,购物服务,家电电子卖场,家电电子卖场,Shopping,Home Electronics Hypermarket,Home Electronics Hypermarket,0.7,低频需求
+301,60301,购物服务,家电电子卖场,综合家电商场,Shopping,Home Electronics Hypermarket,Comprehensive Home Electronics Shopping Center,0.75,品质商业
+302,60302,购物服务,家电电子卖场,国美,Shopping,Home Electronics Hypermarket,GOME,0.8,知名品牌
+303,60303,购物服务,家电电子卖场,大中,Shopping,Home Electronics Hypermarket,Dazhong,0.75,普通品牌
+304,60304,购物服务,家电电子卖场,苏宁,Shopping,Home Electronics Hypermarket,Suning,0.8,知名品牌
+305,60305,购物服务,家电电子卖场,手机销售,Shopping,Home Electronics Hypermarket,Mobile Handsets Sales,0.7,普通需求
+306,60306,购物服务,家电电子卖场,数码电子,Shopping,Home Electronics Hypermarket,Digital Electronics,0.7,普通需求
+307,60307,购物服务,家电电子卖场,丰泽,Shopping,Home Electronics Hypermarket,Fortress,0.75,品质商业
+308,60308,购物服务,家电电子卖场,苏宁镭射,Shopping,Home Electronics Hypermarket,Suning Citicall,0.75,普通品牌
+309,60400,购物服务,超级市场,超市,Shopping,Supermarket,Supermarket,0.8,高频需求
+310,60401,购物服务,超级市场,家乐福,Shopping,Supermarket,Carrefour,0.85,知名品牌
+311,60402,购物服务,超级市场,沃尔玛,Shopping,Supermarket,Wal-Mart,0.85,知名品牌
+312,60403,购物服务,超级市场,华润,Shopping,Supermarket,CRC,0.8,知名品牌
+313,60404,购物服务,超级市场,北京华联,Shopping,Supermarket,Beijing Hualian,0.75,普通品牌
+314,60405,购物服务,超级市场,上海华联,Shopping,Supermarket,Shanghai Hualian,0.75,普通品牌
+315,60406,购物服务,超级市场,麦德龙,Shopping,Supermarket,METRO,0.8,知名品牌
+316,60407,购物服务,超级市场,乐天玛特,Shopping,Supermarket,LOTTE Mart,0.75,普通品牌
+317,60408,购物服务,超级市场,华堂,Shopping,Supermarket,Ito Yokado,0.75,普通品牌
+318,60409,购物服务,超级市场,卜蜂莲花,Shopping,Supermarket,Lotus,0.75,普通品牌
+319,60411,购物服务,超级市场,屈臣氏,Shopping,Supermarket,Watsons,0.8,知名品牌
+320,60413,购物服务,超级市场,惠康超市,Shopping,Supermarket,Wellcome,0.75,普通品牌
+321,60414,购物服务,超级市场,百佳超市,Shopping,Supermarket,PARKnSHOP,0.8,知名品牌
+322,60415,购物服务,超级市场,万宁超市,Shopping,Supermarket,Mannings,0.75,普通品牌
+323,60500,购物服务,花鸟鱼虫市场,花鸟鱼虫市场,Shopping,Plants & Pet Market,Plants & Pet Market,0.6,特色需求
+324,60501,购物服务,花鸟鱼虫市场,花卉市场,Shopping,Plants & Pet Market,Flower Shop,0.65,品质生活
+325,60502,购物服务,花鸟鱼虫市场,宠物市场,Shopping,Plants & Pet Market,Pet Market,0.6,特色需求
+326,60600,购物服务,家居建材市场,家居建材市场,Shopping,Home Building Materials Market,Home Building Materials Market,0.6,低频需求
+327,60601,购物服务,家居建材市场,家具建材综合市场,Shopping,Home Building Materials Market,Home Building Materials Market,0.65,专业需求
+328,60602,购物服务,家居建材市场,家具城,Shopping,Home Building Materials Market,Furniture Store,0.65,专业需求
+329,60603,购物服务,家居建材市场,建材五金市场,Shopping,Home Building Materials Market,Hardware Store,0.6,专业需求
+330,60604,购物服务,家居建材市场,厨卫市场,Shopping,Home Building Materials Market,Kitchen Supply,0.6,专业需求
+331,60605,购物服务,家居建材市场,布艺市场,Shopping,Home Building Materials Market,Deco Cloth Store,0.55,低频需求
+332,60606,购物服务,家居建材市场,灯具瓷器市场,Shopping,Home Building Materials Market,Lighting & Porcelain Market,0.55,低频需求
+333,60700,购物服务,综合市场,综合市场,Shopping,Comprehensive Market,Comprehensive Market,0.7,普通需求
+334,60701,购物服务,综合市场,小商品市场,Shopping,Comprehensive Market,Small Commodity Market,0.65,普通需求
+335,60702,购物服务,综合市场,旧货市场,Shopping,Comprehensive Market,Flea Market,0.5,低频需求
+336,60703,购物服务,综合市场,农副产品市场,Shopping,Comprehensive Market,Agricultural Products Market,0.75,高频需求
+337,60704,购物服务,综合市场,果品市场,Shopping,Comprehensive Market,Fruits Market,0.75,高频需求
+338,60705,购物服务,综合市场,蔬菜市场,Shopping,Comprehensive Market,Vegetable Market,0.8,高频需求
+339,60706,购物服务,综合市场,水产海鲜市场,Shopping,Comprehensive Market,Seafood Market,0.75,特色需求
+340,60800,购物服务,文化用品店,文化用品店,Shopping,Stationary Store,Stationary Store,0.6,低频需求
+341,60900,购物服务,体育用品店,体育用品店,Shopping,Sports Store,Sports Store,0.65,品质生活
+342,60901,购物服务,体育用品店,李宁专卖店,Shopping,Sports Store,Li-Ning,0.75,国产品牌
+343,60902,购物服务,体育用品店,耐克专卖店,Shopping,Sports Store,NIKE,0.85,国际品牌
+344,60903,购物服务,体育用品店,阿迪达斯专卖店,Shopping,Sports Store,adidas,0.85,国际品牌
+345,60904,购物服务,体育用品店,锐步专卖店,Shopping,Sports Store,Reebok,0.75,普通品牌
+346,60905,购物服务,体育用品店,彪马专卖店,Shopping,Sports Store,PUMA,0.8,国际品牌
+347,60906,购物服务,体育用品店,高尔夫用品店,Shopping,Sports Store,Golf Accessories Shop,0.7,特色需求
+348,60907,购物服务,体育用品店,户外用品,Shopping,Sports Store,Outdoor Sports Shop,0.7,特色需求
+349,61000,购物服务,特色商业街,特色商业街,Shopping,Commercial Street,Commercial Street,0.8,核心商业
+350,61001,购物服务,特色商业街,步行街,Shopping,Commercial Street,Pedestrian Street,0.85,核心商业
+351,61100,购物服务,服装鞋帽皮具店,服装鞋帽皮具店,Shopping,Clothing Store,Clothing Store,0.75,普通需求
+352,61101,购物服务,服装鞋帽皮具店,品牌服装店,Shopping,Clothing Store,Brand Clothing Store,0.8,品质商业
+353,61102,购物服务,服装鞋帽皮具店,品牌鞋店,Shopping,Clothing Store,Brand Shoes Store,0.75,普通需求
+354,61103,购物服务,服装鞋帽皮具店,品牌皮具店,Shopping,Clothing Store,Brand Leather Ware Store,0.75,普通需求
+355,61104,购物服务,服装鞋帽皮具店,品牌箱包店,Shopping,Clothing Store,Brand Bags and Suitcases Store,0.75,普通需求
+356,61200,购物服务,专卖店,专营店,Shopping,Franchise Store,Franchise Store,0.7,普通需求
+357,61201,购物服务,专卖店,古玩字画店,Shopping,Franchise Store,Antique Shop,0.6,特色需求
+358,61202,购物服务,专卖店,珠宝首饰工艺品,Shopping,Franchise Store,Jewelry Store,0.75,品质商业
+359,61203,购物服务,专卖店,钟表店,Shopping,Franchise Store,Watches Shop,0.75,品质商业
+360,61204,购物服务,专卖店,眼镜店,Shopping,Franchise Store,Optical Shop,0.7,普通需求
+361,61205,购物服务,专卖店,书店,Shopping,Franchise Store,Bookstore,0.75,品质生活
+362,61206,购物服务,专卖店,音像店,Shopping,Franchise Store,CD/DVD Shop,0.6,低频需求
+363,61207,购物服务,专卖店,儿童用品店,Shopping,Franchise Store,Children's Store,0.7,家庭需求
+364,61208,购物服务,专卖店,自行车专卖店,Shopping,Franchise Store,Bike Shop,0.65,普通需求
+365,61209,购物服务,专卖店,礼品饰品店,Shopping,Franchise Store,Gift Store,0.65,普通需求
+366,61210,购物服务,专卖店,烟酒专卖店,Shopping,Franchise Store,Tobacco & Wine Franchise Store,0.7,普通需求
+367,61211,购物服务,专卖店,宠物用品店,Shopping,Franchise Store,Pet's Store,0.65,特色需求
+368,61212,购物服务,专卖店,摄影器材店,Shopping,Franchise Store,Camera Shop,0.65,专业需求
+369,61213,购物服务,专卖店,宝马生活方式,Shopping,Franchise Store,BMW Lifestyle,0.7,高端品牌
+370,61214,购物服务,专卖店,土特产专卖店,Shopping,Franchise Store,Local Products Franchise Store,0.65,特色需求
+371,61300,购物服务,特殊买卖场所,特殊买卖场所,Shopping,Special Trade House,Special Trade House,0.5,低频需求
+372,61301,购物服务,特殊买卖场所,拍卖行,Shopping,Special Trade House,Auction House,0.6,专业需求
+373,61302,购物服务,特殊买卖场所,典当行,Shopping,Special Trade House,Pawn House,0.4,负面关联
+374,61400,购物服务,个人用品/化妆品店,其它个人用品店,Shopping,Personal Care Items Shop,Personal Care Items Shop,0.7,普通需求
+375,61401,购物服务,个人用品/化妆品店,莎莎,Shopping,Personal Care Items Shop,Sasa,0.75,知名品牌
+376,70000,生活服务,生活服务场所,生活服务场所,Daily Life Service,Daily Life Service Place,Daily Life Service Place,0.29,高频需求
+377,70100,生活服务,旅行社,旅行社,Daily Life Service,Travel Agency,Travel Agency,0.29,低频需求
+378,70200,生活服务,信息咨询中心,信息咨询中心,Daily Life Service,Information Centre,Information Centre,0.29,便利服务
+379,70201,生活服务,信息咨询中心,服务中心,Daily Life Service,Information Centre,Service Centre,0.29,便利服务
+380,70202,生活服务,信息咨询中心,旅馆问讯,Daily Life Service,Information Centre,Enquire of Hotel,0.29,低频需求
+381,70203,生活服务,信息咨询中心,行李查询/行李问询,Daily Life Service,Information Centre,Enquire of Baggage,0.29,低频需求
+382,70300,生活服务,售票处,售票处,Daily Life Service,Ticket Office,Ticket Office,0.29,便利服务
+383,70301,生活服务,售票处,飞机票代售点,Daily Life Service,Ticket Office,Airline Tickets Office,0.29,便利服务
+384,70302,生活服务,售票处,火车票代售点,Daily Life Service,Ticket Office,Train Ticket Office,0.29,便利服务
+385,70303,生活服务,售票处,长途汽车票代售点,Daily Life Service,Ticket Office,Coach Ticket Office,0.29,便利服务
+386,70304,生活服务,售票处,船票代售点,Daily Life Service,Ticket Office,Ferry Ticket Office,0.29,低频需求
+387,70305,生活服务,售票处,公交卡/月票代售点,Daily Life Service,Ticket Office,Bus IC Card,0.29,高频需求
+388,70306,生活服务,售票处,公园景点售票处,Daily Life Service,Ticket Office,Park Box Office,0.29,便利服务
+389,70400,生活服务,邮局,邮局,Daily Life Service,Post Office,Post Office,0.7,基础服务
+390,70401,生活服务,邮局,邮政速递,Daily Life Service,Post Office,Express Post,0.75,便利服务
+391,70500,生活服务,物流速递,物流速递,Daily Life Service,Logistics Service,Logistics Service,0.7,便利服务
+392,70501,生活服务,物流速递,物流仓储场地,Daily Life Service,Logistics Service,Logistics Warehouse Space,0.6,专业需求
+393,70600,生活服务,电讯营业厅,电讯营业厅,Daily Life Service,Telecom Office,Telecom Office,0.29,高频需求
+394,70601,生活服务,电讯营业厅,中国电信营业厅,Daily Life Service,Telecom Office,China Telecom Office,0.29,基础服务
+395,70603,生活服务,电讯营业厅,中国移动营业厅,Daily Life Service,Telecom Office,China Mobile Office,0.29,基础服务
+396,70604,生活服务,电讯营业厅,中国联通营业厅,Daily Life Service,Telecom Office,China Unicom Office,0.29,基础服务
+397,70605,生活服务,电讯营业厅,中国铁通营业厅,Daily Life Service,Telecom Office,China Tietong Office,0.29,普通服务
+398,70606,生活服务,电讯营业厅,中国卫通营业厅,Daily Life Service,Telecom Office,China Satcom Office,0.29,专业服务
+399,70607,生活服务,电讯营业厅,和记电讯,Daily Life Service,Telecom Office,Hutchison Telecommunications,0.29,普通服务
+400,70608,生活服务,电讯营业厅,数码通电讯,Daily Life Service,Telecom Office,SmarTone,0.29,普通服务
+401,70609,生活服务,电讯营业厅,电讯盈科,Daily Life Service,Telecom Office,PCCW,0.29,普通服务
+402,70610,生活服务,电讯营业厅,中国移动香港,Daily Life Service,Telecom Office,China Mobile Hong Kong,0.29,基础服务
+403,70700,生活服务,事务所,事务所,Daily Life Service,Professional Service Firm,Professional Service Firm,0.29,专业服务
+404,70701,生活服务,事务所,律师事务所,Daily Life Service,Professional Service Firm,Law Firm,0.29,专业服务
+405,70702,生活服务,事务所,会计师事务所,Daily Life Service,Professional Service Firm,Accounting Firm,0.29,专业服务
+406,70703,生活服务,事务所,评估事务所,Daily Life Service,Professional Service Firm,Evaluation Firm,0.29,专业服务
+407,70704,生活服务,事务所,审计事务所,Daily Life Service,Professional Service Firm,Audit Firm,0.29,专业服务
+408,70705,生活服务,事务所,认证事务所,Daily Life Service,Professional Service Firm,Authentication Services,0.29,专业服务
+409,70706,生活服务,事务所,专利事务所,Daily Life Service,Professional Service Firm,Patent Office,0.29,专业服务
+410,70800,生活服务,人才市场,人才市场,Daily Life Service,Job Center,Job Center,0.29,低频需求
+411,70900,生活服务,自来水营业厅,自来水营业厅,Daily Life Service,Water Supply Service Office,Water Supply Service Office,0.29,基础服务
+412,71000,生活服务,电力营业厅,电力营业厅,Daily Life Service,Electric Supply Service Office,Electric Supply Service Office,0.29,基础服务
+413,71100,生活服务,美容美发店,美容美发店,Daily Life Service,Beauty and Hairdressing Store,Beauty and Hairdressing Store,0.29,高频需求
+414,71200,生活服务,维修站点,维修站点,Daily Life Service,Repair Store,Repair Store,0.29,便利服务
+415,71300,生活服务,摄影冲印店,摄影冲印,Daily Life Service,Photo Finishing,Photo Finishing,0.29,低频需求
+416,71400,生活服务,洗浴推拿场所,洗浴推拿场所,Daily Life Service,Bath & Massage Center,Bath & Massage Center,0.29,品质生活
+417,71500,生活服务,洗衣店,洗衣店,Daily Life Service,Laundry,Laundry,0.29,高频需求
+418,71600,生活服务,中介机构,中介机构,Daily Life Service,Agency,Agency,0.29,专业服务
+419,71700,生活服务,搬家公司,搬家公司,Daily Life Service,Move Service,Move Service,0.29,低频需求
+420,71800,生活服务,彩票彩券销售点,彩票彩券销售点,Daily Life Service,Lottery Store,Lottery Store,0.29,普通需求
+421,71801,生活服务,彩票彩券销售点,马会投注站,Daily Life Service,Lottery Store,Horse-Betting Center,0.29,潜在负面
+422,71900,生活服务,丧葬设施,丧葬设施,Daily Life Service,Funeral Facilities,Funeral Facilities,-0.8,严重负面
+423,71901,生活服务,丧葬设施,陵园,Daily Life Service,Funeral Facilities,Cemetery,-0.8,严重负面
+424,71902,生活服务,丧葬设施,公墓,Daily Life Service,Funeral Facilities,Cemetery,-0.8,严重负面
+425,71903,生活服务,丧葬设施,殡仪馆,Daily Life Service,Funeral Facilities,Funeral House,-0.9,严重负面
+426,72000,生活服务,婴儿服务场所,婴儿服务场所,Daily Life Service,Baby Service Place,Baby Service Place,0.29,家庭需求
+427,72001,生活服务,婴儿服务场所,婴儿游泳馆,Daily Life Service,Baby Service Place,Baby Natatorium,0.29,特色需求
+428,72101,生活服务,共享设备,充电宝,Daily Life Service,Shared Device,Power Bank,0.29,便利服务
+429,73000,生活服务,电动自动车充电站,电动自行车充电站,Daily Life Service,Electric Bicycle Charging Station,Electric Bicycle Charging Station,0.29,新兴需求
+430,73001,生活服务,电动自动车充电站,电动自行车换电站,Daily Life Service,Electric Bicycle Power Swapping Station,Electric Bicycle Power Swapping Station,0.29,新兴需求
+431,73002,生活服务,电动自动车充电站,电动自行车专用充电站,Daily Life Service,Electric Bicycle Dedicated Charging Station,Electric Bicycle Dedicated Charging Station,0.29,新兴需求
+432,80000,体育休闲服务,体育休闲服务场所,体育休闲服务场所,Sports & Recreation,Sports & Recreation Places,Sports & Recreation Places,0.8,品质生活
+433,80100,体育休闲服务,运动场馆,运动场所,Sports & Recreation,Sports Stadium,Sports Places,0.75,健康生活
+434,80101,体育休闲服务,运动场馆,综合体育馆,Sports & Recreation,Sports Stadium,Sports Centre,0.8,核心设施
+435,80102,体育休闲服务,运动场馆,保龄球馆,Sports & Recreation,Sports Stadium,Bowling Hall,0.7,特色设施
+436,80103,体育休闲服务,运动场馆,网球场,Sports & Recreation,Sports Stadium,Tennis Court,0.7,特色设施
+437,80104,体育休闲服务,运动场馆,篮球场馆,Sports & Recreation,Sports Stadium,Basketball Stadium,0.75,热门设施
+438,80105,体育休闲服务,运动场馆,足球场,Sports & Recreation,Sports Stadium,Football Field,0.75,热门设施
+439,80106,体育休闲服务,运动场馆,滑雪场,Sports & Recreation,Sports Stadium,Ski Field,0.7,特色设施
+440,80107,体育休闲服务,运动场馆,溜冰场,Sports & Recreation,Sports Stadium,Skating Rink,0.7,特色设施
+441,80108,体育休闲服务,运动场馆,户外健身场所,Sports & Recreation,Sports Stadium,Outdoor Gym Facility,0.75,健康生活
+442,80109,体育休闲服务,运动场馆,海滨浴场,Sports & Recreation,Sports Stadium,Public Beach,0.8,优质设施
+443,80110,体育休闲服务,运动场馆,游泳馆,Sports & Recreation,Sports Stadium,Natatorium,0.8,核心设施
+444,80111,体育休闲服务,运动场馆,健身中心,Sports & Recreation,Sports Stadium,Gym Center,0.8,核心设施
+445,80112,体育休闲服务,运动场馆,乒乓球馆,Sports & Recreation,Sports Stadium,Table Tennis Hall,0.7,普通设施
+446,80113,体育休闲服务,运动场馆,台球厅,Sports & Recreation,Sports Stadium,Pool Room,0.65,普通设施
+447,80114,体育休闲服务,运动场馆,壁球场,Sports & Recreation,Sports Stadium,Squash Court,0.65,特色设施
+448,80115,体育休闲服务,运动场馆,马术俱乐部,Sports & Recreation,Sports Stadium,Horse Riding Club,0.7,高端设施
+449,80116,体育休闲服务,运动场馆,赛马场,Sports & Recreation,Sports Stadium,Race Track,0.6,特色设施
+450,80117,体育休闲服务,运动场馆,橄榄球场,Sports & Recreation,Sports Stadium,Rugby Court,0.6,特色设施
+451,80118,体育休闲服务,运动场馆,羽毛球场,Sports & Recreation,Sports Stadium,Badminton Court,0.75,热门设施
+452,80119,体育休闲服务,运动场馆,跆拳道场馆,Sports & Recreation,Sports Stadium,Taekwondo Venue,0.7,特色设施
+453,80200,体育休闲服务,高尔夫相关,高尔夫相关,Sports & Recreation,Golf Related,Golf Related,0.7,高端生活
+454,80201,体育休闲服务,高尔夫相关,高尔夫球场,Sports & Recreation,Golf Related,Golf Course,0.75,高端设施
+455,80202,体育休闲服务,高尔夫相关,高尔夫练习场,Sports & Recreation,Golf Related,Golf Training Course,0.7,高端设施
+456,80300,体育休闲服务,娱乐场所,娱乐场所,Sports & Recreation,Recreation Center,Recreation Center,0.7,品质生活
+457,80301,体育休闲服务,娱乐场所,夜总会,Sports & Recreation,Recreation Center,Night Club,0.5,潜在噪音
+458,80302,体育休闲服务,娱乐场所,KTV,Sports & Recreation,Recreation Center,KTV,0.6,潜在噪音
+459,80303,体育休闲服务,娱乐场所,迪厅,Sports & Recreation,Recreation Center,Disco,0.4,噪音负面
+460,80304,体育休闲服务,娱乐场所,酒吧,Sports & Recreation,Recreation Center,Pub,0.65,品质生活
+461,80305,体育休闲服务,娱乐场所,游戏厅,Sports & Recreation,Recreation Center,Game Center,0.6,普通娱乐
+462,80306,体育休闲服务,娱乐场所,棋牌室,Sports & Recreation,Recreation Center,Card & Chess Room,0.6,普通娱乐
+463,80307,体育休闲服务,娱乐场所,博彩中心,Sports & Recreation,Recreation Center,Lottery Center,0.4,潜在负面
+464,80308,体育休闲服务,娱乐场所,网吧,Sports & Recreation,Recreation Center,Internet Bar,0.5,普通设施
+465,80400,体育休闲服务,度假疗养场所,度假疗养场所,Sports & Recreation,Holiday & Nursing Resort,Holiday & Nursing Resort,0.7,品质生活
+466,80401,体育休闲服务,度假疗养场所,度假村,Sports & Recreation,Holiday & Nursing Resort,Resort,0.75,优质设施
+467,80402,体育休闲服务,度假疗养场所,疗养院,Sports & Recreation,Holiday & Nursing Resort,Nursing Home,0.6,专业设施
+468,80500,体育休闲服务,休闲场所,休闲场所,Sports & Recreation,Recreation Place,Recreation Place,0.75,品质生活
+469,80501,体育休闲服务,休闲场所,游乐场,Sports & Recreation,Recreation Place,Amusement Park,0.8,核心设施
+470,80502,体育休闲服务,休闲场所,垂钓园,Sports & Recreation,Recreation Place,Fishing Spot,0.7,特色设施
+471,80503,体育休闲服务,休闲场所,采摘园,Sports & Recreation,Recreation Place,Plucking Park,0.7,特色设施
+472,80504,体育休闲服务,休闲场所,露营地,Sports & Recreation,Recreation Place,Camping Site,0.65,特色设施
+473,80505,体育休闲服务,休闲场所,水上活动中心,Sports & Recreation,Recreation Place,Water Sports Centre,0.75,优质设施
+474,80600,体育休闲服务,影剧院,影剧院相关,Sports & Recreation,Theatre & Cinema,Theatre & Cinema Related,0.8,文化设施
+475,80601,体育休闲服务,影剧院,电影院,Sports & Recreation,Theatre & Cinema,Cinema,0.85,核心设施
+476,80602,体育休闲服务,影剧院,音乐厅,Sports & Recreation,Theatre & Cinema,Concert Hall,0.8,文化设施
+477,80603,体育休闲服务,影剧院,剧场,Sports & Recreation,Theatre & Cinema,Theatre,0.8,文化设施
+478,90000,医疗保健服务,医疗保健服务场所,医疗保健服务场所,Medical Service,Medical and Health Care Service Place,Medical and Health Care Service Place,0.85,核心资源
+479,90100,医疗保健服务,综合医院,综合医院,Medical Service,Hospital,Hospital,0.9,核心资源
+480,90101,医疗保健服务,综合医院,三级甲等医院,Medical Service,Hospital,AAA Class Hospital,0.95,优质资源
+481,90102,医疗保健服务,综合医院,卫生院,Medical Service,Hospital,Health Center,0.8,基础资源
+482,90200,医疗保健服务,专科医院,专科医院,Medical Service,Special Hospital,Special Hospital,0.85,专业资源
+483,90201,医疗保健服务,专科医院,整形美容,Medical Service,Special Hospital,Plastic Surgery,0.7,专业服务
+484,90202,医疗保健服务,专科医院,口腔医院,Medical Service,Special Hospital,Stomatological Hospital,0.8,专业资源
+485,90203,医疗保健服务,专科医院,眼科医院,Medical Service,Special Hospital,Ophthalmology Hospital,0.8,专业资源
+486,90204,医疗保健服务,专科医院,耳鼻喉医院,Medical Service,Special Hospital,ENT Hospital,0.8,专业资源
+487,90205,医疗保健服务,专科医院,胸科医院,Medical Service,Special Hospital,Chest Hospital,0.85,专业资源
+488,90206,医疗保健服务,专科医院,骨科医院,Medical Service,Special Hospital,Orthopedic Hospital,0.85,专业资源
+489,90207,医疗保健服务,专科医院,肿瘤医院,Medical Service,Special Hospital,Tumor Hospital,0.85,专业资源
+490,90208,医疗保健服务,专科医院,脑科医院,Medical Service,Special Hospital,Brain Hospital,0.85,专业资源
+491,90209,医疗保健服务,专科医院,妇科医院,Medical Service,Special Hospital,Maternity Hospital,0.85,专业资源
+492,90210,医疗保健服务,专科医院,精神病医院,Medical Service,Special Hospital,Psychiatric Hospital,0.7,特殊资源
+493,90211,医疗保健服务,专科医院,传染病医院,Medical Service,Special Hospital,Infectious Disease Hospital,0.7,特殊资源
+494,90300,医疗保健服务,诊所,诊所,Medical Service,Clinic,Clinic,0.8,便利资源
+495,90400,医疗保健服务,急救中心,急救中心,Medical Service,Emergency Center,Emergency Center,0.9,核心资源
+496,90500,医疗保健服务,疾病预防机构,疾病预防,Medical Service,Disease Prevention Institution,Disease Prevention,0.8,专业资源
+497,90600,医疗保健服务,医药保健销售店,医药保健相关,Medical Service,Pharmacy,Medicine Health Care Related,0.75,便利资源
+498,90601,医疗保健服务,医药保健销售店,药房,Medical Service,Pharmacy,Pharmacy,0.8,高频需求
+499,90602,医疗保健服务,医药保健销售店,医疗保健用品,Medical Service,Pharmacy,Medical Supplies,0.75,便利资源
+500,90700,医疗保健服务,动物医疗场所,动物医疗场所,Medical Service,Veterinary Hospital,Veterinary Hospital,0.7,宠物需求
+501,90701,医疗保健服务,动物医疗场所,宠物诊所,Medical Service,Veterinary Hospital,Pet Clinic,0.75,宠物服务
+502,90702,医疗保健服务,动物医疗场所,兽医站,Medical Service,Veterinary Hospital,Veterinary Station,0.65,专业服务
+503,90800,医疗保健服务,核酸检测,核酸检测,Medical Service,COVID-19 Test,COVID-19 Test,0.7,特殊时期需求
+504,100000,住宿服务,住宿服务相关,住宿服务相关,Accommodation Service,Accommodation Service Related,Accommodation Service Related,0.29,低频需求
+505,100100,住宿服务,宾馆酒店,宾馆酒店,Accommodation Service,Hotel,Hotel,0.29,便利设施
+506,100101,住宿服务,宾馆酒店,奢华酒店,Accommodation Service,Hotel,Luxury Hotel,0.29,高端设施
+507,100102,住宿服务,宾馆酒店,五星级宾馆,Accommodation Service,Hotel,Five-star Hotel,0.29,高端设施
+508,100103,住宿服务,宾馆酒店,四星级宾馆,Accommodation Service,Hotel,Four-star Hotel,0.29,品质设施
+509,100104,住宿服务,宾馆酒店,三星级宾馆,Accommodation Service,Hotel,Three-star Hotel,0.29,普通设施
+510,100105,住宿服务,宾馆酒店,经济型连锁酒店,Accommodation Service,Hotel,Economical Chain Hotel,0.29,便利设施
+511,100200,住宿服务,旅馆招待所,旅馆招待所,Accommodation Service,Hostel,Hostel,0.29,基础设施
+512,100201,住宿服务,旅馆招待所,青年旅舍,Accommodation Service,Hostel,Youth Hostel,0.29,特色设施
+513,110000,风景名胜,风景名胜相关,旅游景点,Tourist Attraction,Tourist Attraction Related,Tourist Attraction,0.85,环境价值
+514,110100,风景名胜,公园广场,公园广场,Tourist Attraction,Park & Square,Park & Square,0.9,核心环境
+515,110101,风景名胜,公园广场,公园,Tourist Attraction,Park & Square,Park,0.9,优质环境
+516,110102,风景名胜,公园广场,动物园,Tourist Attraction,Park & Square,Zoo,0.85,优质环境
+517,110103,风景名胜,公园广场,植物园,Tourist Attraction,Park & Square,Botanical Garden,0.85,优质环境
+518,110104,风景名胜,公园广场,水族馆,Tourist Attraction,Park & Square,Aquarium,0.85,优质环境
+519,110105,风景名胜,公园广场,城市广场,Tourist Attraction,Park & Square,City Plaza,0.8,公共空间
+520,110106,风景名胜,公园广场,公园内部设施,Tourist Attraction,Park & Plaza,Facilities within the park,0.75,配套设施
+521,110200,风景名胜,风景名胜,风景名胜,Tourist Attraction,Scenery Spot,Scenery Spot,0.9,优质环境
+522,110201,风景名胜,风景名胜,世界遗产,Tourist Attraction,Scenery Spot,World Heritage,0.95,顶级环境
+523,110202,风景名胜,风景名胜,国家级景点,Tourist Attraction,Scenery Spot,National View Spot,0.9,优质环境
+524,110203,风景名胜,风景名胜,省级景点,Tourist Attraction,Scenery Spot,Provincial View Spot,0.85,良好环境
+525,110204,风景名胜,风景名胜,纪念馆,Tourist Attraction,Scenery Spot,Memorial Hall,0.8,文化资源
+526,110205,风景名胜,风景名胜,寺庙道观,Tourist Attraction,Scenery Spot,Buddhist & Taoist Temple,0.75,文化资源
+527,110206,风景名胜,风景名胜,教堂,Tourist Attraction,Scenery Spot,Church,0.75,文化资源
+528,110207,风景名胜,风景名胜,回教寺,Tourist Attraction,Scenery Spot,Mosque,0.75,文化资源
+529,110208,风景名胜,风景名胜,海滩,Tourist Attraction,Scenery Spot,Beach,0.9,优质环境
+530,110209,风景名胜,风景名胜,观景点,Tourist Attraction,Scenery Spot,View Point,0.85,环境价值
+531,110210,风景名胜,风景名胜,红色景区,Tourist Attraction,Scenery Spot,Red scenic spot,0.8,文化资源
+532,120000,商务住宅,商务住宅相关,商务住宅相关,Commercial House,Commercial House Related,Commercial House Related,0,不评价
+533,120100,商务住宅,产业园区,产业园区,Commercial House,Industrial Park,Industrial Park,-0.3,潜在噪音
+534,120200,商务住宅,楼宇,楼宇相关,Commercial House,Building,Building Related,0,不评价
+535,120201,商务住宅,楼宇,商务写字楼,Commercial House,Building,Business Office Building,0,不评价
+536,120202,商务住宅,楼宇,工业大厦建筑物,Commercial House,Building,Industrial Building,-0.4,潜在噪音
+537,120203,商务住宅,楼宇,商住两用楼宇,Commercial House,Building,Commercial-residential Building,0,不评价
+538,120300,商务住宅,住宅区,住宅区,Commercial House,Residential Area,Residential Area,0,不评价
+539,120301,商务住宅,住宅区,别墅,Commercial House,Residential Area,Villa,0,不评价
+540,120302,商务住宅,住宅区,住宅小区,Commercial House,Residential Area,Residential Quarter,0,不评价
+541,120303,商务住宅,住宅区,宿舍,Commercial House,Residential Area,Dormitory,0,不评价
+542,120304,商务住宅,住宅区,社区中心,Commercial House,Residential Area,Community Center,0,不评价
+543,130000,政府机构及社会团体,政府及社会团体相关,政府及社会团体相关,Governmental Organization & Social Group,Governmental & Social Groups Related,Governmental & Social Groups Related,0,不评价
+544,130100,政府机构及社会团体,政府机关,政府机关相关,Governmental Organization & Social Group,Governmental Organization,Governmental Organization Related,0,不评价
+545,130101,政府机构及社会团体,政府机关,国家级机关及事业单位,Governmental Organization & Social Group,Governmental Organization,State Level Organization & Institution,0,不评价
+546,130102,政府机构及社会团体,政府机关,省直辖市级政府及事业单位,Governmental Organization & Social Group,Governmental Organization,Provincial Level Government and Institution,0,不评价
+547,130103,政府机构及社会团体,政府机关,地市级政府及事业单位,Governmental Organization & Social Group,Governmental Organization,Prefecture Level Government and Institution,0,不评价
+548,130104,政府机构及社会团体,政府机关,区县级政府及事业单位,Governmental Organization & Social Group,Governmental Organization,District & County Level Government and Institution,0,不评价
+549,130105,政府机构及社会团体,政府机关,乡镇级政府及事业单位,Governmental Organization & Social Group,Governmental Organization,Town Level Government and Institution,0,不评价
+550,130106,政府机构及社会团体,政府机关,乡镇以下级政府及事业单位,Governmental Organization & Social Group,Governmental Organization,Below Town level Government and Institution,0,不评价
+551,130107,政府机构及社会团体,政府机关,外地政府办,Governmental Organization & Social Group,Governmental Organization,Non-local Government Representative Office,0,不评价
+552,130200,政府机构及社会团体,外国机构,外国机构相关,Governmental Organization & Social Group,Foreign Organization,Foreign Organization Related,0,不评价
+553,130201,政府机构及社会团体,外国机构,外国使领馆,Governmental Organization & Social Group,Foreign Organization,Foreign Embassy and Consulate,0,不评价
+554,130202,政府机构及社会团体,外国机构,国际组织办事处,Governmental Organization & Social Group,Foreign Organization,Representative Office of International Organization,0,不评价
+555,130300,政府机构及社会团体,民主党派,民主党派,Governmental Organization & Social Group,Democratic Party,Democratic Party,0,不评价
+556,130400,政府机构及社会团体,社会团体,社会团体相关,Governmental Organization & Social Group,Social Group,Social Group Related,0,不评价
+557,130401,政府机构及社会团体,社会团体,共青团,Governmental Organization & Social Group,Social Group,Communist Youth League,0,不评价
+558,130402,政府机构及社会团体,社会团体,少先队,Governmental Organization & Social Group,Social Group,Young Pioneer,0,不评价
+559,130403,政府机构及社会团体,社会团体,妇联,Governmental Organization & Social Group,Social Group,Women's Federation,0,不评价
+560,130404,政府机构及社会团体,社会团体,残联,Governmental Organization & Social Group,Social Group,Disabled Persons' Federation,0,不评价
+561,130405,政府机构及社会团体,社会团体,红十字会,Governmental Organization & Social Group,Social Group,Red Cross,0,不评价
+562,130406,政府机构及社会团体,社会团体,消费者协会,Governmental Organization & Social Group,Social Group,Consumers' Association,0,不评价
+563,130407,政府机构及社会团体,社会团体,行业协会,Governmental Organization & Social Group,Social Group,Industry Association,0,不评价
+564,130408,政府机构及社会团体,社会团体,慈善机构,Governmental Organization & Social Group,Social Group,Charity Organizations,0,不评价
+565,130409,政府机构及社会团体,社会团体,教会,Governmental Organization & Social Group,Social Group,Church,0,不评价
+566,130500,政府机构及社会团体,公检法机构,公检法机关,Governmental Organization & Social Group,Public Security Organization,Public Security Organization,0,不评价
+567,130501,政府机构及社会团体,公检法机构,公安警察,Governmental Organization & Social Group,Public Security Organization,Police Station,0,不评价
+568,130502,政府机构及社会团体,公检法机构,检察院,Governmental Organization & Social Group,Public Security Organization,Procuratorate,0,不评价
+569,130503,政府机构及社会团体,公检法机构,法院,Governmental Organization & Social Group,Public Security Organization,Court,0,不评价
+570,130504,政府机构及社会团体,公检法机构,消防机关,Governmental Organization & Social Group,Public Security Organization,Fire Fighting Organization,0,不评价
+571,130505,政府机构及社会团体,公检法机构,公证鉴定机构,Governmental Organization & Social Group,Public Security Organization,Notarial Survey Organization,0,不评价
+572,130506,政府机构及社会团体,公检法机构,社会治安机构,Governmental Organization & Social Group,Public Security Organization,Social Security Organization,0,不评价
+573,130600,政府机构及社会团体,交通车辆管理,交通车辆管理相关,Governmental Organization & Social Group,Traffic Vehicle Management,Traffic Vehicle Management Related,0,不评价
+574,130601,政府机构及社会团体,交通车辆管理,交通管理机构,Governmental Organization & Social Group,Traffic Vehicle Management,Traffic Management Authority,0,不评价
+575,130602,政府机构及社会团体,交通车辆管理,车辆管理机构,Governmental Organization & Social Group,Traffic Vehicle Management,Vehicle Management Authority,0,不评价
+576,130603,政府机构及社会团体,交通车辆管理,验车场,Governmental Organization & Social Group,Traffic Vehicle Management,Vehicle Assessment Service,0,不评价
+577,130604,政府机构及社会团体,交通车辆管理,交通执法站,Governmental Organization & Social Group,Traffic Vehicle Management,Traffic Management Station,0,不评价
+578,130605,政府机构及社会团体,交通车辆管理,车辆通行证办理处,Governmental Organization & Social Group,Traffic Vehicle Management,Vehicle Pass Card Office,0,不评价
+579,130606,政府机构及社会团体,交通车辆管理,货车相关检查站,Governmental Organization & Social Group,Traffic Vehicle Management,Truck Related Checkpoints,0,不评价
+580,130700,政府机构及社会团体,工商税务机构,工商税务机构,Governmental Organization & Social Group,Industrial and Commercial Taxation Institution,Industrial and Commercial Taxation Institution,0,不评价
+581,130701,政府机构及社会团体,工商税务机构,工商部门,Governmental Organization & Social Group,Industrial and Commercial Taxation Institution,Administration for Industry & Commerce,0,不评价
+582,130702,政府机构及社会团体,工商税务机构,国税机关,Governmental Organization & Social Group,Industrial and Commercial Taxation Institution,State Tax Authority,0,不评价
+583,130703,政府机构及社会团体,工商税务机构,地税机关,Governmental Organization & Social Group,Industrial and Commercial Taxation Institution,Local Tax Authority,0,不评价
+584,140000,科教文化服务,科教文化场所,科教文化场所,Science/Culture & Education Service,Science & Education Cultural Place,Science & Education Cultural Place,0.85,核心资源
+585,140100,科教文化服务,博物馆,博物馆,Science/Culture & Education Service,Museum,Museum,0.9,文化资源
+586,140101,科教文化服务,博物馆,奥迪博物馆,Science/Culture & Education Service,Museum,Audi Museum,0.85,特色资源
+587,140102,科教文化服务,博物馆,梅赛德斯-奔驰博物馆,Science/Culture & Education Service,Museum,Mercedes-Benz Museum,0.85,特色资源
+588,140200,科教文化服务,展览馆,展览馆,Science/Culture & Education Service,Exhibition Hall,Exhibition Hall,0.8,文化资源
+589,140201,科教文化服务,展览馆,室内展位,Science/Culture & Education Service,Exhibition Hall,Indoor Booth,0.75,普通设施
+590,140300,科教文化服务,会展中心,会展中心,Science/Culture & Education Service,Convention & Exhibition Center,Convention & Exhibition Center,0.85,核心设施
+591,140400,科教文化服务,美术馆,美术馆,Science/Culture & Education Service,Art Gallery,Art Gallery,0.85,文化资源
+592,140500,科教文化服务,图书馆,图书馆,Science/Culture & Education Service,Library,Library,0.9,核心资源
+593,140600,科教文化服务,科技馆,科技馆,Science/Culture & Education Service,Science & Technology Museum,Science & Technology Museum,0.85,教育资源
+594,140700,科教文化服务,天文馆,天文馆,Science/Culture & Education Service,Planetarium,Planetarium,0.85,教育资源
+595,140800,科教文化服务,文化宫,文化宫,Science/Culture & Education Service,Cultural Palace,Cultural Palace,0.85,文化资源
+596,140900,科教文化服务,档案馆,档案馆,Science/Culture & Education Service,Archives Hall,Archives Hall,0.8,文化资源
+597,141000,科教文化服务,文艺团体,文艺团体,Science/Culture & Education Service,Arts Organization,Arts Organization,0.8,文化资源
+598,141100,科教文化服务,传媒机构,传媒机构,Science/Culture & Education Service,Media Organization,Media Organization,0,不评价
+599,141101,科教文化服务,传媒机构,电视台,Science/Culture & Education Service,Media Organization,TV Station,0,不评价
+600,141102,科教文化服务,传媒机构,电台,Science/Culture & Education Service,Media Organization,Radio Station,0,不评价
+601,141103,科教文化服务,传媒机构,报社,Science/Culture & Education Service,Media Organization,Newspaper Office,0,不评价
+602,141104,科教文化服务,传媒机构,杂志社,Science/Culture & Education Service,Media Organization,Journal Publisher,0,不评价
+603,141105,科教文化服务,传媒机构,出版社,Science/Culture & Education Service,Media Organization,Publishing House,0,不评价
+604,141200,科教文化服务,学校,学校,Science/Culture & Education Service,School,School,0.95,核心资源
+605,141201,科教文化服务,学校,高等院校,Science/Culture & Education Service,School,University & College,0.9,重要资源
+606,141202,科教文化服务,学校,中学,Science/Culture & Education Service,School,Middle School,0.95,核心资源
+607,141203,科教文化服务,学校,小学,Science/Culture & Education Service,School,Elementary School,0.95,核心资源
+608,141204,科教文化服务,学校,幼儿园,Science/Culture & Education Service,School,Kindergarten,0.9,重要资源
+609,141205,科教文化服务,学校,成人教育,Science/Culture & Education Service,School,Adult Education,0.8,教育资源
+610,141206,科教文化服务,学校,职业技术学校,Science/Culture & Education Service,School,Vocational Technical School,0.8,教育资源
+611,141207,科教文化服务,学校,学校内部设施,Culture & Education,School,Facilities within the School,0,不评价
+612,141300,科教文化服务,科研机构,科研机构,Science/Culture & Education Service,Research Institution,Research Institution,0.85,专业资源
+613,141400,科教文化服务,培训机构,培训机构,Science/Culture & Education Service,Training Institution,Training Institution,0.8,教育资源
+614,141500,科教文化服务,驾校,驾校,Science/Culture & Education Service,Driving School,Driving School,0.7,专业需求
+615,150000,交通设施服务,交通服务相关,交通服务相关,Transportation Service,Transportation Service Related,Transportation Service Related,0.75,便利性
+616,150100,交通设施服务,机场相关,机场相关,Transportation Service,Airport Related,Airport Related,0.6,特殊场景
+617,150101,交通设施服务,机场相关,候机室,Transportation Service,Airport Related,Departure Lounge,0,内部设施
+618,150102,交通设施服务,机场相关,摆渡车站,Transportation Service,Airport Related,The Ferry Station,0,内部设施
+619,150104,交通设施服务,机场相关,飞机场,Transportation Service,Airport Related,Airport,0.7,特殊场景
+620,150105,交通设施服务,机场相关,机场出发/到达,Transportation Service,Airport Related,Airport Departure/Arrival,0,内部设施
+621,150106,交通设施服务,机场相关,直升机场,Transportation Service,Airport Related,Heliport,0.6,特殊场景
+622,150107,交通设施服务,机场相关,机场货运处,Transportation Service,Airport Related,Airport Freight Station,0,内部设施
+623,150200,交通设施服务,火车站,火车站,Transportation Service,Railway Station,Railway Station,0.75,核心交通
+624,150201,交通设施服务,火车站,候车室,Transportation Service,Railway Station,Waiting Room,0,内部设施
+625,150202,交通设施服务,火车站,进站口/检票口,Transportation Service,Railway Station,Ticket Entrance,0,内部设施
+626,150203,交通设施服务,火车站,出站口,Transportation Service,Railway Station,Exit,0,内部设施
+627,150204,交通设施服务,火车站,站台,Transportation Service,Railway Station,Platform,0,内部设施
+628,150205,交通设施服务,火车站,售票,Transportation Service,Railway Station,Sell Ticket,0,内部设施
+629,150206,交通设施服务,火车站,退票,Transportation Service,Railway Station,Get a Refund for a Ticket,0,内部设施
+630,150207,交通设施服务,火车站,改签,Transportation Service,Railway Station,Endorse the Ticket,0,内部设施
+631,150208,交通设施服务,火车站,公安制证,Transportation Service,Railway Station,Public Security Accreditation,0,内部设施
+632,150209,交通设施服务,火车站,票务相关,Transportation Service,Railway Station,Ticket Business Correlation,0,内部设施
+633,150210,交通设施服务,火车站,货运火车站,Transportation Service,Railway Station,Freight Railway Station,-0.4,潜在噪音
+634,150300,交通设施服务,港口码头,港口码头,Transportation Service,Port & Marina,Port & Marina,0.6,特殊场景
+635,150301,交通设施服务,港口码头,客运港,Transportation Service,Port & Marina,Passenger Port,0.7,交通枢纽
+636,150302,交通设施服务,港口码头,车渡口,Transportation Service,Port & Marina,Ferry Terminal for Vehicle,0.6,特殊场景
+637,150303,交通设施服务,港口码头,人渡口,Transportation Service,Port & Marina,Ferry Terminal,0.65,交通设施
+638,150304,交通设施服务,港口码头,货运港口码头,Transportation Service,Port & Marina,Freight Ports,-0.3,潜在噪音
+639,150305,交通设施服务,港口码头,进港,Transportation Service,Port & Marina,Enter Port,0,内部设施
+640,150306,交通设施服务,港口码头,出港,Transportation Service,Port & Marina,Leave Port,0,内部设施
+641,150307,交通设施服务,港口码头,候船室,Transportation Service,Port & Marina,Waiting Hall,0,内部设施
+642,150400,交通设施服务,长途汽车站,长途汽车站,Transportation Service,Coach Station,Coach Station,0.75,核心交通
+643,150401,交通设施服务,长途汽车站,进站,Transportation Service,Coach Station,Way In,0,内部设施
+644,150402,交通设施服务,长途汽车站,出站,Transportation Service,Coach Station,Way Out,0,内部设施
+645,150403,交通设施服务,长途汽车站,候车室,Transportation Service,Coach Station,Waiting Room,0,内部设施
+646,150500,交通设施服务,地铁站,地铁站,Transportation Service,Subway Station,Subway Station,0.9,核心交通
+647,150501,交通设施服务,地铁站,出入口,Transportation Service,Subway Station,Exit,0,内部设施
+648,150600,交通设施服务,轻轨站,轻轨站,Transportation Service,Light Rail Station,Light Rail Station,0.85,优质交通
+649,150700,交通设施服务,公交车站,公交车站相关,Transportation Service,Bus Station,Bus Station Related,0.8,高频交通
+650,150701,交通设施服务,公交车站,旅游专线车站,Transportation Service,Bus Station,Tourist Routes Bus Station,0.75,特色交通
+651,150702,交通设施服务,公交车站,普通公交站,Transportation Service,Bus Station,Common Bus Station,0.8,高频交通
+652,150703,交通设施服务,公交车站,机场巴士,Transportation Service,Bus Station,Airport Bus,0.75,特殊线路
+653,150704,交通设施服务,公交车站,快速公交站,Transportation Service,Bus Station,BRT,0.85,优质交通
+654,150705,交通设施服务,公交车站,电车站,Transportation Service,Bus Station,Tram,0.8,优质交通
+655,150706,交通设施服务,公交车站,智轨车站,Transportation Service,Bus Station,ART,0.8,新兴交通
+656,150800,交通设施服务,班车站,班车站,Transportation Service,Commuter Bus Station,Commuter Bus Station,0.75,通勤交通
+657,150900,交通设施服务,停车场,停车场相关,Transportation Service,Parking Lot,Parking Lot Related,0.75,便利设施
+658,150903,交通设施服务,停车场,换乘停车场,Transportation Service,Parking Lot,Park-and-Ride Place,0.8,便利设施
+659,150904,交通设施服务,停车场,公共停车场,Transportation Service,Parking Lot,Public Parking Lot,0.8,便利设施
+660,150905,交通设施服务,停车场,专用停车场,Transportation Service,Parking Lot,Reserved Parking Lot,0.7,特殊需求
+661,150906,交通设施服务,停车场,路边停车场,Transportation Service,Parking Lot,Roadside Parking Lot,0.7,便利设施
+662,150907,交通设施服务,停车场,停车场入口,Transportation Service,Parking Lot,Parking Lot Entrance,0,内部设施
+663,150908,交通设施服务,停车场,停车场出口,Transportation Service,Parking Lot,Parking Lot Exit,0,内部设施
+664,150909,交通设施服务,停车场,停车场出入口,Transportation Service,Parking Lot,Parking Lot Entrance & Exit,0,内部设施
+665,151000,交通设施服务,过境口岸,过境口岸,Transportation Service,Border Crossing,Border Crossing,0.6,特殊场景
+666,151001,交通设施服务,过境口岸,旅检楼,Transportation Service,Border Crossing,Travel inspection building,0,内部设施
+667,151002,交通设施服务,过境口岸,出境,Transportation Service,Border Crossing,depart,0,内部设施
+668,151003,交通设施服务,过境口岸,入境,Transportation Service,Border Crossing,Immigration,0,内部设施
+669,151100,交通设施服务,出租车,出租车,Transportation Service,Taxi,Taxi,0.75,便利交通
+670,151200,交通设施服务,轮渡站,轮渡站,Transportation Service,Ferry Station,Ferry Station,0.7,特殊交通
+671,151300,交通设施服务,索道站,索道站,Transportation Service,Ropeway Station,Ropeway Station,0.7,特色交通
+672,151400,交通设施服务,上下客区,上下客区,Transportation Service,Loading & Unloading Area,Loading & Unloading Area,0.7,便利设施
+673,151401,交通设施服务,上下客区,自驾车,Transportation Service,Loading & Unloading Area,Self Driving,0.7,便利设施
+674,151402,交通设施服务,上下客区,出租车,Transportation Service,Loading & Unloading Area,Taxi,0.75,便利设施
+675,151403,交通设施服务,上下客区,大巴车,Transportation Service,Loading & Unloading Area,Bus,0.7,便利设施
+676,151404,交通设施服务,上下客区,网约车,Transportation Service,Loading & Unloading Area,Online Car Hailing,0.75,便利设施
+677,151405,交通设施服务,上下客区,摩托车,Transportation Service,Loading & Unloading Area,Motorcycle,0.65,普通设施
+678,160000,金融保险服务,金融保险服务机构,金融保险机构,Finance & Insurance Service,Finance & Insurance Service Institution,Finance & Insurance Institution,0.85,核心资源
+679,160100,金融保险服务,银行,银行,Finance & Insurance Service,Bank,Bank,0.9,核心资源
+680,160101,金融保险服务,银行,中国人民银行,Finance & Insurance Service,Bank,The People's Bank of China,0.95,顶级资源
+681,160102,金融保险服务,银行,国家开发银行,Finance & Insurance Service,Bank,China Development Bank,0.9,重要资源
+682,160103,金融保险服务,银行,中国进出口银行,Finance & Insurance Service,Bank,The Export-Import Bank of China,0.9,重要资源
+683,160104,金融保险服务,银行,中国银行,Finance & Insurance Service,Bank,Bank of China,0.95,顶级资源
+684,160105,金融保险服务,银行,中国工商银行,Finance & Insurance Service,Bank,ICBC,0.95,顶级资源
+685,160106,金融保险服务,银行,中国建设银行,Finance & Insurance Service,Bank,China Construction Bank,0.95,顶级资源
+686,160107,金融保险服务,银行,中国农业银行,Finance & Insurance Service,Bank,Agricultural Bank of China,0.95,顶级资源
+687,160108,金融保险服务,银行,交通银行,Finance & Insurance Service,Bank,Bank of Communications,0.9,重要资源
+688,160109,金融保险服务,银行,招商银行,Finance & Insurance Service,Bank,China Merchants Bank,0.9,重要资源
+689,160110,金融保险服务,银行,华夏银行,Finance & Insurance Service,Bank,Huaxia Bank,0.85,优质资源
+690,160111,金融保险服务,银行,中信银行,Finance & Insurance Service,Bank,China CITIC Bank,0.9,重要资源
+691,160112,金融保险服务,银行,中国民生银行,Finance & Insurance Service,Bank,China Minsheng Bank,0.85,优质资源
+692,160113,金融保险服务,银行,中国光大银行,Finance & Insurance Service,Bank,China Everbright Bank,0.85,优质资源
+693,160114,金融保险服务,银行,上海银行,Finance & Insurance Service,Bank,Bank of Shanghai,0.85,优质资源
+694,160115,金融保险服务,银行,上海浦东发展银行,Finance & Insurance Service,Bank,Shanghai Pudong Development Bank,0.85,优质资源
+695,160117,金融保险服务,银行,平安银行,Finance & Insurance Service,Bank,Ping An Bank,0.9,重要资源
+696,160118,金融保险服务,银行,兴业银行,Finance & Insurance Service,Bank,Industrial Bank,0.85,优质资源
+697,160119,金融保险服务,银行,北京银行,Finance & Insurance Service,Bank,Bank of Beijing,0.85,优质资源
+698,160120,金融保险服务,银行,广发银行,Finance & Insurance Service,Bank,CGB,0.85,优质资源
+699,160121,金融保险服务,银行,农村商业银行,Finance & Insurance Service,Bank,Rural Commercial Bank,0.8,普通资源
+700,160122,金融保险服务,银行,香港恒生银行,Finance & Insurance Service,Bank,Hong Kong Hang Seng Bank,0.85,优质资源
+701,160123,金融保险服务,银行,东亚银行,Finance & Insurance Service,Bank,Bank of East Asia,0.85,优质资源
+702,160124,金融保险服务,银行,花旗银行,Finance & Insurance Service,Bank,Citibank,0.9,国际品牌
+703,160125,金融保险服务,银行,渣打银行,Finance & Insurance Service,Bank,Standard Chartered Bank,0.9,国际品牌
+704,160126,金融保险服务,银行,汇丰银行,Finance & Insurance Service,Bank,HSBC,0.9,国际品牌
+705,160127,金融保险服务,银行,荷兰银行,Finance & Insurance Service,Bank,ABN AMRO Bank,0.85,国际品牌
+706,160128,金融保险服务,银行,美国运通银行,Finance & Insurance Service,Bank,American Express Bank,0.85,国际品牌
+707,160129,金融保险服务,银行,瑞士友邦银行,Finance & Insurance Service,Bank,AIG Private Bank,0.85,国际品牌
+708,160130,金融保险服务,银行,美国银行,Finance & Insurance Service,Bank,Bank of America,0.9,国际品牌
+709,160131,金融保险服务,银行,蒙特利尔银行,Finance & Insurance Service,Bank,Bank of Montreal,0.85,国际品牌
+710,160132,金融保险服务,银行,纽约银行,Finance & Insurance Service,Bank,Bank of New York,0.85,国际品牌
+711,160133,金融保险服务,银行,苏格兰皇家银行,Finance & Insurance Service,Bank,The Royal Bank of Scotland,0.85,国际品牌
+712,160134,金融保险服务,银行,法国兴业银行,Finance & Insurance Service,Bank,Societe Generale Bank,0.85,国际品牌
+713,160135,金融保险服务,银行,德意志银行,Finance & Insurance Service,Bank,Deutsche Bank,0.9,国际品牌
+714,160136,金融保险服务,银行,日本三菱东京日联银行,Finance & Insurance Service,Bank,Bank of Tokyo-Mitsubishi UFJ,0.85,国际品牌
+715,160137,金融保险服务,银行,巴克莱银行,Finance & Insurance Service,Bank,Barclays Bank,0.85,国际品牌
+716,160138,金融保险服务,银行,摩根大通银行,Finance & Insurance Service,Bank,JPMorgan Chase Bank,0.9,国际品牌
+717,160139,金融保险服务,银行,中国邮政储蓄银行,Finance & Insurance Service,Bank,Postal Savings Bank of China,0.9,重要资源
+718,160140,金融保险服务,银行,香港星展银行,Finance & Insurance Service,Bank,DBS,0.85,优质资源
+719,160141,金融保险服务,银行,南洋商业银行,Finance & Insurance Service,Bank,Nanyang Commercial Bank,0.8,普通资源
+720,160142,金融保险服务,银行,上海商业银行,Finance & Insurance Service,Bank,Shanghai Commercial Bank,0.8,普通资源
+721,160143,金融保险服务,银行,永亨银行,Finance & Insurance Service,Bank,Wing Hang Bank,0.8,普通资源
+722,160144,金融保险服务,银行,香港永隆银行,Finance & Insurance Service,Bank,Wing Lung Bank,0.8,普通资源
+723,160145,金融保险服务,银行,创兴银行,Finance & Insurance Service,Bank,Chong Hing Bank,0.8,普通资源
+724,160146,金融保险服务,银行,大新银行,Finance & Insurance Service,Bank,Dah Sing Bank,0.8,普通资源
+725,160147,金融保险服务,银行,中信银行(国际),Finance & Insurance Service,Bank,China CITIC Bank International,0.85,优质资源
+726,160148,金融保险服务,银行,大众银行(香港),Finance & Insurance Service,Bank,Public Bank (Hong Kong),0.8,普通资源
+727,160149,金融保险服务,银行,北京农商银行,Finance & Insurance Service,Bank,Beijing Rural Commercial Bank,0.8,普通资源
+728,160150,金融保险服务,银行,上海农商银行,Finance & Insurance Service,Bank,Shanghai Rural Commercial Bank,0.8,普通资源
+729,160151,金融保险服务,银行,广州农商银行,Finance & Insurance Service,Bank,Guangzhou Rural Commercial Bank,0.8,普通资源
+730,160152,金融保险服务,银行,深圳农村商业银行,Finance & Insurance Service,Bank,Shenzhen Rural Commercial Bank,0.8,普通资源
+731,160200,金融保险服务,银行相关,银行相关,Finance & Insurance Service,Bank Related,Bank Related,0,不评价
+732,160300,金融保险服务,自动提款机,自动提款机,Finance & Insurance Service,ATM,ATM,0.8,便利设施
+733,160301,金融保险服务,自动提款机,中国银行ATM,Finance & Insurance Service,ATM,Bank of China ATM,0.85,知名品牌
+734,160302,金融保险服务,自动提款机,中国工商银行ATM,Finance & Insurance Service,ATM,ICBC ATM,0.85,知名品牌
+735,160303,金融保险服务,自动提款机,中国建设银行ATM,Finance & Insurance Service,ATM,China Construction Bank ATM,0.85,知名品牌
+736,160304,金融保险服务,自动提款机,中国农业银行ATM,Finance & Insurance Service,ATM,Agricultural Bank of China ATM,0.85,知名品牌
+737,160305,金融保险服务,自动提款机,交通银行ATM,Finance & Insurance Service,ATM,Bank of Communications ATM,0.8,普通品牌
+738,160306,金融保险服务,自动提款机,招商银行ATM,Finance & Insurance Service,ATM,China Merchants Bank ATM,0.8,普通品牌
+739,160307,金融保险服务,自动提款机,华夏银行ATM,Finance & Insurance Service,ATM,Huaxia Bank ATM,0.75,普通品牌
+740,160308,金融保险服务,自动提款机,中信银行ATM,Finance & Insurance Service,ATM,China CITIC Bank ATM,0.8,普通品牌
+741,160309,金融保险服务,自动提款机,中国民生银行ATM,Finance & Insurance Service,ATM,China Minsheng Bank ATM,0.75,普通品牌
+742,160310,金融保险服务,自动提款机,中国光大银行ATM,Finance & Insurance Service,ATM,China Everbright Bank ATM,0.75,普通品牌
+743,160311,金融保险服务,自动提款机,上海银行ATM,Finance & Insurance Service,ATM,Bank of Shanghai ATM,0.75,普通品牌
+744,160312,金融保险服务,自动提款机,上海浦东发展银行ATM,Finance & Insurance Service,ATM,Shanghai Pudong Development Bank ATM,0.75,普通品牌
+745,160314,金融保险服务,自动提款机,平安银行ATM,Finance & Insurance Service,ATM,Ping An Bank ATM,0.8,普通品牌
+746,160315,金融保险服务,自动提款机,兴业银行ATM,Finance & Insurance Service,ATM,Industrial Bank ATM,0.75,普通品牌
+747,160316,金融保险服务,自动提款机,北京银行ATM,Finance & Insurance Service,ATM,Bank of Beijing ATM,0.75,普通品牌
+748,160317,金融保险服务,自动提款机,广发银行ATM,Finance & Insurance Service,ATM,CGB ATM,0.75,普通品牌
+749,160318,金融保险服务,自动提款机,农村商业银行ATM,Finance & Insurance Service,ATM,Rural Commercial Bank ATM,0.7,普通品牌
+750,160319,金融保险服务,自动提款机,香港恒生银行ATM,Finance & Insurance Service,ATM,Hong Kong Hang Seng Bank ATM,0.8,普通品牌
+751,160320,金融保险服务,自动提款机,东亚银行ATM,Finance & Insurance Service,ATM,Bank of East Asia ATM,0.8,普通品牌
+752,160321,金融保险服务,自动提款机,花旗银行ATM,Finance & Insurance Service,ATM,Citibank ATM,0.85,国际品牌
+753,160322,金融保险服务,自动提款机,渣打银行ATM,Finance & Insurance Service,ATM,Standard Chartered Bank ATM,0.85,国际品牌
+754,160323,金融保险服务,自动提款机,汇丰银行ATM,Finance & Insurance Service,ATM,HSBC ATM,0.85,国际品牌
+755,160324,金融保险服务,自动提款机,荷兰银行ATM,Finance & Insurance Service,ATM,ABN AMRO Bank ATM,0.8,国际品牌
+756,160325,金融保险服务,自动提款机,美国运通银行ATM,Finance & Insurance Service,ATM,American Express Bank ATM,0.8,国际品牌
+757,160326,金融保险服务,自动提款机,瑞士友邦银行ATM,Finance & Insurance Service,ATM,AIG Private Bank ATM,0.8,国际品牌
+758,160327,金融保险服务,自动提款机,美国银行ATM,Finance & Insurance Service,ATM,Bank of America ATM,0.85,国际品牌
+759,160328,金融保险服务,自动提款机,蒙特利尔银行ATM,Finance & Insurance Service,ATM,Bank of Montreal ATM,0.8,国际品牌
+760,160329,金融保险服务,自动提款机,纽约银行ATM,Finance & Insurance Service,ATM,Bank of New York ATM,0.8,国际品牌
+761,160330,金融保险服务,自动提款机,苏格兰皇家银行ATM,Finance & Insurance Service,ATM,The Royal Bank of Scotland ATM,0.8,国际品牌
+762,160331,金融保险服务,自动提款机,法国兴业银行ATM,Finance & Insurance Service,ATM,Societe Generale Bank ATM,0.8,国际品牌
+763,160332,金融保险服务,自动提款机,德意志银行ATM,Finance & Insurance Service,ATM,Deutsche Bank ATM,0.85,国际品牌
+764,160333,金融保险服务,自动提款机,日本三菱东京日联银行ATM,Finance & Insurance Service,ATM,Bank of Tokyo-Mitsubishi UFJ ATM,0.8,国际品牌
+765,160334,金融保险服务,自动提款机,巴克莱银行ATM,Finance & Insurance Service,ATM,Barclays Bank ATM,0.8,国际品牌
+766,160335,金融保险服务,自动提款机,摩根大通银行ATM,Finance & Insurance Service,ATM,JPMorgan Chase Bank ATM,0.85,国际品牌
+767,160336,金融保险服务,自动提款机,中国邮政储蓄银行ATM,Finance & Insurance Service,ATM,Postal Savings Bank of China ATM,0.8,普通品牌
+768,160337,金融保险服务,自动提款机,香港星展银行ATM,Finance & Insurance Service,ATM,DBS ATM,0.8,普通品牌
+769,160338,金融保险服务,自动提款机,南洋商业银行ATM,Finance & Insurance Service,ATM,Nanyang Commercial Bank ATM,0.75,普通品牌
+770,160339,金融保险服务,自动提款机,上海商业银行ATM,Finance & Insurance Service,ATM,Shanghai Commercial Bank ATM,0.75,普通品牌
+771,160340,金融保险服务,自动提款机,永亨银行ATM,Finance & Insurance Service,ATM,Wing Hang Bank ATM,0.75,普通品牌
+772,160341,金融保险服务,自动提款机,香港永隆银行ATM,Finance & Insurance Service,ATM,Wing Lung Bank ATM,0.75,普通品牌
+773,160342,金融保险服务,自动提款机,创兴银行ATM,Finance & Insurance Service,ATM,Chong Hing Bank ATM,0.75,普通品牌
+774,160343,金融保险服务,自动提款机,大新银行ATM,Finance & Insurance Service,ATM,Dah Sing Bank ATM,0.75,普通品牌
+775,160344,金融保险服务,自动提款机,中信银行(国际)ATM,Finance & Insurance Service,ATM,China CITIC Bank International ATM,0.8,普通品牌
+776,160345,金融保险服务,自动提款机,大众银行(香港)ATM,Finance & Insurance Service,ATM,Public Bank (Hong Kong) ATM,0.75,普通品牌
+777,160346,金融保险服务,自动提款机,北京农商银行ATM,Finance & Insurance Service,ATM,Beijing Rural Commercial Bank ATM,0.75,普通品牌
+778,160347,金融保险服务,自动提款机,上海农商银行ATM,Finance & Insurance Service,ATM,Shanghai Rural Commercial Bank ATM,0.75,普通品牌
+779,160348,金融保险服务,自动提款机,广州农商银行ATM,Finance & Insurance Service,ATM,Guangzhou Rural Commercial Bank ATM,0.75,普通品牌
+780,160349,金融保险服务,自动提款机,深圳农村商业银行ATM,Finance & Insurance Service,ATM,Shenzhen Rural Commercial Bank ATM,0.75,普通品牌
+781,160400,金融保险服务,保险公司,保险公司,Finance & Insurance Service,Insurance Company,Insurance Company,0.8,金融服务
+782,160401,金融保险服务,保险公司,中国人民保险公司,Finance & Insurance Service,Insurance Company,The People's Insurance Company of China,0.85,知名品牌
+783,160402,金融保险服务,保险公司,中国人寿保险公司,Finance & Insurance Service,Insurance Company,China Life Insurance Company,0.85,知名品牌
+784,160403,金融保险服务,保险公司,中国平安保险公司,Finance & Insurance Service,Insurance Company,Ping An Insurance Company of China,0.85,知名品牌
+785,160404,金融保险服务,保险公司,中国再保险公司,Finance & Insurance Service,Insurance Company,China Reinsurance Company,0.8,普通品牌
+786,160405,金融保险服务,保险公司,中国太平洋保险,Finance & Insurance Service,Insurance Company,China Pacific Insurance Company,0.85,知名品牌
+787,160406,金融保险服务,保险公司,新华人寿保险公司,Finance & Insurance Service,Insurance Company,New China Life Insurance Company,0.8,普通品牌
+788,160407,金融保险服务,保险公司,华泰财产保险股份有限公司,Finance & Insurance Service,Insurance Company,Huatai Property Insurance Company Ltd.,0.75,普通品牌
+789,160408,金融保险服务,保险公司,泰康人寿保险公司,Finance & Insurance Service,Insurance Company,Taikang Life Insurance Company,0.8,普通品牌
+790,160500,金融保险服务,证券公司,证券公司,Finance & Insurance Service,Securities Company,Securities Company,0.75,金融服务
+791,160501,金融保险服务,证券公司,证券营业厅,Finance & Insurance Service,Securities Company,Office of Securities Business,0.75,金融服务
+792,160600,金融保险服务,财务公司,财务公司,Finance & Insurance Service,Finance Company,Finance Company,0.7,专业服务
+793,170000,公司企业,公司企业,公司企业,Enterprises,Enterprises,Enterprises,-0.3,潜在噪音
+794,170100,公司企业,知名企业,知名企业,Enterprises,Famous Enterprise,Famous Enterprise,-0.2,潜在噪音
+795,170200,公司企业,公司,公司,Enterprises,Company,Company,-0.3,潜在噪音
+796,170201,公司企业,公司,广告装饰,Enterprises,Company,Advertisement and Decoration,-0.2,普通企业
+797,170202,公司企业,公司,建筑公司,Enterprises,Company,Construction Company,-0.4,潜在噪音
+798,170203,公司企业,公司,医药公司,Enterprises,Company,Medical Company,-0.2,普通企业
+799,170204,公司企业,公司,机械电子,Enterprises,Company,Machinery and Electronics,-0.3,潜在噪音
+800,170205,公司企业,公司,冶金化工,Enterprises,Company,Chemical and Metallurgy,-0.5,严重负面
+801,170206,公司企业,公司,网络科技,Enterprises,Company,Network Science and Technology,-0.1,普通企业
+802,170207,公司企业,公司,商业贸易,Enterprises,Company,Commercial Trade,-0.1,普通企业
+803,170208,公司企业,公司,电信公司,Enterprises,Company,Telecommunication Company,-0.1,普通企业
+804,170209,公司企业,公司,矿产公司,Enterprises,Company,Mining Company,-0.5,严重负面
+805,170300,公司企业,工厂,工厂,Enterprises,Factory,Factory,-0.6,严重负面
+806,170400,公司企业,农林牧渔基地,其它农林牧渔基地,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Other Farming，Forestry，Animal Husbandry and Fishery Base,-0.3,潜在异味
+807,170401,公司企业,农林牧渔基地,渔场,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Fishing Farm,-0.4,潜在异味
+808,170402,公司企业,农林牧渔基地,农场,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Farm,-0.3,潜在异味
+809,170403,公司企业,农林牧渔基地,林场,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Forest Farm,-0.2,普通设施
+810,170404,公司企业,农林牧渔基地,牧场,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Pasture,-0.4,潜在异味
+811,170405,公司企业,农林牧渔基地,家禽养殖基地,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Poultry Breeding Base,-0.5,严重异味
+812,170406,公司企业,农林牧渔基地,蔬菜基地,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Vegetable Planting Base,-0.3,潜在农药
+813,170407,公司企业,农林牧渔基地,水果基地,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Fruit Cultivation Base,-0.2,普通设施
+814,170408,公司企业,农林牧渔基地,花卉苗圃基地,Enterprises,Farming，Forestry，Animal Husbandry and Fishery Base,Flower Nurserey Base,-0.1,普通设施
+815,180000,道路附属设施,道路附属设施,道路附属设施,Road Furniture,Road Furniture,Road Furniture,0,不评价
+816,180100,道路附属设施,警示信息,警示信息,Road Furniture,Warning Sign,Warning Sign,0,不评价
+817,180101,道路附属设施,警示信息,摄像头,Road Furniture,Warning Sign,Camera,0,不评价
+818,180102,道路附属设施,警示信息,测速设施,Road Furniture,Warning Sign,Speed Sensor,0,不评价
+819,180103,道路附属设施,警示信息,铁路道口,Road Furniture,Warning Sign,Railway Crossing,-0.6,严重噪音
+820,180104,道路附属设施,警示信息,违章停车,Road Furniture,Warning Sign,Illegal Parking,0,不评价
+821,180200,道路附属设施,收费站,收费站,Road Furniture,Toll Gate,Toll Gate,-0.4,潜在拥堵
+822,180201,道路附属设施,收费站,高速收费站,Road Furniture,Toll Gate,Expressway Toll Gate,-0.5,严重拥堵
+823,180202,道路附属设施,收费站,国省道收费站,Road Furniture,Toll Gate,National and Provincial Road Toll Gate,-0.4,潜在拥堵
+824,180203,道路附属设施,收费站,桥洞收费站,Road Furniture,Toll Gate,Tunnel & Bridge Toll Gate,-0.3,普通拥堵
+825,180300,道路附属设施,服务区,高速服务区,Road Furniture,Service Area,Expressway Service Area,0.6,便利设施
+826,180301,道路附属设施,服务区,高速加油站服务区,Road Furniture,Service Area,Expressway Filling Station Service Area,0.65,便利设施
+827,180302,道路附属设施,服务区,高速停车区,Road Furniture,Service Area,Expressway Parking Area,0.6,便利设施
+828,180400,道路附属设施,红绿灯,红绿灯,Road Furniture,Traffic Light,Traffic Light,0,不评价
+829,180500,道路附属设施,路牌信息,路牌信息,Road Furniture,Signpost,Signpost,0,不评价
+830,190000,地名地址信息,地名地址信息,地名地址信息,Place Name & Address,Place Name & Address,Place Name & Address,0,不评价
+831,190100,地名地址信息,普通地名,普通地名,Place Name & Address,Normal Place Name,Normal Place Name,0,不评价
+832,190101,地名地址信息,普通地名,国家名,Place Name & Address,Normal Place Name,Country Name,0,不评价
+833,190102,地名地址信息,普通地名,省级地名,Place Name & Address,Normal Place Name,Provincial Place Name,0,不评价
+834,190103,地名地址信息,普通地名,直辖市级地名,Place Name & Address,Normal Place Name,Municipal Place Name,0,不评价
+835,190104,地名地址信息,普通地名,地市级地名,Place Name & Address,Normal Place Name,Prefecture-level Place Name,0,不评价
+836,190105,地名地址信息,普通地名,区县级地名,Place Name & Address,Normal Place Name,District/County-level Place Name,0,不评价
+837,190106,地名地址信息,普通地名,乡镇级地名,Place Name & Address,Normal Place Name,Township-level Place Name,0,不评价
+838,190107,地名地址信息,普通地名,街道级地名,Place Name & Address,Normal Place Name,Subdistrict-level Place Name,0,不评价
+839,190108,地名地址信息,普通地名,村庄级地名,Place Name & Address,Normal Place Name,Village-level Place Name,0,不评价
+840,190109,地名地址信息,普通地名,村组级地名,Place Name & Address,Normal Place Name,Village Team-level Place Name,0,不评价
+841,190200,地名地址信息,自然地名,自然地名,Place Name & Address,Natural Place Name,Natural Place Name,0,不评价
+842,190201,地名地址信息,自然地名,海湾海峡,Place Name & Address,Natural Place Name,Gulf and Strait,0,不评价
+843,190202,地名地址信息,自然地名,岛屿,Place Name & Address,Natural Place Name,Island,0,不评价
+844,190203,地名地址信息,自然地名,山,Place Name & Address,Natural Place Name,Mountain,0,不评价
+845,190204,地名地址信息,自然地名,河流,Place Name & Address,Natural Place Name,River,0,不评价
+846,190205,地名地址信息,自然地名,湖泊,Place Name & Address,Natural Place Name,Lake,0,不评价
+847,190206,地名地址信息,自然地名,丘陵,Place Name & Address,Natural Place Name,Hill,0,不评价
+848,190207,地名地址信息,自然地名,山地,Place Name & Address,Natural Place Name,Mountainous Region,0,不评价
+849,190208,地名地址信息,自然地名,冰川,Place Name & Address,Natural Place Name,Glacier,0,不评价
+850,190209,地名地址信息,自然地名,高原,Place Name & Address,Natural Place Name,Plateau,0,不评价
+851,190210,地名地址信息,自然地名,平原,Place Name & Address,Natural Place Name,Plain,0,不评价
+852,190211,地名地址信息,自然地名,盆地,Place Name & Address,Natural Place Name,Basin,0,不评价
+853,190212,地名地址信息,自然地名,沙漠,Place Name & Address,Natural Place Name,Desert,0,不评价
+854,190213,地名地址信息,自然地名,峡谷,Place Name & Address,Natural Place Name,Canyon,0,不评价
+855,190214,地名地址信息,自然地名,溪谷,Place Name & Address,Natural Place Name,Valley,0,不评价
+856,190215,地名地址信息,自然地名,海沟,Place Name & Address,Natural Place Name,Oceanic Trench,0,不评价
+857,190216,地名地址信息,自然地名,半岛,Place Name & Address,Natural Place Name,Peninsula,0,不评价
+858,190217,地名地址信息,自然地名,湾,Place Name & Address,Natural Place Name,Bay,0,不评价
+859,190218,地名地址信息,自然地名,洋,Place Name & Address,Natural Place Name,Ocean,0,不评价
+860,190219,地名地址信息,自然地名,三角洲,Place Name & Address,Natural Place Name,Delta,0,不评价
+861,190220,地名地址信息,自然地名,山脉,Place Name & Address,Natural Place Name,Mountain Range,0,不评价
+862,190300,地名地址信息,交通地名,交通地名,Place Name & Address,Transportation Place Name,Transportation Place Name,0,不评价
+863,190301,地名地址信息,交通地名,道路名,Place Name & Address,Transportation Place Name,Road Name,0,不评价
+864,190302,地名地址信息,交通地名,路口名,Place Name & Address,Transportation Place Name,Name of Intersection,0,不评价
+865,190303,地名地址信息,交通地名,环岛名,Place Name & Address,Transportation Place Name,Name of Roundabout,0,不评价
+866,190304,地名地址信息,交通地名,高速路出口,Place Name & Address,Transportation Place Name,Expressway Exit,-0.4,潜在噪音
+867,190305,地名地址信息,交通地名,高速路入口,Place Name & Address,Transportation Place Name,Expressway Entrance,-0.4,潜在噪音
+868,190306,地名地址信息,交通地名,立交桥,Place Name & Address,Transportation Place Name,Motorway Interchange,-0.5,严重噪音
+869,190307,地名地址信息,交通地名,桥,Place Name & Address,Transportation Place Name,Bridge,0,不评价
+870,190308,地名地址信息,交通地名,城市快速路出口,Place Name & Address,Transportation Place Name,Urban Expressway Exit,-0.3,潜在噪音
+871,190309,地名地址信息,交通地名,城市快速路入口,Place Name & Address,Transportation Place Name,Urban Expressway Entrance,-0.3,潜在噪音
+872,190310,地名地址信息,交通地名,隧道,Place Name & Address,Transportation Place Name,Tunnel,0,不评价
+873,190311,地名地址信息,交通地名,铁路,Place Name & Address,Transportation Place Name,Railway,-0.7,严重噪音
+874,190400,地名地址信息,门牌信息,门牌信息,Place Name & Address,Address Sign,Address Sign,0,不评价
+875,190401,地名地址信息,门牌信息,地名门牌,Place Name & Address,Address Sign,Placename Sign,0,不评价
+876,190402,地名地址信息,门牌信息,道路门牌,Place Name & Address,Address Sign,Road Name Sign,0,不评价
+877,190403,地名地址信息,门牌信息,楼栋号,Place Name & Address,Address Sign,Building Number,0,不评价
+878,190500,地名地址信息,市中心,城市中心,Place Name & Address,City Center,City Center,0,不评价
+879,190600,地名地址信息,标志性建筑物,标志性建筑物,Place Name & Address,Landmark Buildings,Landmark Buildings,0,不评价
+880,190700,地名地址信息,热点地名,热点地名,Place Name & Address,The hot names,The hot names,0,不评价
+881,200000,公共设施,公共设施,公共设施,Public Facility,Public Facility,Public Facility,0.75,便利设施
+882,200100,公共设施,报刊亭,报刊亭,Public Facility,Newsstand,Newsstand,0.65,文化设施
+883,200200,公共设施,公用电话,公用电话,Public Facility,Public Phone,Public Phone,0.6,基础服务
+884,200300,公共设施,公共厕所,公共厕所,Public Facility,Public Toilet,Public Toilet,0.7,便利设施
+885,200301,公共设施,公共厕所,男洗手间,Public Facility,Public Toilet,Male Toilet,0,内部设施
+886,200302,公共设施,公共厕所,女洗手间,Public Facility,Public Toilet,Female Toilet,0,内部设施
+887,200303,公共设施,公共厕所,残障洗手间/无障碍洗手间,Public Facility,Public Toilet,Wheelchair Accessible,0,内部设施
+888,200304,公共设施,公共厕所,婴儿换洗间/哺乳室/母婴室,Public Facility,Public Toilet,Room of Mother and Infant,0,内部设施
+889,200400,公共设施,紧急避难场所,紧急避难场所,Public Facility,Emergency Shelter,Emergency Shelter,0.8,安全设施
+890,220000,事件活动,事件活动,事件活动,Incidents and Events,Incidents and Events,Incidents and Events,0,不评价
+891,220100,事件活动,公众活动,公众活动,Incidents and Events,Public Event,Public Event,0,不评价
+892,220101,事件活动,公众活动,节日庆典,Incidents and Events,Public Event,Festival Celebration,0,不评价
+893,220102,事件活动,公众活动,展会展览,Incidents and Events,Public Event,Convention & Exposition,0,不评价
+894,220103,事件活动,公众活动,体育赛事,Incidents and Events,Public Event,Sports Event,0,不评价
+895,220104,事件活动,公众活动,文艺演出,Incidents and Events,Public Event,Art Performance,0,不评价
+896,220105,事件活动,公众活动,大型会议,Incidents and Events,Public Event,Conference,0,不评价
+897,220106,事件活动,公众活动,运营活动,Incidents and Events,Public Event,Operating Activities,0,不评价
+898,220107,事件活动,公众活动,商场活动,Incidents and Events,Public Event,Marketplace Activities,0,不评价
+899,220200,事件活动,突发事件,突发事件,Incidents and Events,Emergency,Emergency,0,不评价
+900,220201,事件活动,突发事件,自然灾害,Incidents and Events,Emergency,Natural Disaster,0,不评价
+901,220202,事件活动,突发事件,事故灾难,Incidents and Events,Emergency,Accident,0,不评价
+902,220203,事件活动,突发事件,城市新闻,Incidents and Events,Emergency,City News,0,不评价
+903,220204,事件活动,突发事件,公共卫生事件,Incidents and Events,Emergency,Public Health Event,0,不评价
+904,220205,事件活动,突发事件,公共社会事件,Incidents and Events,Emergency,Public Social Event,0,不评价
+905,970000,室内设施,室内设施,室内设施,Indoor facilities,Indoor facilities,Indoor facilities,0,不评价
+906,980000,虚拟数据,虚拟数据,虚拟数据,Invented Data,Invented Data,Invented Data,0,不评价
+907,980100,虚拟数据,虚拟民宿,虚拟民宿,Invented Data,Invented Home Accommodation,Invented Home Accommodation,0,不评价
+908,990000,通行设施,通行设施,通行设施,Pass Facilities,Pass Facilities,Pass Facilities,0,不评价
+909,991000,通行设施,建筑物门,建筑物门,Pass Facilities,Gate of Buildings,Gate of Buildings,0,不评价
+910,991001,通行设施,建筑物门,建筑物正门,Pass Facilities,Gate of Buildings,Main Gate of Buildings,0,不评价
+911,991400,通行设施,临街院门,临街院门,Pass Facilities,Gate of Street House,Gate of Street House,0,不评价
+912,991401,通行设施,临街院门,临街院正门,Pass Facilities,Gate of Street House,Main Entrance of Street House Gate,0,不评价
+913,991500,通行设施,虚拟门,虚拟门,Pass Facilities,Virtual Gate,Virtual Gate,0,不评价
+914,991600,通行设施,特殊通道,特殊通道,Pass Facilities,Special corridor,Special corridor,0,不评价
+915,991601,通行设施,特殊通道,无障碍电梯,Pass Facilities,Special corridor,Barrier-free elevators,0,不评价
