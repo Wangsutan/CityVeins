@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """
 CityVeins GUI应用
 使用PyQt开发的图形用户界面，用于调用CityVeins后端功能
@@ -65,11 +62,22 @@ from utils.poi.poi_analysis import calculate_weighted_score
 from utils.file.weight_loader import load_weight_config
 from utils.file.file_handler import save_category_stats
 from query_residential import (
+    query_by_id,
     query_by_name,
     query_by_coordinates,
     get_residential_details,
 )
-from config import WEIGHT_FILE, OUTPUT_DIR
+from config import WEIGHT_FILE, OUTPUT_DIR, KEY_FILE, DATA_DIR
+# 在文件顶部的导入部分，修改导入语句
+try:
+    from utils.api.api_buttons import APIButtonsWidget
+except ImportError as e:
+    print(f"无法导入API按钮组件: {str(e)}")
+    # 添加一个空的占位类，防止程序崩溃
+    class APIButtonsWidget(QWidget):
+        def __init__(self, parent=None):
+            super().__init__(parent)
+            self.setVisible(False)  # 隐藏这个占位组件
 
 
 # 工作线程类，用于执行耗时操作，避免阻塞GUI
@@ -188,10 +196,11 @@ class POIFetchWorker(WorkerThread):
 class ScoreCalcWorker(WorkerThread):
     """计算得分的工作线程"""
 
-    def __init__(self, poi_file, stats_dir=None):
+    def __init__(self, poi_file, stats_dir=None, weight_file=None):
         super().__init__()
         self.poi_file = poi_file
         self.stats_dir = stats_dir
+        self.weight_file = weight_file
 
     def run(self):
         """执行计算得分的任务"""
@@ -222,7 +231,21 @@ class ScoreCalcWorker(WorkerThread):
             self.progress_updated.emit(30, "加载权重配置...")
 
             # 加载权重配置
-            weight_map = load_weight_config(WEIGHT_FILE)
+            # 优先使用用户选择的权重文件
+            if self.weight_file and os.path.exists(self.weight_file):
+                weight_file = self.weight_file
+                self.progress_updated.emit(40, f"使用用户选择的权重配置: {os.path.basename(self.weight_file)}")
+            else:
+                # 如果用户没有选择权重文件，则优先使用自定义权重文件
+                custom_weight_file = os.path.join(DATA_DIR, "poi_weights", "高德POI_加权_自定义.csv")
+                if os.path.exists(custom_weight_file):
+                    weight_file = custom_weight_file
+                    self.progress_updated.emit(40, f"使用自定义权重配置: {os.path.basename(custom_weight_file)}")
+                else:
+                    weight_file = WEIGHT_FILE
+                    self.progress_updated.emit(40, f"使用默认权重配置: {os.path.basename(WEIGHT_FILE)}")
+
+            weight_map = load_weight_config(weight_file)
 
             self.progress_updated.emit(50, "计算加权得分...")
 
@@ -446,6 +469,7 @@ class CityVeinsGUI(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
+        self.weight_file = None  # 存储当前选择的权重文件路径
         self.init_ui()
         self.worker_thread: Optional[WorkerThread] = None
 
@@ -465,6 +489,27 @@ class CityVeinsGUI(QMainWindow):
 
         # 创建主布局
         main_layout: QVBoxLayout = QVBoxLayout(central_widget)
+
+        # 创建顶部布局（用于放置API按钮）
+        top_layout: QHBoxLayout = QHBoxLayout()
+        top_layout.setContentsMargins(0, 0, 0, 5)
+        
+        # 添加弹性空间，将按钮推到右侧
+        top_layout.addStretch()
+        
+        # 导入并添加API按钮组件
+        try:
+            self.api_buttons_widget = APIButtonsWidget()
+            top_layout.addWidget(self.api_buttons_widget)
+        except Exception as e:
+            # 如果导入失败，显示错误信息但不影响程序运行
+            error_label = QLabel("API按钮组件加载失败")
+            error_label.setStyleSheet("color: red;")
+            top_layout.addWidget(error_label)
+            print(f"API按钮组件加载失败: {str(e)}")
+        
+        # 将顶部布局添加到主布局
+        main_layout.addLayout(top_layout)
 
         # 创建选项卡部件
         self.tab_widget: QTabWidget = QTabWidget()
@@ -554,6 +599,11 @@ class CityVeinsGUI(QMainWindow):
         id_layout: QFormLayout = QFormLayout(id_widget)
         self.residential_id_input: QLineEdit = QLineEdit()
         id_layout.addRow("住宅区ID:", self.residential_id_input)
+
+        self.query_id_button: QPushButton = QPushButton("查询")
+        self.query_id_button.clicked.connect(self.query_by_id)
+        id_layout.addRow("", self.query_id_button)  # 使用id_layout而不是name_layout
+
         self.input_stack.addWidget(id_widget)
 
         # 创建名称查询界面
@@ -714,6 +764,22 @@ class CityVeinsGUI(QMainWindow):
 
         input_layout.addRow("统计目录:", stats_dir_layout)
 
+        # 创建权重配置选择组
+        weight_group = QGroupBox("权重配置")
+        weight_layout = QHBoxLayout(weight_group)
+
+        # 创建权重配置选择按钮
+        self.weight_button = QPushButton("选择权重配置文件")
+        self.weight_button.clicked.connect(self.select_weight_file)
+        weight_layout.addWidget(self.weight_button)
+
+        # 创建权重配置文件显示标签
+        self.weight_label = QLabel("当前权重配置: 默认")
+        weight_layout.addWidget(self.weight_label)
+
+        # 添加权重配置组到评分布局
+        layout.addWidget(weight_group)
+
         layout.addWidget(input_group)
 
         # 创建按钮区域
@@ -839,6 +905,27 @@ class CityVeinsGUI(QMainWindow):
 
         layout.addWidget(output_group)
 
+    def select_weight_file(self):
+        """选择权重配置文件"""
+        # 打开文件选择对话框
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "选择权重配置文件",
+            os.path.join(DATA_DIR, "poi_weights"),
+            "CSV文件 (*.csv);;所有文件 (*)"
+        )
+        
+        # 如果用户选择了文件
+        if file_path:
+            # 更新权重配置文件路径
+            self.weight_file = file_path
+            
+            # 更新权重配置文件显示标签
+            self.weight_label.setText(f"当前权重配置: {os.path.basename(file_path)}")
+            
+            # 更新状态栏
+            self.status_bar.showMessage(f"已选择权重配置文件: {os.path.basename(file_path)}", 3000)
+
     def fetch_poi_data(self) -> None:
         """获取POI数据"""
         # 获取输入值
@@ -920,7 +1007,9 @@ class CityVeinsGUI(QMainWindow):
 
         # 创建工作线程
         self.worker_thread: ScoreCalcWorker = ScoreCalcWorker(
-            poi_file=poi_file, stats_dir=stats_dir
+            poi_file=poi_file, 
+            stats_dir=stats_dir,
+            weight_file=self.weight_file  # 添加权重配置文件参数
         )
 
         # 连接信号
@@ -1015,6 +1104,41 @@ class CityVeinsGUI(QMainWindow):
             self.input_stack.setCurrentIndex(1)
         elif method == "coord":
             self.input_stack.setCurrentIndex(2)
+
+    def query_by_id(self) -> None:
+        """根据ID查询住宅区"""
+        residential_id = self.residential_id_input.text().strip()
+        if not residential_id:
+            QMessageBox.warning(self, "输入错误", "请输入住宅区ID")
+            return
+
+        # 显示进度提示
+        self.poi_output.append(
+            f"[{datetime.now().strftime('%H:%M:%S')}] 正在查询住宅区ID: {residential_id}..."
+        )
+
+        try:
+            # 查询住宅区
+            result = query_by_id(residential_id)
+
+            if not result:
+                self.poi_output.append(
+                    f"[{datetime.now().strftime('%H:%M:%S')}] 未找到ID为 {residential_id} 的住宅区"
+                )
+                QMessageBox.information(self, "查询结果", f"未找到ID为 {residential_id} 的住宅区")
+                return
+
+            # 选择住宅区
+            self.select_residential(result)
+            self.poi_output.append(
+                f"[{datetime.now().strftime('%H:%M:%S')}] 已选择住宅区: {result['name']}"
+            )
+
+        except Exception as e:
+            self.poi_output.append(
+                f"[{datetime.now().strftime('%H:%M:%S')}] 查询失败: {str(e)}"
+            )
+            QMessageBox.critical(self, "查询错误", f"查询失败: {str(e)}")
 
     def query_by_name(self) -> None:
         """根据名称查询住宅区"""

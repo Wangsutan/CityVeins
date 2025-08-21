@@ -100,6 +100,65 @@ def query_by_name(name: str) -> List[Dict[str, Any]]:
         return []
 
 
+def query_by_id(residential_id: str) -> Optional[Dict[str, Any]]:
+    """
+    根据住宅区ID查询住宅区信息
+
+    Args:
+        residential_id (str): 住宅区ID
+
+    Returns:
+        Optional[Dict[str, Any]]: 住宅区信息，如果找不到则返回None
+    """
+    try:
+        # 获取API密钥
+        api_key = get_api_key()
+        if not api_key:
+            print("错误: 无法获取API密钥")
+            return None
+
+        # 使用高德地图POI详情API获取住宅区信息
+        url = "https://restapi.amap.com/v3/place/detail"
+        params = {
+            "key": api_key,
+            "id": residential_id
+        }
+
+        response = requests.get(url, params=params)
+        data = response.json()
+
+        if data["status"] == "1" and "pois" in data and len(data["pois"]) > 0:
+            poi = data["pois"][0]
+            # 提取经纬度
+            location_parts = poi["location"].split(",")
+            if len(location_parts) >= 2:
+                longitude = float(location_parts[0])
+                latitude = float(location_parts[1])
+            else:
+                print(f"警告：位置格式不正确: {poi['location']}")
+                return None
+
+            # 构建结果
+            result = {
+                "id": poi["id"],
+                "name": poi["name"],
+                "address": poi["address"],
+                "province": poi.get("pname", ""),
+                "city": poi.get("cityname", ""),
+                "district": poi.get("adname", ""),
+                "longitude": longitude,
+                "latitude": latitude,
+                "type": poi["type"],
+            }
+            return result
+        else:
+            print(f"未找到ID为 {residential_id} 的住宅区")
+            return None
+    except Exception as e:
+        print(f"查询失败: {str(e)}")
+        return None
+
+
 def query_by_coordinates(
     longitude: float, latitude: float, radius: int = 1000
 ) -> List[Dict[str, Any]]:
