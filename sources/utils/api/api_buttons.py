@@ -10,9 +10,17 @@ API按钮模块
 
 import os
 from PyQt5.QtWidgets import (
-    QWidget, QHBoxLayout, QPushButton, QDialog, QGroupBox,
-    QVBoxLayout, QTextEdit, QLineEdit, QFormLayout,
-    QDialogButtonBox, QMessageBox
+    QWidget,
+    QHBoxLayout,
+    QPushButton,
+    QDialog,
+    QGroupBox,
+    QVBoxLayout,
+    QTextEdit,
+    QLineEdit,
+    QFormLayout,
+    QDialogButtonBox,
+    QMessageBox,
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
@@ -64,7 +72,8 @@ class AMapDialog(QDialog):
         info_layout = QVBoxLayout(info_group)
         info_text = QTextEdit()
         info_text.setReadOnly(True)
-        info_text.setHtml("""
+        info_text.setHtml(
+            """
             <p>该程序依赖高德地图API来获取POI（兴趣点）数据。</p>
             <ol>
                 <li>访问高德开放平台网站</li>
@@ -72,7 +81,8 @@ class AMapDialog(QDialog):
                 <li>创建应用并选择Web服务API</li>
                 <li>获取Key值并填入下方</li>
             </ol>
-        """)
+        """
+        )
         info_layout.addWidget(info_text)
         layout.addWidget(info_group)
 
@@ -89,7 +99,9 @@ class AMapDialog(QDialog):
         visit_button.clicked.connect(self.api_manager.open_api_website)
         button_layout.addWidget(visit_button)
 
-        dialog_buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        dialog_buttons = QDialogButtonBox(
+            QDialogButtonBox.Save | QDialogButtonBox.Cancel
+        )
         dialog_buttons.accepted.connect(self.save_key)
         dialog_buttons.rejected.connect(self.reject)
         button_layout.addWidget(dialog_buttons)
@@ -118,6 +130,6 @@ class APIButtonsWidget(QWidget):
     def setup_ui(self):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignCenter)  # 设置布局居中对齐
         self.amap_button = AMapButton(self)
         layout.addWidget(self.amap_button)
-        layout.addStretch()

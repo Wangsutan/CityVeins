@@ -37,8 +37,20 @@ sys.path.insert(0, PROJECT_ROOT)
 # 直接导入key_loader函数
 def load_key(key_file: str) -> str:
     """加载API密钥"""
-    with open(key_file, "r", encoding="utf-8") as f:
-        return f.read().strip()
+    if not os.path.exists(key_file):
+        print(f"警告: 密钥文件不存在: {key_file}")
+        return ""
+
+    try:
+        with open(key_file, "r", encoding="utf-8") as f:
+            key = f.read().strip()
+            if not key:
+                print(f"警告: 密钥文件为空: {key_file}")
+                return ""
+            return key
+    except Exception as e:
+        print(f"读取密钥文件失败: {e}")
+        return ""
 
 
 # 直接定义配置变量

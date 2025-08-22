@@ -35,28 +35,30 @@ def load_key(path: str = KEY_FILE) -> Optional[str]:
     从指定文本文件读取高德API密钥
 
     文件需仅含一行Key，不含多余空格/换行。
-    若文件不存在或为空，将抛出FileNotFoundError/ValueError。
+    若文件不存在或为空，将返回空字符串而不是抛出异常。
 
     Args:
         path (str): 密钥文件路径，默认从config中读取KEY_FILE
 
     Returns:
-        Optional[str]: 高德API密钥字符串，如果加载失败则返回None
-
-    Raises:
-        FileNotFoundError: 当密钥文件不存在时抛出此异常
-        ValueError: 当密钥文件为空或内容无效时抛出此异常
+        Optional[str]: 高德API密钥字符串，如果加载失败则返回空字符串
     """
     if not os.path.exists(path):
-        raise FileNotFoundError(f"密钥文件不存在: {path}")
+        print(f"警告: 密钥文件不存在: {path}")
+        return ""
 
-    with open(path, "r", encoding="utf-8") as f:
-        key: str = f.read().strip()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            key: str = f.read().strip()
 
-    if not key:
-        raise ValueError(f"密钥文件为空: {path}")
+        if not key:
+            print(f"警告: 密钥文件为空: {path}")
+            return ""
 
-    return key
+        return key
+    except Exception as e:
+        print(f"警告: 读取密钥文件失败: {e}")
+        return ""
 
 
 if __name__ == "__main__":

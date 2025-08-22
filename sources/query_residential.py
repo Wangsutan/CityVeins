@@ -23,11 +23,19 @@ def get_api_key() -> str:
     从密钥文件中获取API密钥
 
     Returns:
-        str: API密钥
+        str: API密钥，如果密钥文件不存在则返回空字符串
     """
+    if not os.path.exists(KEY_FILE):
+        print(f"警告: 密钥文件不存在: {KEY_FILE}")
+        return ""
+
     try:
         with open(KEY_FILE, "r", encoding="utf-8") as f:
-            return f.read().strip()
+            key = f.read().strip()
+            if not key:
+                print(f"警告: 密钥文件为空: {KEY_FILE}")
+                return ""
+            return key
     except Exception as e:
         print(f"读取API密钥失败: {str(e)}")
         return ""
@@ -119,10 +127,7 @@ def query_by_id(residential_id: str) -> Optional[Dict[str, Any]]:
 
         # 使用高德地图POI详情API获取住宅区信息
         url = "https://restapi.amap.com/v3/place/detail"
-        params = {
-            "key": api_key,
-            "id": residential_id
-        }
+        params = {"key": api_key, "id": residential_id}
 
         response = requests.get(url, params=params)
         data = response.json()

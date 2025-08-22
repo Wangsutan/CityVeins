@@ -68,11 +68,13 @@ from query_residential import (
     get_residential_details,
 )
 from config import WEIGHT_FILE, OUTPUT_DIR, KEY_FILE, DATA_DIR
+
 # 在文件顶部的导入部分，修改导入语句
 try:
     from utils.api.api_buttons import APIButtonsWidget
 except ImportError as e:
     print(f"无法导入API按钮组件: {str(e)}")
+
     # 添加一个空的占位类，防止程序崩溃
     class APIButtonsWidget(QWidget):
         def __init__(self, parent=None):
@@ -234,16 +236,25 @@ class ScoreCalcWorker(WorkerThread):
             # 优先使用用户选择的权重文件
             if self.weight_file and os.path.exists(self.weight_file):
                 weight_file = self.weight_file
-                self.progress_updated.emit(40, f"使用用户选择的权重配置: {os.path.basename(self.weight_file)}")
+                self.progress_updated.emit(
+                    40, f"使用用户选择的权重配置: {os.path.basename(self.weight_file)}"
+                )
             else:
                 # 如果用户没有选择权重文件，则优先使用自定义权重文件
-                custom_weight_file = os.path.join(DATA_DIR, "poi_weights", "高德POI_加权_自定义.csv")
+                custom_weight_file = os.path.join(
+                    DATA_DIR, "poi_weights", "高德POI_加权_自定义.csv"
+                )
                 if os.path.exists(custom_weight_file):
                     weight_file = custom_weight_file
-                    self.progress_updated.emit(40, f"使用自定义权重配置: {os.path.basename(custom_weight_file)}")
+                    self.progress_updated.emit(
+                        40,
+                        f"使用自定义权重配置: {os.path.basename(custom_weight_file)}",
+                    )
                 else:
                     weight_file = WEIGHT_FILE
-                    self.progress_updated.emit(40, f"使用默认权重配置: {os.path.basename(WEIGHT_FILE)}")
+                    self.progress_updated.emit(
+                        40, f"使用默认权重配置: {os.path.basename(WEIGHT_FILE)}"
+                    )
 
             weight_map = load_weight_config(weight_file)
 
@@ -493,10 +504,10 @@ class CityVeinsGUI(QMainWindow):
         # 创建顶部布局（用于放置API按钮）
         top_layout: QHBoxLayout = QHBoxLayout()
         top_layout.setContentsMargins(0, 0, 0, 5)
-        
-        # 添加弹性空间，将按钮推到右侧
+
+        # 添加左侧弹性空间
         top_layout.addStretch()
-        
+
         # 导入并添加API按钮组件
         try:
             self.api_buttons_widget = APIButtonsWidget()
@@ -507,7 +518,10 @@ class CityVeinsGUI(QMainWindow):
             error_label.setStyleSheet("color: red;")
             top_layout.addWidget(error_label)
             print(f"API按钮组件加载失败: {str(e)}")
-        
+
+        # 添加右侧弹性空间
+        top_layout.addStretch()
+
         # 将顶部布局添加到主布局
         main_layout.addLayout(top_layout)
 
@@ -912,19 +926,21 @@ class CityVeinsGUI(QMainWindow):
             self,
             "选择权重配置文件",
             os.path.join(DATA_DIR, "poi_weights"),
-            "CSV文件 (*.csv);;所有文件 (*)"
+            "CSV文件 (*.csv);;所有文件 (*)",
         )
-        
+
         # 如果用户选择了文件
         if file_path:
             # 更新权重配置文件路径
             self.weight_file = file_path
-            
+
             # 更新权重配置文件显示标签
             self.weight_label.setText(f"当前权重配置: {os.path.basename(file_path)}")
-            
+
             # 更新状态栏
-            self.status_bar.showMessage(f"已选择权重配置文件: {os.path.basename(file_path)}", 3000)
+            self.status_bar.showMessage(
+                f"已选择权重配置文件: {os.path.basename(file_path)}", 3000
+            )
 
     def fetch_poi_data(self) -> None:
         """获取POI数据"""
@@ -1007,9 +1023,9 @@ class CityVeinsGUI(QMainWindow):
 
         # 创建工作线程
         self.worker_thread: ScoreCalcWorker = ScoreCalcWorker(
-            poi_file=poi_file, 
+            poi_file=poi_file,
             stats_dir=stats_dir,
-            weight_file=self.weight_file  # 添加权重配置文件参数
+            weight_file=self.weight_file,  # 添加权重配置文件参数
         )
 
         # 连接信号
@@ -1125,7 +1141,9 @@ class CityVeinsGUI(QMainWindow):
                 self.poi_output.append(
                     f"[{datetime.now().strftime('%H:%M:%S')}] 未找到ID为 {residential_id} 的住宅区"
                 )
-                QMessageBox.information(self, "查询结果", f"未找到ID为 {residential_id} 的住宅区")
+                QMessageBox.information(
+                    self, "查询结果", f"未找到ID为 {residential_id} 的住宅区"
+                )
                 return
 
             # 选择住宅区

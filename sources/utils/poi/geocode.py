@@ -65,15 +65,21 @@ try:
             # 如果还是失败，直接实现load_key函数
             def load_key(path: str = KEY_FILE) -> str:
                 if not os.path.exists(path):
-                    raise FileNotFoundError(f"密钥文件不存在: {path}")
+                    print(f"警告: 密钥文件不存在: {path}")
+                    return ""
 
-                with open(path, "r", encoding="utf-8") as f:
-                    key: str = f.read().strip()
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        key: str = f.read().strip()
 
-                if not key:
-                    raise ValueError(f"密钥文件为空: {path}")
+                    if not key:
+                        print(f"警告: 密钥文件为空: {path}")
+                        return ""
 
-                return key
+                    return key
+                except Exception as e:
+                    print(f"读取密钥文件失败: {e}")
+                    return 
 
     GAODE_KEY: Optional[str] = load_key(KEY_FILE)
 except Exception as e:

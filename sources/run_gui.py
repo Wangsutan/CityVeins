@@ -26,10 +26,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def main() -> None:
     """
     主函数 - 启动CityVeins GUI应用
-    
+
     本函数负责创建Qt应用程序实例，初始化主窗口，并启动事件循环。
     它还处理可能出现的导入错误和其他异常，提供友好的错误信息。
-    
+
     异常:
         ImportError: 当缺少必要的依赖库时抛出
         Exception: 当启动GUI应用过程中出现其他错误时抛出

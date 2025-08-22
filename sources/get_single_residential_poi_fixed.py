@@ -39,10 +39,18 @@ from utils.poi.poi_filter import filter_poi_types
 from utils.residential import get_residential_info
 
 # 配置参数
-GAODE_KEY: str = load_key(KEY_FILE)
+# GAODE_KEY不再在模块级别初始化，而是在需要时加载
 RADIUS: int = 1200
 OUTPUT_DIR: str = OUTPUT_DIR
 POI_TYPES_FILE: str = WEIGHT_FILE  # POI分类权重文件
+
+def get_gaode_key():
+    """获取高德API密钥，如果密钥文件不存在则返回空字符串"""
+    try:
+        return load_key(KEY_FILE)
+    except Exception as e:
+        print(f"警告: 无法加载API密钥: {e}")
+        return 
 # POI过滤开关，默认开启，过滤掉权重较低且非生活常规需要的POI类型
 FILTER_LOW_WEIGHT_POI: bool = True
 # 权重阈值，低于此值的POI类型将被过滤掉（当FILTER_LOW_WEIGHT_POI为True时）
@@ -129,7 +137,7 @@ def get_pois(
         try:
             url: str = "https://restapi.amap.com/v3/place/around"
             params: Dict[str, Any] = {
-                "key": GAODE_KEY,
+                "key": get_gaode_key(),
                 "location": f"{lng},{lat}",
                 "types": poi_type,
                 "radius": RADIUS,
@@ -220,7 +228,7 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
         try:
             # 使用高德POI详情API获取住宅区信息
             url = "https://restapi.amap.com/v3/place/detail"
-            params = {"key": GAODE_KEY, "id": residential_id}
+            params = {"key": get_gaode_key(), "id": residential_id}
             response = requests.get(url, params=params, timeout=10)
             result = response.json()
 
