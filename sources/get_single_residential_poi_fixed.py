@@ -169,9 +169,11 @@ def get_pois(
 def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str, str]:
     """
     获取住宅区的经纬度坐标
-    尝试从多个来源获取住宅区信息，优先从CSV文件读取，如果没有则尝试从API获取
+    依赖于 get_residential_info 函数获取住宅区信息，如果没有经纬度则尝试通过地址解析获取
+
     Args:
         residential_id (str): 住宅区ID
+
     Returns:
         tuple: (lng, lat, name, address)
         lng (float): 经度
@@ -179,96 +181,33 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
         name (str): 住宅区名称
         address (str): 住宅区地址
     """
-    # 尝试从各个行政区的住宅区文件中查找
-    districts = [
-        "田家庵区",
-        "大通区",
-        "谢家集区",
-        "八公山区",
-        "潘集区",
-        "凤台县",
-        "寿县",
-    ]
-
-    # 确保residential目录存在
-    residential_dir = os.path.join(DATA_DIR, "residential")
-    if not os.path.exists(residential_dir):
-        os.makedirs(residential_dir, exist_ok=True)
-        print(f"创建住宅区数据目录: {residential_dir}")
-
-    for district in districts:
-        csv_file = os.path.join(DATA_DIR, "residential", f"residential_{district}.csv")
-        if os.path.exists(csv_file):
-            try:
-                df = pd.read_csv(csv_file)
-                # 查找匹配的住宅区
-                match = df[df["id"] == residential_id]
-                if not match.empty:
-                    row = match.iloc[0]
-                    return (
-                        float(row["lng"]),
-                        float(row["lat"]),
-                        row["name"],
-                        row.get("address", ""),
-                    )
-            except Exception as e:
-                print(f"读取住宅区文件 {csv_file} 失败: {str(e)}")
-
-    # 如果没有找到，尝试从residential_info函数获取
+    # 首先尝试从 get_residential_info 函数获取住宅区信息
     try:
-        name, address = get_residential_info(residential_id)
-        if name is None or address is None:
-            raise ValueError("无法获取住宅区信息")
-    except Exception as e:
-        print(f"获取住宅区信息失败: {str(e)}")
-        # 如果通过residential_info也无法获取，尝试使用高德API直接搜索
-        print(
-            f"无法通过常规方式获取住宅区信息，尝试通过高德API直接搜索ID: {residential_id}"
-        )
-        try:
-            # 使用高德POI详情API获取住宅区信息
-            url = "https://restapi.amap.com/v3/place/detail"
-            params = {"key": get_gaode_key(), "id": residential_id}
-            response = requests.get(url, params=params, timeout=10)
-            result = response.json()
+        name, address, lng, lat = get_residential_info(residential_id)
 
-            if (
-                result.get("status") == "1"
-                and "pois" in result
-                and len(result["pois"]) > 0
-            ):
-                poi_data = result["pois"][0]
-                name = poi_data.get("name", "")
-                address = poi_data.get("address", "")
-                location = poi_data.get("location", "")
-
-                if location:
-                    location_parts = location.split(",")
-                    if len(location_parts) >= 2:
-                        lng, lat = float(location_parts[0]), float(location_parts[1])
-                    else:
-                        print(f"警告：位置格式不正确: {location}")
-                        raise ValueError(f"位置格式不正确: {location}")
-                    print(
-                        f"通过高德API成功获取住宅区信息: {name}, {address}, {lng}, {lat}"
-                    )
-                    return lng, lat, name, address
-            else:
-                raise ValueError(f"高德API未找到住宅区ID: {residential_id}")
-        except Exception as e:
-            print(f"通过高德API获取住宅区信息失败: {str(e)}")
+        if name is None:
             raise ValueError(f"无法获取住宅区ID: {residential_id} 的信息")
 
-    # 如果找到了名称和地址但没有经纬度，尝试通过地址解析获取经纬度
-    try:
-        from sources.utils import geocode
+        # 如果已经有经纬度信息，直接返回
+        if lng is not None and lat is not None:
+            return float(lng), float(lat), name, address
 
-        lng, lat = geocode(address)
-        print(f"通过地址解析成功获取经纬度: {lng}, {lat}")
-        return lng, lat, name, address
+        # 如果没有经纬度信息，尝试通过地址解析获取
+        if address:
+            try:
+                from sources.utils import geocode
+                lng, lat = geocode(address)
+                print(f"通过地址解析成功获取经纬度: {lng}, {lat}")
+                return lng, lat, name, address
+            except Exception as e:
+                print(f"地址解析失败: {str(e)}")
+                raise ValueError(f"无法获取住宅区ID: {residential_id} 的经纬度信息")
+        else:
+            raise ValueError(f"住宅区ID: {residential_id} 没有地址信息，无法解析经纬度")
+
     except Exception as e:
-        print(f"地址解析失败: {str(e)}")
-        raise ValueError(f"无法获取住宅区ID: {residential_id} 的经纬度信息")
+        print(f"获取住宅区坐标失败: {str(e)}")
+        raise ValueError(f"无法获取住宅区ID: {residential_id} 的坐标信息")
 
 
 def main(residential_id: str, name: str = None, address: str = None) -> None:
