@@ -295,11 +295,8 @@ def main() -> None:
         if not md_file.endswith(".md"):
             md_file = os.path.splitext(md_file)[0] + ".md"
     else:
-        # 使用社区名称作为文件名，如果没有社区名称则使用ID
-        if community_name:
-            md_file = os.path.join(args.stats_dir, f"{community_name}_评估报告.md")
-        else:
-            md_file = os.path.join(args.stats_dir, f"{args.residential_id}_评估报告.md")
+        # 使用ID作为文件名
+        md_file = os.path.join(args.stats_dir, f"{args.residential_id}_report.md")
 
     # 写入Markdown报告文件
     with open(md_file, "w", encoding="utf-8") as f:
