@@ -1,0 +1,472 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>城脉 - 城市生活圈分析平台</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      
+      header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+      }
+      
+      h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+      }
+      
+      .slogan {
+        font-size: 1.3rem;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.8;
+      }
+      
+      .slogan-highlight {
+        position: relative;
+        display: inline-block;
+        font-weight: bold;
+      }
+      
+      .slogan-highlight.dudian::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #e74c3c, #f39c12);
+        border-radius: 2px;
+        transform: scaleX(0.9);
+      }
+      
+      .slogan-highlight.qimai::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #2ecc71, #3498db);
+        border-radius: 2px;
+        transform: scaleX(0.9);
+      }
+      
+      .main-content {
+        padding: 40px 30px;
+      }
+      
+      .search-section {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .search-title {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+      }
+      
+      .search-box {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 25px;
+      }
+      
+      #name {
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px 0 0 8px;
+        width: 70%;
+        max-width: 400px;
+        transition: all 0.3s;
+      }
+      
+      #name:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      }
+      
+      #query-btn {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        border-radius: 0 8px 8px 0;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      #query-btn:hover {
+        background: linear-gradient(135deg, #2980b9 0%, #2471a3 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .save-section {
+        text-align: center;
+      }
+      
+      #save-btn {
+        padding: 14px 35px;
+        font-size: 1.2rem;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      #save-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      #save-btn:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .results-section {
+        margin-top: 30px;
+      }
+      
+      #log {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        min-height: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        font-family: monospace;
+        line-height: 1.5;
+      }
+      
+      .picker {
+        background: #fff;
+        border: 2px solid #3498db;
+        border-radius: 12px;
+        padding: 25px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+      
+      .picker h3 {
+        margin-bottom: 20px;
+        color: #2c3e50;
+        text-align: center;
+      }
+      
+      .picker label {
+        display: block;
+        padding: 12px 15px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+        cursor: pointer;
+      }
+      
+      .picker label:hover {
+        background: #f1f8ff;
+      }
+      
+      .picker input[type="radio"] {
+        margin-right: 10px;
+      }
+      
+      .picker-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+      
+      .picker-btn {
+        padding: 10px 25px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+      }
+      
+      .confirm-btn {
+        background: #3498db;
+        color: white;
+      }
+      
+      .cancel-btn {
+        background: #e74c3c;
+        color: white;
+      }
+      
+      .picker-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      footer {
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        border-top: 1px solid #eee;
+      }
+      
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 2.5rem;
+        }
+        
+        .slogan {
+          font-size: 1.1rem;
+        }
+        
+        .search-box {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        #name {
+          width: 100%;
+          border-radius: 8px;
+          margin-bottom: 10px;
+        }
+        
+        #query-btn {
+          width: 100%;
+          border-radius: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>城脉</h1>
+        <p class="slogan">打通城市一刻钟便民生活圈<span class="slogan-highlight dudian">堵点</span>，畅通城市居民生活<span class="slogan-highlight qimai">气脉</span>。</p>
+      </header>
+      
+      <div class="main-content">
+        <section class="search-section">
+          <h2 class="search-title">查询住宅区信息</h2>
+          <div class="search-box">
+            <input id="name" type="text" placeholder="输入住宅区名称" />
+            <button id="query-btn" onclick="queryName()">查询</button>
+          </div>
+        </section>
+        
+        <section class="save-section">
+          <button id="save-btn" onclick="saveData()" disabled>保存到本地</button>
+        </section>
+        
+        <section class="results-section">
+          <h3 style="margin-bottom: 15px; color: #2c3e50;">查询结果</h3>
+          <pre id="log">请输入住宅区名称并点击查询按钮...</pre>
+        </section>
+      </div>
+      
+      <footer>
+        <p>城脉 · 城市生活圈分析平台 © 2025</p>
+      </footer>
+    </div>
+
+    <script>
+      const API = 'http://47.112.146.115';
+
+      let lastResult = null;      // 最终选中的那条
+      let candidates = [];        // 查询返回的多条
+
+      // 更新保存按钮状态
+      function updateSaveButton() {
+        const saveBtn = document.getElementById('save-btn');
+        saveBtn.disabled = !lastResult || !lastResult.result;
+      }
+
+      async function queryName() {
+        const name = document.getElementById('name').value.trim();
+        if (!name) {
+          alert('请输入住宅区名称');
+          return;
+        }
+        
+        log('查询中...');
+        try {
+          const res = await fetch(`${API}/query`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({method: 'name', name})
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+          candidates = data.result || [];
+          if (candidates.length === 0) throw new Error('无结果');
+          if (candidates.length === 1) {
+            selectCandidate(0);
+          } else {
+            showPicker(candidates);
+          }
+        } catch (e) {
+          log('查询出错：' + e.message);
+          console.error('查询错误详情:', e);
+          // 查询失败时重置状态
+          lastResult = null;
+          updateSaveButton();
+        }
+      }
+
+      function showPicker(list) {
+        // 移除现有的选择器
+        const existingPicker = document.getElementById('picker');
+        if (existingPicker) {
+          existingPicker.remove();
+        }
+
+        const picker = document.createElement('div');
+        picker.id = 'picker';
+        picker.className = 'picker';
+        picker.innerHTML = `<h3>找到多个住宅区，请选择：</h3>` +
+          list.map((c, i) =>
+            `<label><input type="radio" name="pick" value="${i}"> ${c.name} - ${c.address} (ID: ${c.id})</label>`
+          ).join('') +
+          `<div class="picker-buttons">
+            <button class="picker-btn confirm-btn" onclick="confirmPick()">确定</button>
+            <button class="picker-btn cancel-btn" onclick="cancelPick()">取消</button>
+          </div>`;
+        document.body.appendChild(picker);
+      }
+
+      function confirmPick() {
+        const idx = document.querySelector('input[name="pick"]:checked');
+        if (!idx) { 
+          alert('请先选择一项'); 
+          return; 
+        }
+        selectCandidate(parseInt(idx.value));
+        document.getElementById('picker').remove();
+      }
+
+      function cancelPick() {
+        document.getElementById('picker').remove();
+        log('已取消选择');
+        // 取消选择后重置状态
+        lastResult = null;
+        updateSaveButton();
+      }
+
+      function selectCandidate(idx) {
+        lastResult = { result: [candidates[idx]] };
+        candidates = [];
+        const selected = lastResult.result[0];
+        log(`已选择：${selected.name}\n地址：${selected.address}\nID：${selected.id}\n坐标：${selected.longitude}, ${selected.latitude}`);
+        updateSaveButton();
+      }
+
+      async function saveData() {
+        if (!lastResult || !lastResult.result || lastResult.result.length === 0) {
+          alert('请先完成查询并选择住宅区！');
+          return;
+        }
+        
+        const r = lastResult.result[0];
+        
+        // 确保 payload 是普通对象，不是字符串
+        const payload = {
+          residential_id: String(r.id),
+          name: String(r.name || r.id),
+          address: String(r.address || ''),
+          lng: r.longitude ? parseFloat(r.longitude) : null,
+          lat: r.latitude ? parseFloat(r.latitude) : null,
+          radius: 1200,
+          threshold: 0.4,
+          filter_poi: true
+        };
+        
+        console.log('发送的数据:', payload);
+        
+        log('正在保存（去重 POI + 评分 + 报告）...');
+        try {
+          const res = await fetch(`${API}/save`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)  // 只在这里序列化一次
+          });
+          
+          const result = await res.json();
+          if (!res.ok) {
+            throw new Error(result.error || `HTTP ${res.status}`);
+          }
+          
+          log(`保存完成！\n目录：${result.save_dir}`);
+          if (result.html_url) {
+            window.open(`${API}${result.html_url}`, '_blank');
+          }
+        } catch (e) {
+          log('保存失败：' + e.message);
+          console.error('详细错误:', e);
+        }
+      }
+
+      function log(txt) {
+        document.getElementById('log').textContent = txt;
+      }
+
+      // 按回车键查询
+      document.getElementById('name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          queryName();
+        }
+      });
+
+      // 初始化保存按钮状态
+      updateSaveButton();
+    </script>
+  </body>
+</html>

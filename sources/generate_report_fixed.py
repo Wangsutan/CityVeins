@@ -17,6 +17,8 @@ import subprocess
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 from utils.poi.poi_filter import filter_poi_types, build_category_hierarchy
 
 
@@ -128,7 +130,7 @@ def generate_markdown_report(
     )
 
     # 读取权重配置文件
-    weight_config_file = "data/poi_weights/高德POI_加权.csv"
+    weight_config_file = os.path.join(BASE_DIR, 'data', 'poi_weights', '高德POI_加权.csv')
     weight_config_df = pd.read_csv(weight_config_file)
 
     # 使用poi_filter.py中的函数构建类别层级结构

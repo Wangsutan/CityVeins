@@ -127,6 +127,8 @@ temp/
 tmp/
 *.tmp
 *.temp
+*.gz
+*.desktop
 
 # 排除特定数据目录，但保留重要配置文件
 data/residential/
