@@ -6,6 +6,7 @@ import datetime
 import json
 import shutil
 import logging
+from urllib.parse import quote
 
 # ---------- 环境 ----------
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -30,7 +31,7 @@ def find_weight_csv():
     custom = os.path.join(PROJECT_ROOT, 'data', 'poi_weights', '高德POI_加权.csv')
     if os.path.exists(custom):
         return custom
-    default = os.path.join(PROJECT_ROOT, 'config', 'poi_weight.csv')
+    default = os.path.join(PROJECT_ROOT, 'data', 'poi_weights', 'poi_weight_default.csv')
     if os.path.exists(default):
         return default
     raise FileNotFoundError(f'未找到任何权重文件，已搜索：{custom} 和 {default}')
@@ -92,9 +93,18 @@ def score():
         weight_csv = find_weight_csv()
         weight_map = load_weight_config(weight_csv)
         total, cnt, df = calculate_weighted_score(poi_file, weight_map)
+        
+        # 添加大、中、小类数量统计
+        big_category_count = len(df[df['类型'] == '大类'])
+        mid_category_count = len(df[df['类型'] == '中类'])
+        small_category_count = len(df[df['类型'] == '小类'])
+        
         return jsonify({
             'total_score': total,
             'poi_count': cnt,
+            'big_category_count': big_category_count,
+            'mid_category_count': mid_category_count,
+            'small_category_count': small_category_count,
             'categories': df.to_dict('records')
         })
     except Exception as e:
@@ -204,17 +214,31 @@ def save_all():
         weight_map = load_weight_config(weight_csv)
         total_score, poi_cnt, cate_df = calculate_weighted_score(poi_file, weight_map)
 
+        # 保存score文件
         score_csv = os.path.join(save_dir, f'score_{rid}.csv')
         cate_df.to_csv(score_csv, index=False, encoding='utf-8-sig')
         app.logger.debug("评分计算完成")
 
-        # 7. 各种 JSON（报告模板需要）
+        # 7. 生成各种JSON文件（报告模板需要）
         summary = {
             'residential_id': rid,
             'total_score': float(total_score),
             'poi_count': int(poi_cnt),
             'timestamp': datetime.datetime.now().isoformat()
         }
+        
+        # 统计大、中、小类数量
+        big_category_count = len(cate_df[cate_df['类型'] == '大类'])
+        mid_category_count = len(cate_df[cate_df['类型'] == '中类'])
+        small_category_count = len(cate_df[cate_df['类型'] == '小类'])
+        
+        # 更新summary数据
+        summary.update({
+            'big_category_count': big_category_count,
+            'mid_category_count': mid_category_count,
+            'small_category_count': small_category_count
+        })
+        
         with open(os.path.join(save_dir, 'summary.json'), 'w', encoding='utf-8') as f:
             json.dump(summary, f, ensure_ascii=False, indent=2)
 
@@ -249,10 +273,13 @@ def save_all():
 
         app.logger.debug("JSON文件生成完成")
 
-        # 8. 生成报告
+        # 8. 生成报告 - 使用英文文件名避免乱码
         app.logger.debug("开始生成报告")
-        md_path = os.path.join(save_dir, f'{name}_评估报告.md')
-        html_path = md_path.replace('.md', '.html')
+        # 使用英文文件名
+        md_filename = f'report_{rid}.md'
+        html_filename = f'report_{rid}.html'
+        md_path = os.path.join(save_dir, md_filename)
+        html_path = os.path.join(save_dir, html_filename)
         
         with open(md_path, 'w', encoding='utf-8') as f:
             f.write(generate_markdown_report(rid, save_dir, name))
@@ -261,8 +288,16 @@ def save_all():
 
         return jsonify({
             'save_dir': save_dir,
-            'markdown_url': f'/download/{rid}_{ts}/{name}_评估报告.md',
-            'html_url': f'/download/{rid}_{ts}/{name}_评估报告.html'
+            'markdown_url': f'/download/{rid}_{ts}/{md_filename}?name={quote(name)}',
+            'html_url': f'/download/{rid}_{ts}/{html_filename}?name={quote(name)}',
+            'files': {
+                'poi': f'/download/{rid}_{ts}/poi_{rid}_unique.csv',
+                'score': f'/download/{rid}_{ts}/score_{rid}.csv',
+                'summary': f'/download/{rid}_{ts}/summary.json',
+                'stats': f'/download/{rid}_{ts}/stats_{rid}.json',
+                'report_md': f'/download/{rid}_{ts}/{md_filename}?name={quote(name)}',
+                'report_html': f'/download/{rid}_{ts}/{html_filename}?name={quote(name)}'
+            }
         })
         
     except Exception as e:
@@ -272,8 +307,131 @@ def save_all():
 @app.route('/download/<path:subpath>/<filename>')
 def download(subpath, filename):
     dir_path = os.path.join(SAVE_ROOT, subpath)
-    return send_from_directory(dir_path, filename, as_attachment=True)
+    
+    # 获取自定义文件名参数
+    custom_name = request.args.get('name', '')
+    
+    # 确保文件名使用UTF-8编码
+    try:
+        filename = filename.encode('utf-8').decode('utf-8')
+    except:
+        pass
+    
+    response = send_from_directory(dir_path, filename, as_attachment=True)
+    
+    # 设置下载文件的编码头
+    try:
+        # 如果有自定义文件名，使用自定义文件名
+        if custom_name:
+            # 根据文件类型设置下载文件名
+            if filename.endswith('.md'):
+                download_filename = f"{custom_name}_评估报告.md"
+            elif filename.endswith('.html'):
+                download_filename = f"{custom_name}_评估报告.html"
+            else:
+                # 其他文件保持原名
+                download_filename = filename
+        else:
+            download_filename = filename
+        
+        # 对中文文件名进行URL编码
+        encoded_filename = quote(download_filename.encode('utf-8'))
+        
+        # 设置Content-Disposition头，使用RFC 5987编码
+        response.headers['Content-Disposition'] = f"attachment; filename*=UTF-8''{encoded_filename}"
+        
+    except Exception as e:
+        app.logger.warning(f"设置文件名编码失败: {e}")
+        # 如果编码失败，使用原始文件名
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
 
+@app.route('/files/<path:subpath>')
+def list_files(subpath):
+    """获取文件列表的API"""
+    dir_path = os.path.join(SAVE_ROOT, subpath)
+    
+    if not os.path.exists(dir_path):
+        return jsonify({'error': '目录不存在'}), 404
+    
+    files = []
+    for filename in os.listdir(dir_path):
+        file_path = os.path.join(dir_path, filename)
+        if os.path.isfile(file_path):
+            stat = os.stat(file_path)
+            
+            # 根据文件名生成显示名称
+            display_name = filename
+            if filename.startswith('report_') and filename.endswith('.md'):
+                display_name = '评估报告 (Markdown)'
+            elif filename.startswith('report_') and filename.endswith('.html'):
+                display_name = '评估报告 (HTML)'
+            elif filename.startswith('poi_') and filename.endswith('.csv'):
+                display_name = 'POI数据'
+            elif filename.startswith('score_') and filename.endswith('.csv'):
+                display_name = '评分数据'
+            elif filename == 'summary.json':
+                display_name = '汇总信息'
+            elif filename.startswith('stats_') and filename.endswith('.json'):
+                display_name = '统计信息'
+                
+            files.append({
+                'name': filename,
+                'display_name': display_name,
+                'size': stat.st_size,
+                'mtime': datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
+                'url': f'/download/{subpath}/{quote(filename)}'
+            })
+    
+    return jsonify({'files': files})
+
+@app.route('/download-zip/<path:subpath>')
+def download_zip(subpath):
+    """打包下载整个目录"""
+    import zipfile
+    
+    dir_path = os.path.join(SAVE_ROOT, subpath)
+    
+    if not os.path.exists(dir_path):
+        return jsonify({'error': '目录不存在'}), 404
+    
+    # 创建ZIP文件
+    zip_filename = f'{subpath}.zip'
+    zip_path = os.path.join(SAVE_ROOT, zip_filename)
+    
+    try:
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(dir_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    # 在ZIP文件中保持相对路径
+                    arcname = os.path.relpath(file_path, dir_path)
+                    zipf.write(file_path, arcname)
+        
+        # 发送ZIP文件
+        response = send_from_directory(SAVE_ROOT, zip_filename, as_attachment=True)
+        
+        # 设置下载文件名
+        encoded_filename = quote(f'{subpath}.zip'.encode('utf-8'))
+        response.headers['Content-Disposition'] = f"attachment; filename*=UTF-8''{encoded_filename}"
+        
+        return response
+        
+    except Exception as e:
+        app.logger.error(f"创建ZIP文件失败: {e}")
+        return jsonify({'error': f'创建ZIP文件失败: {str(e)}'}), 500
+    finally:
+        # 清理临时ZIP文件
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+
+@app.after_request
+def after_request(response):
+    """确保所有响应都使用UTF-8编码"""
+    if response.content_type.startswith('application/json'):
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=8000)

@@ -2,6 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>城脉 - 城市生活圈分析平台</title>
     <style>
       * {
@@ -16,7 +18,7 @@
         color: #333;
         line-height: 1.6;
         min-height: 100vh;
-        padding: 20px;
+        padding: 15px;
       }
       
       .container {
@@ -31,22 +33,27 @@
       header {
         background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
         color: white;
-        padding: 40px 30px;
+        padding: 30px 20px;
         text-align: center;
       }
       
       h1 {
-        font-size: 3.5rem;
+        font-size: 2.8rem;
         font-weight: 700;
         margin-bottom: 15px;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
       }
       
       .slogan {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         max-width: 600px;
         margin: 0 auto;
-        line-height: 1.8;
+        line-height: 1.7;
+      }
+      
+      .slogan-line {
+        display: block;
+        margin-bottom: 8px;
       }
       
       .slogan-highlight {
@@ -80,34 +87,36 @@
       }
       
       .main-content {
-        padding: 40px 30px;
+        padding: 30px 20px;
       }
       
       .search-section {
         text-align: center;
-        margin-bottom: 40px;
-        padding-bottom: 30px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
         border-bottom: 1px solid #eee;
       }
       
       .search-title {
-        font-size: 1.4rem;
-        margin-bottom: 20px;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
         color: #2c3e50;
       }
       
       .search-box {
         display: flex;
-        justify-content: center;
-        margin-bottom: 25px;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
       }
       
       #name {
-        padding: 12px 20px;
-        font-size: 1.1rem;
+        padding: 12px 15px;
+        font-size: 1rem;
         border: 2px solid #ddd;
-        border-radius: 8px 0 0 8px;
-        width: 70%;
+        border-radius: 8px;
+        width: 100%;
         max-width: 400px;
         transition: all 0.3s;
       }
@@ -120,13 +129,15 @@
       
       #query-btn {
         padding: 12px 25px;
-        font-size: 1.1rem;
+        font-size: 1rem;
         background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         color: white;
         border: none;
-        border-radius: 0 8px 8px 0;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s;
+        width: 100%;
+        max-width: 400px;
       }
       
       #query-btn:hover {
@@ -137,25 +148,26 @@
       
       .action-section {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
       }
       
       .action-buttons {
         display: flex;
-        justify-content: center;
-        gap: 15px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
       }
       
       .action-btn {
         padding: 14px 25px;
-        font-size: 1.1rem;
+        font-size: 1rem;
         border: none;
         border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        min-width: 160px;
+        width: 100%;
+        max-width: 300px;
       }
       
       .save-btn {
@@ -182,34 +194,39 @@
       
       .download-options {
         background: #f8f9fa;
-        padding: 20px;
+        padding: 15px;
         border-radius: 8px;
-        margin-top: 20px;
+        margin-top: 15px;
         border: 1px solid #e9ecef;
       }
       
       .download-options h4 {
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         color: #2c3e50;
         text-align: center;
+        font-size: 1.2rem;
       }
       
       .platform-buttons {
         display: flex;
-        justify-content: center;
-        gap: 10px;
         flex-wrap: wrap;
-        margin-bottom: 15px;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
       }
       
       .platform-btn {
-        padding: 10px 20px;
+        padding: 8px 15px;
         border: 2px solid #3498db;
         background: white;
         color: #3498db;
         border-radius: 6px;
         cursor: pointer;
         transition: all 0.3s;
+        font-size: 0.9rem;
+        flex: 1;
+        min-width: 120px;
+        max-width: 150px;
       }
       
       .platform-btn.active {
@@ -224,60 +241,69 @@
       
       .download-instructions {
         background: white;
-        padding: 15px;
+        padding: 12px;
         border-radius: 6px;
         border-left: 4px solid #3498db;
-        margin-top: 15px;
-        font-size: 0.9rem;
+        margin-top: 12px;
+        font-size: 0.85rem;
       }
       
       .results-section {
-        margin-top: 30px;
+        margin-top: 25px;
+      }
+      
+      .results-section h3 {
+        margin-bottom: 12px;
+        color: #2c3e50;
+        font-size: 1.2rem;
       }
       
       #log {
         background: #f8f9fa;
-        padding: 20px;
+        padding: 15px;
         border-radius: 8px;
         border: 1px solid #e9ecef;
-        min-height: 200px;
-        max-height: 400px;
+        min-height: 150px;
+        max-height: 350px;
         overflow-y: auto;
         white-space: pre-wrap;
         font-family: monospace;
         line-height: 1.5;
+        font-size: 0.9rem;
       }
       
       .picker {
         background: #fff;
         border: 2px solid #3498db;
         border-radius: 12px;
-        padding: 25px;
+        padding: 20px;
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 1000;
         width: 90%;
-        max-width: 600px;
+        max-width: 500px;
         max-height: 80vh;
         overflow-y: auto;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       }
       
       .picker h3 {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         color: #2c3e50;
         text-align: center;
+        font-size: 1.3rem;
       }
       
       .picker label {
         display: block;
-        padding: 12px 15px;
-        margin-bottom: 8px;
+        padding: 10px 12px;
+        margin-bottom: 6px;
         border-radius: 6px;
         transition: background 0.2s;
         cursor: pointer;
+        font-size: 0.95rem;
       }
       
       .picker label:hover {
@@ -285,23 +311,25 @@
       }
       
       .picker input[type="radio"] {
-        margin-right: 10px;
+        margin-right: 8px;
       }
       
       .picker-buttons {
         display: flex;
         justify-content: center;
-        gap: 15px;
-        margin-top: 20px;
+        gap: 12px;
+        margin-top: 15px;
       }
       
       .picker-btn {
-        padding: 10px 25px;
+        padding: 10px 20px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 1rem;
+        font-size: 0.95rem;
         transition: all 0.3s;
+        flex: 1;
+        max-width: 120px;
       }
       
       .confirm-btn {
@@ -319,47 +347,190 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
       
+      .file-list {
+        text-align: left;
+        margin: 12px 0;
+      }
+      
+      .file-item {
+        display: flex;
+        flex-direction: column;
+        padding: 10px 12px;
+        margin: 6px 0;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.2s;
+      }
+      
+      .file-item:hover {
+        background: #f8f9fa;
+        border-color: #3498db;
+      }
+      
+      .file-info {
+        flex: 1;
+        margin-bottom: 8px;
+      }
+      
+      .file-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+      }
+      
+      .file-details {
+        font-size: 0.8rem;
+        color: #666;
+      }
+      
+      .file-actions {
+        display: flex;
+        gap: 8px;
+      }
+      
+      .download-file-btn {
+        padding: 6px 12px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+        flex: 1;
+      }
+      
+      .download-file-btn:hover {
+        background: #2980b9;
+        transform: translateY(-1px);
+      }
+      
       footer {
         text-align: center;
-        padding: 20px;
+        padding: 15px;
         color: #7f8c8d;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         border-top: 1px solid #eee;
       }
       
-      @media (max-width: 600px) {
+      /* 平板和桌面样式 */
+      @media (min-width: 768px) {
+        body {
+          padding: 20px;
+        }
+        
+        header {
+          padding: 40px 30px;
+        }
+        
         h1 {
-          font-size: 2.5rem;
+          font-size: 3.5rem;
         }
         
         .slogan {
-          font-size: 1.1rem;
+          font-size: 1.3rem;
+        }
+        
+        .main-content {
+          padding: 40px 30px;
         }
         
         .search-box {
-          flex-direction: column;
-          align-items: center;
+          flex-direction: row;
+          justify-content: center;
         }
         
         #name {
-          width: 100%;
-          border-radius: 8px;
-          margin-bottom: 10px;
+          width: 70%;
+          border-radius: 8px 0 0 8px;
+          margin-bottom: 0;
         }
         
         #query-btn {
-          width: 100%;
-          border-radius: 8px;
+          width: auto;
+          border-radius: 0 8px 8px 0;
         }
         
         .action-buttons {
-          flex-direction: column;
-          align-items: center;
+          flex-direction: row;
+          justify-content: center;
         }
         
         .action-btn {
-          width: 100%;
-          max-width: 300px;
+          width: auto;
+        }
+        
+        .file-item {
+          flex-direction: row;
+          align-items: center;
+        }
+        
+        .file-info {
+          margin-bottom: 0;
+        }
+        
+        .file-actions {
+          margin-left: 15px;
+        }
+        
+        .download-file-btn {
+          flex: none;
+        }
+        
+        .platform-btn {
+          flex: none;
+        }
+      }
+      
+      /* 大屏幕样式 */
+      @media (min-width: 1024px) {
+        .slogan {
+          font-size: 1.4rem;
+        }
+        
+        .search-title {
+          font-size: 1.4rem;
+        }
+        
+        #name {
+          font-size: 1.1rem;
+        }
+        
+        #query-btn {
+          font-size: 1.1rem;
+        }
+        
+        .action-btn {
+          font-size: 1.1rem;
+        }
+      }
+      
+      /* 小屏幕手机样式 */
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 2.2rem;
+        }
+        
+        .slogan {
+          font-size: 1rem;
+        }
+        
+        .search-title {
+          font-size: 1.1rem;
+        }
+        
+        .picker {
+          padding: 15px;
+        }
+        
+        .picker h3 {
+          font-size: 1.2rem;
+        }
+        
+        .picker label {
+          font-size: 0.9rem;
+          padding: 8px 10px;
         }
       }
     </style>
@@ -368,7 +539,10 @@
     <div class="container">
       <header>
         <h1>城脉</h1>
-        <p class="slogan">打通城市一刻钟便民生活圈<span class="slogan-highlight dudian">堵点</span>，畅通城市居民生活<span class="slogan-highlight qimai">气脉</span>。</p>
+        <p class="slogan">
+          <span class="slogan-line">打通城市一刻钟便民生活圈<span class="slogan-highlight dudian">堵点</span>，</span>
+          <span class="slogan-line">畅通城市居民生活<span class="slogan-highlight qimai">气脉</span>。</span>
+        </p>
       </header>
       
       <div class="main-content">
@@ -397,10 +571,10 @@
             
             <div id="download-instructions" class="download-instructions">
               <strong>Windows 下载说明：</strong><br>
-              1. 右键点击下面的下载链接<br>
-              2. 选择"另存为"<br>
-              3. 选择保存位置（如：桌面、文档等）<br>
-              4. 点击保存即可下载到本地
+              1. 点击"开始下载"按钮<br>
+              2. 浏览器会自动下载ZIP压缩包<br>
+              3. 解压到任意文件夹即可查看报告<br>
+              4. 或者右键链接选择"另存为"
             </div>
             
             <div style="text-align: center; margin-top: 15px;">
@@ -411,7 +585,7 @@
         </section>
         
         <section class="results-section">
-          <h3 style="margin-bottom: 15px; color: #2c3e50;">查询结果</h3>
+          <h3>查询结果</h3>
           <pre id="log">请输入住宅区名称并点击查询按钮...</pre>
         </section>
       </div>
@@ -427,6 +601,13 @@
       let candidates = [];
       let currentSaveDir = '';
       let selectedPlatform = 'windows';
+      let currentResidentialName = '';
+
+      // 确保所有请求使用UTF-8编码
+      const defaultHeaders = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json; charset=utf-8'
+      };
 
       // 更新按钮状态
       function updateButtonStates() {
@@ -479,13 +660,8 @@
             `;
             break;
           case 'browser':
-            instructions.innerHTML = `
-              <strong>浏览器直接下载：</strong><br>
-              1. 点击下方文件链接直接下载<br>
-              2. 支持单个文件下载<br>
-              3. 右键链接可选择"另存为"<br>
-              4. 推荐下载HTML报告文件查看
-            `;
+            // 浏览器下载模式 - 显示文件列表
+            showFileList();
             break;
         }
       }
@@ -504,6 +680,122 @@
         document.getElementById('download-options').style.display = 'none';
       }
 
+      // 显示文件列表
+      async function showFileList() {
+        if (!currentSaveDir) {
+          alert('没有可下载的数据');
+          return;
+        }
+
+        const subpath = currentSaveDir.split('/').pop();
+        
+        try {
+          const res = await fetch(`${API}/files/${subpath}`);
+          const data = await res.json();
+          
+          if (!res.ok) {
+            throw new Error(data.error || `HTTP ${res.status}`);
+          }
+          
+          const fileListHTML = `
+            <div class="file-list">
+              <strong>选择要下载的文件：</strong><br><br>
+              ${data.files.map(file => `
+                <div class="file-item">
+                  <div class="file-info">
+                    <div class="file-name">${file.display_name}</div>
+                    <div class="file-details">
+                      大小: ${formatFileSize(file.size)} | 修改时间: ${file.mtime}
+                    </div>
+                  </div>
+                  <div class="file-actions">
+                    <button class="download-file-btn" onclick="downloadSingleFile('${file.url}')">下载</button>
+                  </div>
+                </div>
+              `).join('')}
+              
+              <div style="margin-top: 15px; text-align: center;">
+                <button class="action-btn save-btn" onclick="downloadZip()" style="margin-right: 10px;">打包下载全部</button>
+                <button class="action-btn" onclick="previewReport()" style="background: #e67e22;">预览报告</button>
+              </div>
+              
+              <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                提示：点击"下载"按钮直接下载单个文件，或使用"打包下载全部"下载所有文件
+              </div>
+            </div>
+          `;
+          
+          document.getElementById('download-instructions').innerHTML = fileListHTML;
+        } catch (e) {
+          console.error('获取文件列表失败:', e);
+          document.getElementById('download-instructions').innerHTML = `
+            <div style="text-align: center; color: #e74c3c;">
+              获取文件列表失败: ${e.message}<br>
+              请尝试其他下载方式
+            </div>
+          `;
+        }
+      }
+
+      // 格式化文件大小
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      // 下载单个文件
+      function downloadSingleFile(url) {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = API + url;
+        downloadLink.style.display = 'none';
+        downloadLink.target = '_blank';
+        
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      }
+
+      // 打包下载
+      function downloadZip() {
+        if (!currentSaveDir) {
+          alert('没有可下载的数据');
+          return;
+        }
+
+        const subpath = currentSaveDir.split('/').pop();
+        const zipUrl = `${API}/download-zip/${subpath}`;
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = zipUrl;
+        downloadLink.style.display = 'none';
+        
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        log('开始下载ZIP压缩包...\n文件将保存到浏览器的默认下载目录');
+        
+        setTimeout(() => {
+          alert('ZIP压缩包下载已开始！文件通常保存在"下载"文件夹中');
+        }, 1000);
+      }
+
+      // 预览报告
+      function previewReport() {
+        if (!currentSaveDir) {
+          alert('没有可预览的报告');
+          return;
+        }
+
+        const subpath = currentSaveDir.split('/').pop();
+        const reportUrl = `${API}/download/${subpath}/report_${subpath.split('_')[0]}.html?name=${encodeURIComponent(currentResidentialName)}`;
+        
+        window.open(reportUrl, '_blank');
+      }
+
       // 下载文件
       function downloadFiles() {
         if (!currentSaveDir) {
@@ -511,67 +803,13 @@
           return;
         }
 
-        const baseUrl = `${API}/download/${currentSaveDir.split('/').pop()}`;
-        
         if (selectedPlatform === 'browser') {
-          // 浏览器直接下载模式 - 显示文件列表
-          showFileList(baseUrl);
+          // 浏览器下载模式已经在selectPlatform中处理
+          return;
         } else {
           // 打包下载模式
-          downloadAsZip(baseUrl);
+          downloadZip();
         }
-      }
-
-      // 显示文件列表供选择下载
-      function showFileList(baseUrl) {
-        const fileList = `
-          <div style="text-align: left; margin: 15px 0;">
-            <strong>选择要下载的文件：</strong><br><br>
-            <a href="${baseUrl}/" target="_blank" style="display: block; padding: 8px; background: #e3f2fd; margin: 5px 0; border-radius: 4px; text-decoration: none; color: #1976d2;">
-              📁 查看所有文件（文件管理器）
-            </a>
-            <a href="${baseUrl}/" download style="display: block; padding: 8px; background: #f3e5f5; margin: 5px 0; border-radius: 4px; text-decoration: none; color: #7b1fa2;">
-              📦 下载完整ZIP包
-            </a>
-            <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-              提示：右键链接选择"另存为"可指定保存位置
-            </div>
-          </div>
-        `;
-        
-        document.getElementById('download-instructions').innerHTML = fileList;
-      }
-
-      // 打包下载
-      function downloadAsZip(baseUrl) {
-        // 创建下载链接
-        const downloadLink = document.createElement('a');
-        downloadLink.href = baseUrl + '/?download=zip';
-        downloadLink.download = `cityveins_report_${new Date().getTime()}.zip`;
-        downloadLink.style.display = 'none';
-        
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        log('开始下载...\n文件将保存到浏览器的默认下载目录\n下载完成后请检查下载文件夹');
-        
-        // 根据不同平台给出提示
-        setTimeout(() => {
-          let message = '下载已开始！';
-          switch(selectedPlatform) {
-            case 'windows':
-              message += ' 文件通常保存在"下载"文件夹中';
-              break;
-            case 'linux':
-              message += ' 文件通常保存在 ~/Downloads/ 目录';
-              break;
-            case 'android':
-              message += ' 请在文件管理器中查看下载内容';
-              break;
-          }
-          alert(message);
-        }, 1000);
       }
 
       async function queryName() {
@@ -585,7 +823,7 @@
         try {
           const res = await fetch(`${API}/query`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: defaultHeaders,
             body: JSON.stringify({method: 'name', name})
           });
           const data = await res.json();
@@ -646,6 +884,7 @@
         lastResult = { result: [candidates[idx]] };
         candidates = [];
         const selected = lastResult.result[0];
+        currentResidentialName = selected.name;
         log(`已选择：${selected.name}\n地址：${selected.address}\nID：${selected.id}\n坐标：${selected.longitude}, ${selected.latitude}`);
         updateButtonStates();
       }
@@ -673,7 +912,7 @@
         try {
           const res = await fetch(`${API}/save`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: defaultHeaders,
             body: JSON.stringify(payload)
           });
           
@@ -683,13 +922,15 @@
           }
           
           currentSaveDir = result.save_dir;
+          currentResidentialName = payload.name;
+          
           log(`保存完成！\n云端目录：${result.save_dir}\n\n现在可以点击"下载到本地"按钮将数据下载到您的设备。`);
           
           if (result.html_url) {
             // 自动打开报告预览
             setTimeout(() => {
               if (confirm('是否在浏览器中预览评估报告？')) {
-                window.open(`${API}${result.html_url}`, '_blank');
+                previewReport();
               }
             }, 1000);
           }
@@ -714,6 +955,13 @@
 
       // 初始化按钮状态
       updateButtonStates();
+
+      // 页面加载时确保编码正确
+      document.addEventListener('DOMContentLoaded', function() {
+        // 设置文档编码
+        document.documentElement.lang = 'zh-CN';
+        document.documentElement.charset = 'UTF-8';
+      });
     </script>
   </body>
 </html>
