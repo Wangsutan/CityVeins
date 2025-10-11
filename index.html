@@ -30,8 +30,9 @@
         overflow: hidden;
       }
       
+      /* 修改：将蓝色渐变改为橙色/黄色暖色渐变 */
       header {
-        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
         color: white;
         padding: 30px 20px;
         text-align: center;
@@ -61,31 +62,7 @@
         display: inline-block;
         font-weight: bold;
       }
-      
-      .slogan-highlight.dudian::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(90deg, #e74c3c, #f39c12);
-        border-radius: 2px;
-        transform: scaleX(0.9);
-      }
-      
-      .slogan-highlight.qimai::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(90deg, #2ecc71, #3498db);
-        border-radius: 2px;
-        transform: scaleX(0.9);
-      }
-      
+    
       .main-content {
         padding: 30px 20px;
       }
@@ -122,15 +99,15 @@
       }
       
       #name:focus {
-        border-color: #3498db;
+        border-color: #ff9a00;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        box-shadow: 0 0 0 3px rgba(255, 154, 0, 0.2);
       }
       
       #query-btn {
         padding: 12px 25px;
         font-size: 1rem;
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
         color: white;
         border: none;
         border-radius: 8px;
@@ -141,7 +118,7 @@
       }
       
       #query-btn:hover {
-        background: linear-gradient(135deg, #2980b9 0%, #2471a3 100%);
+        background: linear-gradient(135deg, #ff8c00 0%, #ff5500 100%);
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
@@ -177,6 +154,11 @@
       
       .download-btn {
         background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+      }
+      
+      .ai-btn {
+        background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
         color: white;
       }
       
@@ -217,9 +199,9 @@
       
       .platform-btn {
         padding: 8px 15px;
-        border: 2px solid #3498db;
+        border: 2px solid #ff9a00;
         background: white;
-        color: #3498db;
+        color: #ff9a00;
         border-radius: 6px;
         cursor: pointer;
         transition: all 0.3s;
@@ -230,12 +212,12 @@
       }
       
       .platform-btn.active {
-        background: #3498db;
+        background: #ff9a00;
         color: white;
       }
       
       .platform-btn:hover {
-        background: #3498db;
+        background: #ff9a00;
         color: white;
       }
       
@@ -243,7 +225,7 @@
         background: white;
         padding: 12px;
         border-radius: 6px;
-        border-left: 4px solid #3498db;
+        border-left: 4px solid #ff9a00;
         margin-top: 12px;
         font-size: 0.85rem;
       }
@@ -272,9 +254,9 @@
         font-size: 0.9rem;
       }
       
-      .picker {
+      .modal {
         background: #fff;
-        border: 2px solid #3498db;
+        border: 2px solid #ff9a00;
         border-radius: 12px;
         padding: 20px;
         position: fixed;
@@ -289,39 +271,38 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       }
       
-      .picker h3 {
+      .modal h3 {
         margin-bottom: 15px;
         color: #2c3e50;
         text-align: center;
         font-size: 1.3rem;
       }
       
-      .picker label {
-        display: block;
-        padding: 10px 12px;
-        margin-bottom: 6px;
+      .modal textarea {
+        width: 100%;
+        height: 150px;
+        padding: 12px;
+        border: 2px solid #ddd;
         border-radius: 6px;
-        transition: background 0.2s;
-        cursor: pointer;
-        font-size: 0.95rem;
+        font-size: 1rem;
+        resize: vertical;
+        margin-bottom: 15px;
       }
       
-      .picker label:hover {
-        background: #f1f8ff;
+      .modal textarea:focus {
+        border-color: #ff9a00;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 154, 0, 0.2);
       }
       
-      .picker input[type="radio"] {
-        margin-right: 8px;
-      }
-      
-      .picker-buttons {
+      .modal-buttons {
         display: flex;
         justify-content: center;
         gap: 12px;
         margin-top: 15px;
       }
       
-      .picker-btn {
+      .modal-btn {
         padding: 10px 20px;
         border: none;
         border-radius: 6px;
@@ -333,7 +314,7 @@
       }
       
       .confirm-btn {
-        background: #3498db;
+        background: #ff9a00;
         color: white;
       }
       
@@ -342,7 +323,7 @@
         color: white;
       }
       
-      .picker-btn:hover {
+      .modal-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
@@ -365,7 +346,7 @@
       
       .file-item:hover {
         background: #f8f9fa;
-        border-color: #3498db;
+        border-color: #ff9a00;
       }
       
       .file-info {
@@ -391,7 +372,7 @@
       
       .download-file-btn {
         padding: 6px 12px;
-        background: #3498db;
+        background: #ff9a00;
         color: white;
         border: none;
         border-radius: 4px;
@@ -402,7 +383,7 @@
       }
       
       .download-file-btn:hover {
-        background: #2980b9;
+        background: #ff8c00;
         transform: translateY(-1px);
       }
       
@@ -412,6 +393,22 @@
         color: #7f8c8d;
         font-size: 0.85rem;
         border-top: 1px solid #eee;
+      }
+
+      /* 新增：下载按钮容器响应式布局 */
+      .download-buttons-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      
+      .download-buttons-container .action-btn {
+        flex: 1;
+        min-width: 140px;
+        max-width: 200px;
+        margin: 0;
       }
       
       /* 平板和桌面样式 */
@@ -455,10 +452,12 @@
         .action-buttons {
           flex-direction: row;
           justify-content: center;
+          flex-wrap: wrap;
         }
         
         .action-btn {
           width: auto;
+          min-width: 160px;
         }
         
         .file-item {
@@ -480,6 +479,11 @@
         
         .platform-btn {
           flex: none;
+        }
+
+        /* 桌面端下载按钮布局 */
+        .download-buttons-container {
+          flex-wrap: nowrap;
         }
       }
       
@@ -520,17 +524,36 @@
           font-size: 1.1rem;
         }
         
-        .picker {
+        .modal {
           padding: 15px;
         }
         
-        .picker h3 {
+        .modal h3 {
           font-size: 1.2rem;
         }
+
+        /* 小屏幕下载按钮布局优化 */
+        .download-buttons-container {
+          flex-direction: column;
+          align-items: center;
+        }
         
-        .picker label {
-          font-size: 0.9rem;
-          padding: 8px 10px;
+        .download-buttons-container .action-btn {
+          width: 100%;
+          max-width: 250px;
+        }
+      }
+
+      /* 超小屏幕优化 */
+      @media (max-width: 360px) {
+        .platform-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .platform-btn {
+          width: 100%;
+          max-width: 200px;
         }
       }
     </style>
@@ -540,8 +563,8 @@
       <header>
         <h1>城脉</h1>
         <p class="slogan">
-          <span class="slogan-line">打通城市一刻钟便民生活圈<span class="slogan-highlight dudian">堵点</span>，</span>
-          <span class="slogan-line">畅通城市居民生活<span class="slogan-highlight qimai">气脉</span>。</span>
+          <span class="slogan-line">打通城市一刻钟便民生活圈<span class="slogan-highlight dudian">堵点</span></span>
+          <span class="slogan-line">畅通城市居民生活<span class="slogan-highlight qimai">气脉</span></span>
         </p>
       </header>
       
@@ -557,6 +580,7 @@
         <section class="action-section">
           <div class="action-buttons">
             <button id="save-btn" class="action-btn save-btn" onclick="saveData()" disabled>保存到云端</button>
+            <button id="ai-btn" class="action-btn ai-btn" onclick="showAIModal()" disabled>AI生成报告</button>
             <button id="download-btn" class="action-btn download-btn" onclick="showDownloadOptions()" disabled>下载到本地</button>
           </div>
           
@@ -577,9 +601,10 @@
               4. 或者右键链接选择"另存为"
             </div>
             
-            <div style="text-align: center; margin-top: 15px;">
+            <!-- 修复：使用响应式按钮容器 -->
+            <div class="download-buttons-container">
               <button class="action-btn save-btn" onclick="downloadFiles()">开始下载</button>
-              <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6; margin-left: 10px;">取消</button>
+              <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6;">取消</button>
             </div>
           </div>
         </section>
@@ -612,11 +637,151 @@
       // 更新按钮状态
       function updateButtonStates() {
         const saveBtn = document.getElementById('save-btn');
+        const aiBtn = document.getElementById('ai-btn');
         const downloadBtn = document.getElementById('download-btn');
         const hasResult = lastResult && lastResult.result;
         
         saveBtn.disabled = !hasResult;
+        aiBtn.disabled = !currentSaveDir;
         downloadBtn.disabled = !currentSaveDir;
+      }
+
+      // 显示AI生成报告模态框
+      function showAIModal() {
+        if (!currentSaveDir) {
+          alert('请先保存数据到云端');
+          return;
+        }
+
+        const existingModal = document.getElementById('ai-modal');
+        if (existingModal) {
+          existingModal.remove();
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'ai-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+          <h3>AI生成报告</h3>
+          <textarea id="ai-prompt" placeholder="请输入提示词...">作为商务局工作人员，根据上级关于推进社区一刻钟生活圈建设的工作部署，现提供某社区15分钟生活圈范围内的POI数据清单（附后）。
+
+请基于这些数据，对以下关键业态进行专项分析：
+
+分析维度
+
+1. 基础生活服务
+
+    一菜一早：生鲜菜市场、早餐店等
+
+    便民商业：便利店、小型超市等
+
+2. 重点民生服务
+
+    一老一小：养老机构、托育中心、老年活动场所
+
+    医疗保障：药店、诊所、社区卫生站
+
+3. 生活配套服务
+
+    一洗一修：洗衣店、洗车店、维修点、缝补店
+
+    个人服务：理发店、美容店等
+
+4. 文体教育服务
+
+    教育培训：少儿培训机构、课外辅导机构
+
+    健身休闲：健身房、体育场馆、活动中心
+
+分析要求
+
+    数量统计：各业态POI总数统计
+
+    覆盖评估：分析是否满足社区居民基本需求
+
+    质量分析：重点列举知名品牌或规模较大的POI
+
+    缺口识别：指出存在的不足和服务盲区
+
+    改进建议：提出具体可行的优化建议
+
+报告格式
+
+请用中文生成规范的Markdown格式报告，结构清晰，数据准确，建议具有可操作性。不要在正文前后加上“\`\`\`markdown”“\`\`\`”等额外标记。“-”列举的各项的前面要有空行，不然无法正常分段。</textarea>
+          <div class="modal-buttons">
+            <button class="modal-btn confirm-btn" onclick="generateAIReport()">生成报告</button>
+            <button class="modal-btn cancel-btn" onclick="closeAIModal()">取消</button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      // 关闭AI模态框
+      function closeAIModal() {
+        const modal = document.getElementById('ai-modal');
+        if (modal) {
+          modal.remove();
+        }
+      }
+
+      // 生成AI报告 - 修复：点击按钮立即关闭模态框
+      async function generateAIReport() {
+        const prompt = document.getElementById('ai-prompt').value.trim();
+        if (!prompt) {
+          alert('请输入提示词');
+          return;
+        }
+
+        const rid = lastResult.result[0].id;
+        
+        // 修复：立即关闭模态框，然后再发送请求
+        closeAIModal();
+        
+        log('AI正在生成报告中...');
+        
+        try {
+          const res = await fetch(`${API}/ai-report`, {
+            method: 'POST',
+            headers: defaultHeaders,
+            body: JSON.stringify({
+              residential_id: rid,
+              save_dir: currentSaveDir,
+              prompt: prompt
+            })
+          });
+          
+          const result = await res.json();
+          if (!res.ok) {
+            throw new Error(result.error || `HTTP ${res.status}`);
+          }
+          
+          log('AI报告生成完成！\n现在可以下载或预览AI生成的报告。');
+          
+          // 自动预览AI报告
+          setTimeout(() => {
+            if (confirm('是否在浏览器中预览AI生成的报告？')) {
+              previewAIReport();
+            }
+          }, 1000);
+          
+        } catch (e) {
+          log('AI报告生成失败：' + e.message);
+          console.error('AI报告生成错误详情:', e);
+        }
+      }
+
+      // 预览AI报告
+      function previewAIReport() {
+        if (!currentSaveDir) {
+          alert('没有可预览的报告');
+          return;
+        }
+
+        const subpath = currentSaveDir.split('/').pop();
+        const rid = subpath.split('_')[0];
+        const reportUrl = `${API}/download/${subpath}/ai_report_${rid}.html?name=${encodeURIComponent(currentResidentialName)}`;
+        
+        window.open(reportUrl, '_blank');
       }
 
       // 选择平台
@@ -716,7 +881,8 @@
               
               <div style="margin-top: 15px; text-align: center;">
                 <button class="action-btn save-btn" onclick="downloadZip()" style="margin-right: 10px;">打包下载全部</button>
-                <button class="action-btn" onclick="previewReport()" style="background: #e67e22;">预览报告</button>
+                <button class="action-btn" onclick="previewReport()" style="background: #ff9a00; margin-right: 10px;">预览报告</button>
+                <button class="action-btn" onclick="previewAIReport()" style="background: #ff9a00;">预览AI报告</button>
               </div>
               
               <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
@@ -851,14 +1017,14 @@
 
         const picker = document.createElement('div');
         picker.id = 'picker';
-        picker.className = 'picker';
+        picker.className = 'modal';
         picker.innerHTML = `<h3>找到多个住宅区，请选择：</h3>` +
           list.map((c, i) =>
-            `<label><input type="radio" name="pick" value="${i}"> ${c.name} - ${c.address} (ID: ${c.id})</label>`
+            `<label style="display: block; padding: 10px 12px; margin-bottom: 6px; border-radius: 6px; transition: background 0.2s; cursor: pointer;"><input type="radio" name="pick" value="${i}"> ${c.name} - ${c.address} (ID: ${c.id})</label>`
           ).join('') +
-          `<div class="picker-buttons">
-            <button class="picker-btn confirm-btn" onclick="confirmPick()">确定</button>
-            <button class="picker-btn cancel-btn" onclick="cancelPick()">取消</button>
+          `<div class="modal-buttons">
+            <button class="modal-btn confirm-btn" onclick="confirmPick()">确定</button>
+            <button class="modal-btn cancel-btn" onclick="cancelPick()">取消</button>
           </div>`;
         document.body.appendChild(picker);
       }

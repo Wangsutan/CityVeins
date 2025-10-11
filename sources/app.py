@@ -6,6 +6,7 @@ import datetime
 import json
 import shutil
 import logging
+import requests
 from urllib.parse import quote
 
 # ---------- 环境 ----------
@@ -128,6 +129,85 @@ def report():
         return jsonify({'markdown': md_path, 'html': html_path})
     except Exception as e:
         app.logger.error(f"报告生成错误: {str(e)}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+# ---------- AI生成报告 ----------
+@app.route('/ai-report', methods=['POST'])
+def ai_report():
+    try:
+        data = request.get_json() or {}
+        rid = data.get('residential_id')
+        save_dir = data.get('save_dir')
+        prompt = data.get('prompt', '根据POI数据生成自动报告')
+        
+        if not rid or not save_dir:
+            return jsonify({'error': '缺少 residential_id 或 save_dir'}), 400
+        
+        # 读取POI文件
+        poi_file = os.path.join(save_dir, f'poi_{rid}_unique.csv')
+        if not os.path.exists(poi_file):
+            return jsonify({'error': f'POI文件不存在: {poi_file}'}), 404
+        
+        # 读取POI数据
+        import pandas as pd
+        poi_df = pd.read_csv(poi_file)
+        
+        ai_prompt = f"""{prompt}\n\n{poi_df}"""
+        
+        # 调用DeepSeek API
+        DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY')
+        if not DEEPSEEK_API_KEY:
+            return jsonify({'error': '未配置DeepSeek API密钥'}), 500
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {DEEPSEEK_API_KEY}'
+        }
+        
+        payload = {
+            'model': 'deepseek-chat',
+            'messages': [
+                {'role': 'user', 'content': ai_prompt}
+            ],
+            'temperature': 0.7,
+            'max_tokens': 2000
+        }
+        
+        response = requests.post(
+            'https://api.deepseek.com/chat/completions',
+            headers=headers,
+            json=payload,
+            timeout=60
+        )
+        
+        if response.status_code != 200:
+            return jsonify({'error': f'AI API调用失败: {response.text}'}), 500
+        
+        result = response.json()
+        ai_content = result['choices'][0]['message']['content']
+        
+        # 保存AI生成的报告
+        ai_md_filename = f'ai_report_{rid}.md'
+        ai_html_filename = f'ai_report_{rid}.html'
+        ai_md_path = os.path.join(save_dir, ai_md_filename)
+        ai_html_path = os.path.join(save_dir, ai_html_filename)
+        
+        with open(ai_md_path, 'w', encoding='utf-8') as f:
+            f.write(ai_content)
+        
+        # 转换为HTML
+        markdown_to_html(ai_md_path, ai_html_path)
+        
+        return jsonify({
+            'success': True,
+            'markdown_path': ai_md_path,
+            'html_path': ai_html_path,
+            'markdown_url': f'/download/{os.path.basename(save_dir)}/{ai_md_filename}',
+            'html_url': f'/download/{os.path.basename(save_dir)}/{ai_html_filename}'
+        })
+        
+    except Exception as e:
+        app.logger.error(f"AI报告生成错误: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 # ---------- 一键落盘 + 下载 ----------
@@ -328,6 +408,13 @@ def download(subpath, filename):
                 download_filename = f"{custom_name}_评估报告.md"
             elif filename.endswith('.html'):
                 download_filename = f"{custom_name}_评估报告.html"
+            elif filename.startswith('ai_report_'):
+                if filename.endswith('.md'):
+                    download_filename = f"{custom_name}_AI分析报告.md"
+                elif filename.endswith('.html'):
+                    download_filename = f"{custom_name}_AI分析报告.html"
+                else:
+                    download_filename = filename
             else:
                 # 其他文件保持原名
                 download_filename = filename
@@ -367,6 +454,10 @@ def list_files(subpath):
                 display_name = '评估报告 (Markdown)'
             elif filename.startswith('report_') and filename.endswith('.html'):
                 display_name = '评估报告 (HTML)'
+            elif filename.startswith('ai_report_') and filename.endswith('.md'):
+                display_name = 'AI分析报告 (Markdown)'
+            elif filename.startswith('ai_report_') and filename.endswith('.html'):
+                display_name = 'AI分析报告 (HTML)'
             elif filename.startswith('poi_') and filename.endswith('.csv'):
                 display_name = 'POI数据'
             elif filename.startswith('score_') and filename.endswith('.csv'):

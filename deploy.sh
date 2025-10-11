@@ -35,6 +35,7 @@ rsync -avz --progress \
     --exclude='.idea' \
     --exclude='*.log' \
     --exclude='*.pyc' \
+    --include='.env' \
     ./ $SERVER_USER@$SERVER_IP:$PROJECT_DIR/
 
 # 4. 服务器端配置（跳过依赖安装）
@@ -46,6 +47,21 @@ cd $PROJECT_DIR
 echo "=== 当前目录 ==="
 pwd
 ls -la
+
+# ===== 上传环境变量文件 =====
+echo "🔐 设置环境变量..."
+cd $PROJECT_DIR
+
+if [ -f ".env" ]; then
+    echo "找到 .env 文件，正在设置..."
+    # 设置环境变量
+    set -a
+    source .env
+    set +a
+    echo "✅ 环境变量已加载"
+else
+    echo "⚠️  未找到 .env 文件，请手动创建"
+fi
 
 # ===== 清理旧服务 =====
 echo "🧹 清理旧服务..."
@@ -89,6 +105,7 @@ Type=simple
 User=ecs-user
 WorkingDirectory=/opt/cityveins
 Environment=PATH=/usr/local/bin:/usr/bin:/home/ecs-user/anaconda3/bin
+EnvironmentFile=/opt/cityveins/.env
 ExecStart=/home/ecs-user/anaconda3/bin/gunicorn -w 4 -b 127.0.0.1:8000 --timeout 120 --chdir /opt/cityveins/sources app:app
 Restart=always
 RestartSec=3
