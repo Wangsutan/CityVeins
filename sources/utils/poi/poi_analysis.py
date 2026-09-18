@@ -343,7 +343,7 @@ def generate_summary_report(
         ]
         for idx, row in top10.iterrows():
             print(
-                f"{idx+1}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
+                f"{idx + 1}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
             )
 
         # BOTTOM10
@@ -353,5 +353,5 @@ def generate_summary_report(
         ]
         for idx, row in bottom10.iterrows():
             print(
-                f"{len(df)-9+idx}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
+                f"{len(df) - 9 + idx}. {row['residential_id']}: {row['total_score']:.2f}分 (POI数量: {row['poi_count']})"
             )

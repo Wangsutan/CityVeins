@@ -130,7 +130,9 @@ def generate_markdown_report(
     )
 
     # 读取权重配置文件
-    weight_config_file = os.path.join(BASE_DIR, 'data', 'poi_weights', '高德POI_加权.csv')
+    weight_config_file = os.path.join(
+        BASE_DIR, "data", "poi_weights", "高德POI_加权.csv"
+    )
     weight_config_df = pd.read_csv(weight_config_file)
 
     # 使用poi_filter.py中的函数构建类别层级结构
@@ -169,10 +171,10 @@ def generate_markdown_report(
 ## 评估概况
 
 - **社区ID**: {residential_id}
-- **评估日期**: {datetime.now().strftime('%Y年%m月%d日')}
+- **评估日期**: {datetime.now().strftime("%Y年%m月%d日")}
 - **POI总数**: {poi_count} 个
 - **加权总分**: {total_score:.2f} 分
-- **平均权重**: {total_score/poi_count if poi_count > 0 else 0:.2f}
+- **平均权重**: {total_score / poi_count if poi_count > 0 else 0:.2f}
 - **大类数量**: {big_category_count} 个
 - **中类数量**: {mid_category_count} 个
 - **小类数量**: {small_category_count} 个
@@ -184,7 +186,7 @@ def generate_markdown_report(
 """
 
     for i, category in enumerate(big_categories_sorted):
-        report += f"| {i+1} | {category['名称']} | {category['POI数量']} | {category['加权得分']:.2f} | {category['平均权重']:.2f} | {category['子类型数量']} |\n"
+        report += f"| {i + 1} | {category['名称']} | {category['POI数量']} | {category['加权得分']:.2f} | {category['平均权重']:.2f} | {category['子类型数量']} |\n"
 
     report += "\n## 中类分析\n\n"
     report += "| 排名 | 类别名称 | POI数量 | 加权得分 | 平均权重 | 所属大类 |\n"
@@ -201,7 +203,7 @@ def generate_markdown_report(
                 parent_big = info["大类"]
                 break
 
-        report += f"| {i+1} | {category['名称']} | {category['POI数量']} | {category['加权得分']:.2f} | {category['平均权重']:.2f} | {parent_big or '未知'} |\n"
+        report += f"| {i + 1} | {category['名称']} | {category['POI数量']} | {category['加权得分']:.2f} | {category['平均权重']:.2f} | {parent_big or '未知'} |\n"
 
     report += "\n## 小类分析（TOP10）\n\n"
     report += "| 排名 | 类别名称 | POI数量 | 加权得分 | 平均权重 | 所属中类 |\n"
@@ -218,26 +220,26 @@ def generate_markdown_report(
                 parent_mid = info["中类"]
                 break
 
-        report += f"| {i+1} | {category['名称']} | {category['POI数量']} | {category['加权得分']:.2f} | {category['平均权重']:.2f} | {parent_mid or '未知'} |\n"
+        report += f"| {i + 1} | {category['名称']} | {category['POI数量']} | {category['加权得分']:.2f} | {category['平均权重']:.2f} | {parent_mid or '未知'} |\n"
 
     report += f"""
 ## 评估结论
 
 1. **POI分布情况**:
    - 该社区周边共有 {poi_count} 个POI，覆盖 {big_category_count} 个大类、{mid_category_count} 个中类和 {small_category_count} 个小类。
-   - POI数量最多的类别是 {big_categories_sorted[0]['名称']}，共有 {big_categories_sorted[0]['POI数量']} 个POI。
+   - POI数量最多的类别是 {big_categories_sorted[0]["名称"]}，共有 {big_categories_sorted[0]["POI数量"]} 个POI。
 
 2. **服务得分情况**:
    - 该社区15分钟生活圈加权总分为 {total_score:.2f} 分。
-   - 得分最高的服务类别是 {big_categories_sorted[0]['名称']}，得分为 {big_categories_sorted[0]['加权得分']:.2f} 分。
-   - 平均权重最高的服务类别是 {sorted(big_categories, key=lambda x: x['平均权重'], reverse=True)[0]['名称']}，平均权重为 {sorted(big_categories, key=lambda x: x['平均权重'], reverse=True)[0]['平均权重']:.2f}。
+   - 得分最高的服务类别是 {big_categories_sorted[0]["名称"]}，得分为 {big_categories_sorted[0]["加权得分"]:.2f} 分。
+   - 平均权重最高的服务类别是 {sorted(big_categories, key=lambda x: x["平均权重"], reverse=True)[0]["名称"]}，平均权重为 {sorted(big_categories, key=lambda x: x["平均权重"], reverse=True)[0]["平均权重"]:.2f}。
 
 3. **生活便利性评估**:
-   - 根据POI分布和得分情况，该住宅区的15分钟生活圈便利性为{'较高' if total_score/poi_count > 0.8 else '中等' if total_score/poi_count > 0.6 else '一般'}。
-   - {'各类服务设施较为齐全，能够满足居民日常需求。' if big_category_count >= 5 else '部分服务设施较为缺乏，建议进一步完善。'}
+   - 根据POI分布和得分情况，该住宅区的15分钟生活圈便利性为{"较高" if total_score / poi_count > 0.8 else "中等" if total_score / poi_count > 0.6 else "一般"}。
+   - {"各类服务设施较为齐全，能够满足居民日常需求。" if big_category_count >= 5 else "部分服务设施较为缺乏，建议进一步完善。"}
 
 ---
-*报告生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+*报告生成时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}*
 """
 
     return report

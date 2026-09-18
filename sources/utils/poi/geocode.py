@@ -79,7 +79,7 @@ try:
                     return key
                 except Exception as e:
                     print(f"读取密钥文件失败: {e}")
-                    return 
+                    return
 
     GAODE_KEY: Optional[str] = load_key(KEY_FILE)
 except Exception as e:

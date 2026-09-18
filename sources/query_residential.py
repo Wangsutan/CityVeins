@@ -375,14 +375,18 @@ def main():
     name_results = query_by_name("万科城市花园")
     print(f"找到 {len(name_results)} 个结果")
     for i, result in enumerate(name_results[:3]):  # 只显示前3个结果
-        print(f"{i+1}. {result['name']} ({result['longitude']}, {result['latitude']})")
+        print(
+            f"{i + 1}. {result['name']} ({result['longitude']}, {result['latitude']})"
+        )
 
     # 测试按经纬度查询
     print("\n测试按经纬度查询...")
     coord_results = query_by_coordinates(116.481181, 39.989792)
     print(f"找到 {len(coord_results)} 个结果")
     for i, result in enumerate(coord_results[:3]):  # 只显示前3个结果
-        print(f"{i+1}. {result['name']} ({result['longitude']}, {result['latitude']})")
+        print(
+            f"{i + 1}. {result['name']} ({result['longitude']}, {result['latitude']})"
+        )
 
 
 def _fallback_to_geocoding(api_key: str, name: str) -> List[Dict[str, Any]]:

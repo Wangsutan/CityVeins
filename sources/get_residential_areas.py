@@ -39,6 +39,7 @@ from sources.utils.file.key_loader import load_key
 from sources.utils.poi.get_district_boundary import get_valid_boundary as get_boundary
 from sources.utils.http import RateLimitedSession
 
+
 # GAODE_KEY不再在模块级别初始化，而是在需要时加载
 def get_gaode_key():
     """获取高德API密钥，如果密钥文件不存在则返回空字符串"""
@@ -47,6 +48,7 @@ def get_gaode_key():
     except Exception as e:
         print(f"警告: 无法加载API密钥: {e}")
         return ""
+
 
 # 创建带限速的HTTP会话对象
 session: RateLimitedSession = RateLimitedSession(min_interval=0.2)

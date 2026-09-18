@@ -44,13 +44,16 @@ RADIUS: int = 1200
 OUTPUT_DIR: str = OUTPUT_DIR
 POI_TYPES_FILE: str = WEIGHT_FILE  # POI分类权重文件
 
+
 def get_gaode_key():
     """获取高德API密钥，如果密钥文件不存在则返回空字符串"""
     try:
         return load_key(KEY_FILE)
     except Exception as e:
         print(f"警告: 无法加载API密钥: {e}")
-        return 
+        return
+
+
 # POI过滤开关，默认开启，过滤掉权重较低且非生活常规需要的POI类型
 FILTER_LOW_WEIGHT_POI: bool = True
 # 权重阈值，低于此值的POI类型将被过滤掉（当FILTER_LOW_WEIGHT_POI为True时）
@@ -61,9 +64,9 @@ FILTER_SUBCATEGORY: bool = False
 FILTER_SMALLCATEGORY: bool = False
 
 
-def load_poi_types() -> (
-    Tuple[List[str], Set[str], Dict[str, Dict[str, Union[str, float]]]]
-):
+def load_poi_types() -> Tuple[
+    List[str], Set[str], Dict[str, Dict[str, Union[str, float]]]
+]:
     """
     加载POI分类体系并过滤POI类型
     从CSV文件中加载POI分类体系和权重信息, 使用poi_filter模块进行过滤。
@@ -196,6 +199,7 @@ def get_residential_coordinates(residential_id: str) -> Tuple[float, float, str,
         if address:
             try:
                 from sources.utils import geocode
+
                 lng, lat = geocode(address)
                 print(f"通过地址解析成功获取经纬度: {lng}, {lat}")
                 return lng, lat, name, address

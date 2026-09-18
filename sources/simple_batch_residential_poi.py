@@ -52,13 +52,17 @@ def parse_range(range_str: str):
         if single < 1:
             raise ValueError("单数字必须大于 0")
         return 1, single
+
+
 # -------------------------------------------------------
 
 
 def main():
     # ------------------ 命令行参数 ------------------
     parser = argparse.ArgumentParser(description="批量获取住宅区POI数据")
-    parser.add_argument("--district", default="田家庵区", help="行政区名称，默认为田家庵区")
+    parser.add_argument(
+        "--district", default="田家庵区", help="行政区名称，默认为田家庵区"
+    )
     parser.add_argument("--input-file", help="输入CSV文件路径")
     parser.add_argument(
         "--limit",
@@ -144,8 +148,16 @@ def main():
 
     print("\n=== 处理结果统计 ===")
     print(f"总记录数: {len(df)}")
-    print(f"成功: {success_count} ({success_count/len(df)*100:.1f}%)" if len(df) else "成功: 0")
-    print(f"失败: {fail_count} ({fail_count/len(df)*100:.1f}%) " if len(df) else "失败: 0")
+    print(
+        f"成功: {success_count} ({success_count / len(df) * 100:.1f}%)"
+        if len(df)
+        else "成功: 0"
+    )
+    print(
+        f"失败: {fail_count} ({fail_count / len(df) * 100:.1f}%) "
+        if len(df)
+        else "失败: 0"
+    )
 
 
 if __name__ == "__main__":

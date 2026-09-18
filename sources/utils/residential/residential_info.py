@@ -117,8 +117,9 @@ def get_residential_info(
                     try:
                         location_parts = location.split(",")
                         if len(location_parts) >= 2:
-                            lng, lat = float(location_parts[0]), float(
-                                location_parts[1]
+                            lng, lat = (
+                                float(location_parts[0]),
+                                float(location_parts[1]),
                             )
                         else:
                             print(f"警告：位置格式不正确: {location}")

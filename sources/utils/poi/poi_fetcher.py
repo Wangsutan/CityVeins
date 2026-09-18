@@ -77,7 +77,7 @@ except (ImportError, ValueError):
                 return key
             except Exception as e:
                 print(f"读取密钥文件失败: {e}")
-                return 
+                return
 
 
 GAODE_KEY: str = load_key(KEY_FILE)
@@ -91,7 +91,6 @@ def get_pois(
     page: int = 1
 
     while True:
-
         url: str = "https://restapi.amap.com/v3/place/around"
         params: Dict[str, Any] = {
             "key": GAODE_KEY,
@@ -241,7 +240,7 @@ if __name__ == "__main__":
                 poi_type: str = poi.get("type", "")[:14]  # 限制类型长度
                 address: str = poi.get("address", "")[:24]  # 限制地址长度
                 distance: str = poi.get("distance", "")
-                print(f"{i+1:<4}{name:<20}{poi_type:<15}{address:<25}{distance:<10}")
+                print(f"{i + 1:<4}{name:<20}{poi_type:<15}{address:<25}{distance:<10}")
 
             if len(pois) > 10:
                 print(f"还有 {len(pois) - 10} 个POI未显示")
