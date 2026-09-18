@@ -155,10 +155,25 @@ def ai_report():
         if not rid or not save_dir:
             return jsonify({"error": "缺少 residential_id 或 save_dir"}), 400
 
-        # 读取POI文件
-        poi_file = os.path.join(save_dir, f"poi_{rid}_unique.csv")
-        if not os.path.exists(poi_file):
-            return jsonify({"error": f"POI文件不存在: {poi_file}"}), 404
+        record_dir = _record_dir(rid, save_dir)
+        if not record_dir:
+            return jsonify({"error": f"save_dir 无法识别：{save_dir}"}), 400
+
+        # 取 POI 表；记录目录里那份没了就回退到 output/poi/ 的原始产物
+        poi_file = _find_poi_csv(rid, record_dir)
+        if not poi_file:
+            tried = "、".join([
+                os.path.join(record_dir, f"poi_{rid}_unique.csv"),
+                os.path.join(OUTPUT_DIR, "poi", f"poi_{rid}_unique.csv"),
+            ])
+            return jsonify({
+                "error": f"找不到该住宅区的 POI 数据（已找过：{tried}）。"
+                         f"记录目录里没有 POI 副本、output/poi 里也没有原始产物时，"
+                         f"需要回首页对该小区重新「保存到云端」（会重新拉取 POI）后才能生成 AI 报告。"
+            }), 404
+
+        # AI 报告写到这条记录的目录里，`save_dir` 后续用于拼输出路径
+        save_dir = record_dir
 
         # 读取POI数据
         import pandas as pd
@@ -244,6 +259,62 @@ def ai_report():
 
 # ---------- 一键落盘 + 下载 ----------
 SAVE_ROOT = os.path.join(PROJECT_ROOT, "output", "web_save")
+
+
+def _find_poi_csv(rid: str, save_dir: str = None):
+    """找到某个住宅区的「去重 POI 表」，返回绝对路径或 None。
+
+    查找顺序：
+      1) <save_dir>/poi_<rid>_unique.csv     —— 正常保存流程会把它复制进记录目录
+      2) <save_dir>/poi_<rid>.csv            —— 未去重的兜底
+      3) OUTPUT_DIR/poi/poi_<rid>_unique.csv —— 记录目录里那份被删掉时的兜底
+      4) OUTPUT_DIR/poi/poi_<rid>.csv
+
+    第 3、4 条是这次补上的：随记录走的 POI 副本有可能被清理掉，而 output/poi/ 下的
+    原始产物通常还在，能救回来就不用重新抓一遍（省高德配额）。
+    """
+    poi_dir = os.path.join(OUTPUT_DIR, "poi")
+    candidates = []
+    if save_dir:
+        candidates += [
+            os.path.join(save_dir, f"poi_{rid}_unique.csv"),
+            os.path.join(save_dir, f"poi_{rid}.csv"),
+        ]
+    candidates += [
+        os.path.join(poi_dir, f"poi_{rid}_unique.csv"),
+        os.path.join(poi_dir, f"poi_{rid}.csv"),
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return None
+
+
+def _record_dir(rid: str, save_dir_raw):
+    """把请求里的 save_dir 归一成「这条记录的绝对目录」，认不出就返回 None。
+
+    save_dir 允许两种写法：
+      · 绝对路径   —— /save 返回的就是这个，首页一直这么传
+      · 记录目录名 —— 记录袋（/records）手上只有 <住宅区ID>_<时间戳> 这个目录名
+
+    之前只认绝对路径：记录袋传目录名时 os.path.join(save_dir, ...) 会得到一个
+    相对当前工作目录（/app）的路径，于是必然报「POI文件不存在」——而记录目录里
+    那份 POI 明明在。这个函数把两种写法都认下来。
+    """
+    raw = str(save_dir_raw or "").strip()
+    if not raw:
+        return None
+    if os.path.isabs(raw):
+        return os.path.normpath(raw)
+    # 相对写法只允许**一个单纯的目录名**（<住宅区ID>_<时间戳>）：
+    # 去掉尾部斜杠后若还含分隔符就拒绝，免得 ../ 这类输入虽然最后会被 basename
+    # 抹平、但语义上不该被接受。
+    raw = raw.rstrip("/\\")
+    if not raw or raw in (".", ".."):
+        return None
+    if os.path.sep in raw or (os.path.altsep and os.path.altsep in raw):
+        return None
+    return os.path.join(SAVE_ROOT, raw)
 
 
 @app.route("/save", methods=["POST"])

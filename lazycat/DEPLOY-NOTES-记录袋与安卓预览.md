@@ -251,7 +251,47 @@ CSS / header / keys-UI / weights-UI / tail / 各段 JS，
 `Dockerfile` 必须为每个新页面补 `COPY`（`amap.html` / `deepseek.html` /
 `weights.html`）—— 上一轮就因为漏 COPY `records_api.py` 导致整个进程起不来。
 
-## 七、以后改这块要注意
+## 七、记录袋里「生成 AI 报告」报「POI文件不存在」（已修）
+
+现象：在记录袋里点「生成 AI 报告」，报 `生成失败：POI文件不存在`。
+而那条记录的目录里，`poi_<rid>_unique.csv` 明明躺着。
+
+根因：`save_dir` 的两种写法没对齐。
+
+- `/save` 返回的 `save_dir` 是**绝对路径**（`/app/output/web_save/<id>_<ts>`），
+  首页把它原样回传给 `/ai-report`，所以首页一直没事；
+- 记录袋手上只有**目录名**（`<id>_<ts>`，因为它就是这么列出来的），也原样传了过去；
+- 而 `app.py` 的 `/ai-report` 直接 `os.path.join(save_dir, f"poi_{rid}_unique.csv")` ——
+  传进来的目录名是相对路径，于是拼成 `L460203_20260918_195639/poi_...csv`，
+  相对于进程工作目录 `/app` 去找，必然不存在。
+
+在容器里可以直接复现这个判断：
+
+```sh
+cd /app && ls L460203_20260918_195639        # → No such file or directory
+ls /lzcapp/var/output/web_save/L460203_20260918_195639/poi_L460203_unique.csv   # → 在
+```
+
+修法（改的是 `sources/app.py`，两处小函数）：
+
+1. `_record_dir()`：把 `save_dir` 归一成绝对目录 —— 绝对路径原样接受，
+   单纯的目录名则挂到 `SAVE_ROOT` 下；带分隔符或 `..` 的一律拒绝（400）。
+2. `_find_poi_csv()`：找 POI 表的顺序变成
+   `记录目录/unique → 记录目录/未去重 → output/poi/unique → output/poi/未去重`。
+   最后两条是新加的兜底：随记录走的 POI 副本可能被清理掉，而 `output/poi/` 下的
+   原始产物通常还在，能救回来就不用重新抓一遍（**省高德配额**）。
+3. `records_api._poi_fallback_exists()` 与第 2 条对齐，这样记录袋的
+   `can_generate_ai_report` 判据和 `/ai-report` 的实际行为一致
+   （否则按钮灰着、其实生成得出来）。
+4. 记录袋前端启动时查一次 DeepSeek Key 状态，**没配就直接把「生成 AI 报告」置灰**
+   并在 tooltip 里指向设置页，而不是让用户点了才报错。
+
+验证：`test_ai_report_paths.py`（离线单测，抠出那两个纯函数跑）覆盖两种写法、
+四种 POI 查找顺序、以及 `../` 穿越拒绝；线上实测记录袋那种「只传目录名」的写法
+已经能真正跑出 AI 报告（返回 `html_ok: true`），绝对路径写法同样正常，
+非法 `save_dir` 返回 400。
+
+## 八、以后改这块要注意
 
 - **别在应用里用 `window.open` / `location.href` 打开报告或文件** ——
   安卓上会把页面顶掉，内存里的结果就没了。预览一律走站内弹层，

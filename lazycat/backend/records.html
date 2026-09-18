@@ -183,6 +183,9 @@
   const API = '';                 // 同源
   let RECORDS = [];
   let previewCtx = null;          // 当前预览的 {url, downloadUrl, name}
+  // 没配 DeepSeek Key 时「生成 AI 报告」必然失败，所以先查一次、直接置灰，
+  // 而不是让用户点了才报错
+  let aiKeyReady = null;          // null=还没查到
 
   const $ = function (id) { return document.getElementById(id); };
 
@@ -304,11 +307,16 @@
           (r.report_preview_url ? '' : 'disabled') + '>预览评估报告</button>'
         : '<button type="button" class="primary" data-act="gen-report" ' +
           (canReport ? '' : 'disabled title="缺少生成所需的数据"') + '>生成评估报告</button>';
+      // 缺数据 / 没配 DeepSeek Key，两种都不能生成，但提示要分开说
+      const aiNoKey = aiKeyReady === false;
+      const aiTip = !canAi ? '缺少生成所需的数据'
+                          : (aiNoKey ? '未配置 DeepSeek API Key —— 到「设置」里填上' : '');
       const aiBtn = r.has_ai_report
         ? '<button type="button" class="amber" data-act="preview-ai" ' +
           (r.ai_report_preview_url ? '' : 'disabled') + '>预览 AI 报告</button>'
         : '<button type="button" class="amber" data-act="gen-ai" ' +
-          (canAi ? '' : 'disabled title="缺少生成所需的数据"') + '>生成 AI 报告</button>';
+          ((canAi && !aiNoKey) ? '' : 'disabled title="' + esc(aiTip) + '"') +
+          '>生成 AI 报告</button>';
 
       if (!r.has_report && !canReport) {
         badges.push('<span class="badge warn">无法生成报告</span>');
@@ -601,9 +609,19 @@
   $('reload').addEventListener('click', function () { load(true); });
 
   // ---------- 加载 ----------
+  async function checkAiKey() {
+    try {
+      const d = await fetch(API + '/api/settings/deepseek-key').then(r => r.json());
+      aiKeyReady = !!d.configured;
+    } catch (e) {
+      aiKeyReady = null;          // 查不到就不拦，交给服务端报错
+    }
+  }
+
   async function load(manual) {
     if (manual) toast('正在刷新…', 900);
     clearErr();
+    if (aiKeyReady === null) await checkAiKey();
     $('list').innerHTML = '<div class="empty">正在读取云端记录…</div>';
     try {
       const res = await fetch(API + '/api/records', { headers: { 'Accept': 'application/json' } });

@@ -138,6 +138,19 @@ def _name_from_report(path: str, rid: str, files):
     return rid
 
 
+def _poi_fallback_exists(rid: str) -> bool:
+    """output/poi/ 里是否还留着这个住宅区的原始 POI 产物。
+
+    与 sources/app.py 的 _find_poi_csv() 的兜底顺序保持一致：记录目录里那份
+    POI 副本被清理掉时，AI 报告仍能从 output/poi/ 取到数据。
+    """
+    poi_dir = os.path.join(os.path.dirname(os.path.abspath(_save_root())), "poi")
+    for name in (f"poi_{rid}_unique.csv", f"poi_{rid}.csv"):
+        if os.path.exists(os.path.join(poi_dir, name)):
+            return True
+    return False
+
+
 def _classify(filename: str) -> str:
     """给文件分个类，前端据此显示中文名与图标用的小标记。"""
     lower = filename.lower()
@@ -293,11 +306,15 @@ def _build_record(dirname: str):
     for fname, label in need.items():
         if fname not in present:
             missing.append(label)
-    if f"poi_{rid}_unique.csv" not in present:
+
+    # AI 报告要 POI 表。记录目录里没有时 /ai-report 会回退去 output/poi/ 找原始产物，
+    # 所以这里也要照着判 —— 否则按钮灰着、实际却生成得出来。
+    poi_in_record = f"poi_{rid}_unique.csv" in present or f"poi_{rid}.csv" in present
+    has_poi = poi_in_record or _poi_fallback_exists(rid)
+    if not has_poi:
         missing.append("POI 数据 poi_*_unique.csv（AI 报告需要）")
 
     has_all_for_report = all(f in present for f in need)
-    has_poi = f"poi_{rid}_unique.csv" in present
 
     return {
         "dir": dirname,
