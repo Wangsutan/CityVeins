@@ -1,0 +1,27 @@
+# CityVeins — 懒猫容器运行期依赖
+#
+# 服务端（Flask）真实导入链：app.py → query_residential /
+# get_single_residential_poi_fixed / generate_report_fixed /
+# utils.file.weight_loader / utils.poi.poi_analysis
+#
+# 注意 import 链有两处容易漏：
+#   1) sources/utils/__init__.py 有副作用导入（.poi.geocode 等），
+#      进而触发 utils/poi/__init__.py → get_district_boundary.py → shapely。
+#      只 grep 各模块自身 import 会漏掉 shapely（已实测踩过）。
+#   2) sources/utils/poi/poi_filter.py 里有 `from sources.utils.poi.poi_filter
+#      import ...` 的包前缀导入，因此 /app/sources 与 /app 都必须在 sys.path 上。
+#
+# 刻意不装的（已核实不在服务端链上）：
+#   folium    —— 全项目零 import（旧 requirements.txt 的历史遗留）
+#   pypandoc  —— 全项目零 import；报告转换是 subprocess 直调 pandoc 二进制
+#   matplotlib—— 仅 sources/visualize_poi.py 使用，该模块不在服务端链上
+#   PyQt5     —— 仅 GUI（cityveins_gui.py）使用，本次明确不用 PyQt 前端
+#   xlrd      —— data/ 下无 .xls 老格式文件
+flask==3.0.3
+flask-cors==4.0.1
+requests==2.32.3
+tqdm==4.66.5
+openpyxl==3.1.5
+shapely
+pandas
+numpy

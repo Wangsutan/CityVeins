@@ -1,0 +1,54 @@
+# CityVeins — 懒猫微服部署配置
+#
+# 架构：单容器（embed:app-runtime），Flask 同时提供接口与 Web 界面。
+#   - sources/app.py 提供 /query /poi /score /report /ai-report /save /files /download*
+#   - sources/run_lazycat.py 是容器入口：把项目根的 index.html 挂在 "/"（原 app.py 无此路由），
+#     并绑定 0.0.0.0。app.py 本身未作修改。
+#   - 前端 index.html 原先把 API 写死成 http://47.112.146.115，已改为同源相对路径。
+#   - 用户数据 output/ 由 run.sh 软链到持久化目录 /lzcapp/var/output。
+#
+# 用法（在本目录执行）：
+#   lzc-cli project lint && lzc-cli project release \
+#     && lzc-cli project deploy && lzc-cli project start
+
+manifest: ./lzc-manifest.yml
+pkgout: ./
+icon: ./icon.png
+
+# content: 随包分发的静态内容 → 运行期出现在 /lzcapp/pkg/content/
+#   放懒猫官方的「文件选择器 / 下载拦截」注入脚本（见 manifest 的 injects）
+contentdir: ./content
+
+buildscript: |
+  set -e
+  ROOT="$(pwd)"
+  SRC="$ROOT/.."
+
+  rm -rf "$ROOT/backend/app"
+  mkdir -p "$ROOT/backend/app"
+
+  cp "$SRC/config.py" "$ROOT/backend/app/config.py"
+  cp "$SRC/requirements.txt" "$ROOT/backend/app/requirements.txt"
+  cp "$SRC/index.html" "$ROOT/backend/app/index.html"
+  cp -r "$SRC/sources" "$ROOT/backend/app/sources"
+  cp -r "$SRC/data" "$ROOT/backend/app/data"
+  mkdir -p "$ROOT/backend/app/output"
+
+  # 同样原因：高德 Key 与备用 Key 一律不进包（保留 .gitkeep 以维持目录结构）
+  rm -f "$ROOT/backend/app/data/key/"*.txt 2>/dev/null || true
+  find "$ROOT/backend/app/data/key" -name "*.txt" -delete 2>/dev/null || true
+
+  # --- 不上架版才会做的事：打包个人密钥（现已移除）----------------------
+  # 这里曾经把项目根的 .env 复制成 app/env.seed，作为 DeepSeek Key 的种子。
+  # 上架前必须去掉：否则**每一个下载者都会拿到开发者本人的 API Key**
+  # （DeepSeek Key 可被他人用来消耗额度，高德 Key 同理）。
+  # 密钥改由应用内的「设置」页由使用者自行填写，持久化在 /lzcapp/var/config/。
+  rm -f "$ROOT/backend/app/env.seed"
+
+  find "$ROOT/backend/app" -name "__pycache__" -type d -prune -exec rm -rf {} + 2>/dev/null || true
+  find "$ROOT/backend/app" -name "*.pyc" -delete 2>/dev/null || true
+
+images:
+  app-runtime:
+    context: ./backend
+    dockerfile: ./backend/Dockerfile

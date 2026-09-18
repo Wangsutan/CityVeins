@@ -1,0 +1,34 @@
+# CityVeins 懒猫 lpk 清单
+# application = Web 界面 + Flask 接口（同一容器，容器内 :8000）
+application:
+  subdomain: cityveins
+  image: embed:app-runtime
+  routes:
+    - /=exec://8000,/app/run.sh
+
+  # 关闭平台的自动健康检查 —— 它在本应用上与真实可用性脱节。
+  #
+  # 实测证据（容器运行中逐项验证）：
+  #   · 容器内直连 http://127.0.0.1:8000/           → 200，返回前端页面
+  #   · 经 lzcinit 自身代理 http://127.0.0.1:80/     → 200，同一页面
+  #   · 外部 https://cityveins.ljmc666.heiyu.space/ → 307 跳登录（网关转发正常）
+  #   · 但 lzcinit 的 `-healthcheck` 子命令持续返回 1（连续 5 次全为 1）
+  # 也就是说：应用与代理都正常，仅该健康探针自身报失败；容器过了
+  # start_period 后就会被标成 unhealthy。先试过 test_url: / + start_period: 3m，
+  # 未改善，故按 schema 的 disable 关闭。
+  health_check:
+    disable: true
+
+  # 懒猫官方「文件选择器 / 下载拦截」：拦截应用内的原生文件入口
+  # （<input type=file>、showOpenFilePicker / showSaveFilePicker，以及下载），
+  # 让用户选择「本地文件系统 / 懒猫微服（网盘）」。
+  # 脚本随包分发，见 lzc-build.yml 的 contentdir 与 content/lazycat-injects/。
+  injects:
+    - id: file-chooser
+      on: browser
+      when:
+        - /*
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+          params:
+            locale: auto

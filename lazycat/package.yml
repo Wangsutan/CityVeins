@@ -1,0 +1,28 @@
+package: cloud.lazycat.app.cityveins
+version: 0.0.1
+name: 城脉 CityVeins
+description: >-
+  城市生活圈（15 分钟生活圈）评估平台：按 ID、名称或坐标查询住宅区，
+  拉取周边 POI，按可配置权重计算生活圈得分，并生成 Markdown / HTML 评估报告。
+author: wangsutan
+license: MIT
+
+# 应用需要访问外部接口（高德地图 API、DeepSeek API），据实声明。
+# 说明：permissions 是开发者声明而非最终授权结果，但商店审核需要如实填写。
+permissions:
+  required:
+    - net.internet
+homepage: https://github.com/Wangsutan/CityVeins
+
+locales:
+  zh-CN:
+    name: 城脉
+    description: >-
+      城市生活圈（15 分钟生活圈）评估平台。查询住宅区 → 拉取周边 POI →
+      按权重计算生活圈得分 → 生成评估报告，全流程在浏览器里完成。
+  en-US:
+    name: CityVeins
+    description: >-
+      A 15-minute life-circle evaluation platform: query a residential area,
+      fetch surrounding POIs, compute a weighted life-circle score and generate
+      a Markdown/HTML report — all in the browser.
