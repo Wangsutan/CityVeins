@@ -794,7 +794,7 @@
                  解压说明移到右侧「?」图标里。真的不同的只有「逐个下载文件」。 -->
             <div class="download-buttons-container">
               <button class="action-btn save-btn" onclick="runBusy(downloadZip, '正在下载')">打包下载 ZIP</button>
-              <button class="action-btn" onclick="runBusy(showFileList, '正在读取文件列表')" style="background: #ff9a00;">逐个下载文件</button>
+              <button id="file-list-toggle" class="action-btn" onclick="runBusy(showFileList, '正在读取文件列表')" style="background: #ff9a00;">逐个下载文件</button>
               <span class="hint-icon-wrap">
                 <button type="button" class="hint-icon" aria-label="解压说明"
                         onclick="toggleUnzipHint(event)">?</button>
@@ -1194,23 +1194,63 @@
       // 选择平台
 
       // 显示下载选项
+      // ---------- 下载区展开/收起 ----------
+      // download-instructions 会被 showFileList() 整体覆写成文件清单，
+      // 所以原始说明文字先记下来，收起时好还原。
+      let filesShownInDownload = false;
+      let dlInstructionsDefault = '';
+      const LOOP_LABEL_SHOW = '逐个下载文件';
+      const LOOP_LABEL_HIDE = '收起文件列表';
+
+      // 这个按钮要靠 id 拿 —— 别用属性选择器，太难读也容易在改 onclick 时失效
+      function loopBtn() {
+        return document.getElementById('file-list-toggle');
+      }
+
       function showDownloadOptions() {
         if (!currentSaveDir) {
           alert('请先保存数据到云端');
           return;
         }
-        document.getElementById('download-options').style.display = 'block';
+        const opts = document.getElementById('download-options');
+        const instr = document.getElementById('download-instructions');
+        if (!dlInstructionsDefault && instr) {
+          dlInstructionsDefault = instr.innerHTML;
+        }
+        // 每次展开都回到干净状态：上一轮留下的文件清单不该带出来，
+        // 否则一打开下载区就是一堆上次的文件行。
+        filesShownInDownload = false;
+        if (instr && dlInstructionsDefault) instr.innerHTML = dlInstructionsDefault;
+        const b = loopBtn();
+        if (b) b.textContent = LOOP_LABEL_SHOW;
+        opts.style.display = 'block';
       }
 
-      // 隐藏下载选项
+      // 收起文件清单，但保留整个下载区（关闭按钮在同一个容器里，不能一起藏掉）
+      function collapseFileList() {
+        const instr = document.getElementById('download-instructions');
+        if (instr && dlInstructionsDefault) instr.innerHTML = dlInstructionsDefault;
+        filesShownInDownload = false;
+        const b = loopBtn();
+        if (b) b.textContent = LOOP_LABEL_SHOW;
+      }
+
       function hideDownloadOptions() {
-        document.getElementById('download-options').style.display = 'none';
+        collapseFileList();
+        const opts = document.getElementById('download-options');
+        if (opts) opts.style.display = 'none';
       }
 
-      // 显示文件列表
+      // 显示文件列表（再点一次收起 —— 之前只能展开不能收）
       async function showFileList() {
         if (!currentSaveDir) {
           alert('没有可下载的数据');
+          return;
+        }
+
+        // 已经是展开状态 → 这次点击就是「收起」
+        if (filesShownInDownload) {
+          collapseFileList();
           return;
         }
 
@@ -1245,15 +1285,21 @@
                 <button class="action-btn save-btn" onclick="downloadZip()">打包下载全部</button>
                 <button class="action-btn" onclick="previewReport()" style="background: #ff9a00;">预览报告</button>
                 <button class="action-btn" onclick="previewAIReport()" style="background: #ff9a00;">预览AI报告</button>
+                <button class="action-btn" onclick="collapseFileList()"
+                        style="background: #95a5a6;">收起文件列表</button>
               </div>
               
               <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-                提示：点击"下载"按钮直接下载单个文件，或使用"打包下载全部"下载所有文件
+                提示：点击"下载"按钮直接下载单个文件，或使用"打包下载全部"下载所有文件；
+                点「收起文件列表」或再点一次上方的「逐个下载文件」都可以收起来。
               </div>
             </div>
           `;
           
           document.getElementById('download-instructions').innerHTML = fileListHTML;
+          filesShownInDownload = true;
+          const b = loopBtn();
+          if (b) b.textContent = LOOP_LABEL_HIDE;
         } catch (e) {
           console.error('获取文件列表失败:', e);
           document.getElementById('download-instructions').innerHTML = `
@@ -1262,6 +1308,8 @@
               请尝试其他下载方式
             </div>
           `;
+          // 取列表失败时保持「未展开」语义，按钮文案不变，用户可以直接再试
+          filesShownInDownload = false;
         }
       }
 
