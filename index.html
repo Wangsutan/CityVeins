@@ -32,17 +32,33 @@
       
       /* 修改：将蓝色渐变改为橙色/黄色暖色渐变 */
       header {
+        position: relative;          /* 供右上角齿轮定位 */
         background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
         color: white;
-        padding: 30px 20px;
+        padding: 16px 20px;
         text-align: center;
       }
+      .settings-gear {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        font-size: 20px;
+        line-height: 1;
+        text-decoration: none;
+        padding: 6px 8px;
+        border-radius: 8px;
+        opacity: .9;
+      }
+      .settings-gear:hover { background: rgba(255, 255, 255, .18); opacity: 1; }
+      .settings-gear.disabled { opacity: .35; pointer-events: none; }
       
       h1 {
-        font-size: 2.8rem;
+        font-size: 2rem;
         font-weight: 700;
-        margin-bottom: 15px;
+        margin-bottom: 0;      /* 副标题已移除，不再需要预留间距 */
         letter-spacing: 1px;
+        line-height: 1.2;
       }
       
       .slogan {
@@ -153,7 +169,9 @@
       }
       
       .download-btn {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        /* 原为暗紫 #9b59b6 → #8e44ad，改为明亮的蓝，与绿色「保存到云端」、
+           橙色「AI生成报告」在色相上明确区分 */
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         color: white;
       }
       
@@ -422,7 +440,7 @@
         }
         
         h1 {
-          font-size: 3.5rem;
+          font-size: 2.4rem;
         }
         
         .slogan {
@@ -513,7 +531,7 @@
       /* 小屏幕手机样式 */
       @media (max-width: 480px) {
         h1 {
-          font-size: 2.2rem;
+          font-size: 1.75rem;
         }
         
         .slogan {
@@ -556,16 +574,88 @@
           max-width: 200px;
         }
       }
-    </style>
+            .radius-row {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin: 14px 0 0;
+          font-size: 14px;
+          color: #2c3e50;
+        }
+        .radius-row label { font-weight: 600; }
+        .radius-row input {
+          width: 104px;
+          padding: 8px 10px;
+          border: 1px solid #d8e0ea;
+          border-radius: 8px;
+          font-size: 14px;
+          text-align: right;
+        }
+        .radius-row input:focus {
+          outline: none;
+          border-color: #466fa1;
+          box-shadow: 0 0 0 3px rgba(70, 111, 161, .12);
+        }
+        .radius-row .unit { color: #5c6672; }
+        .hint-icon-wrap { position: relative; display: inline-flex; align-items: center; }
+        .hint-icon {
+          width: 20px;
+          height: 20px;
+          padding: 0;
+          border-radius: 50%;
+          border: 1px solid #b8c4d4;
+          background: #eef2f7;
+          color: #466fa1;
+          font-size: 12.5px;
+          font-weight: 700;
+          line-height: 1;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .hint-icon:hover { background: #e2e9f3; }
+        .hint-popup {
+          display: none;
+          position: absolute;
+          top: 30px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(340px, 76vw);
+          background: #2c3e50;
+          color: #fff;
+          font-size: 12.5px;
+          line-height: 1.75;
+          text-align: left;
+          padding: 10px 13px;
+          border-radius: 8px;
+          z-index: 60;
+          box-shadow: 0 8px 22px rgba(0, 0, 0, .2);
+        }
+        .hint-popup::before {
+          content: '';
+          position: absolute;
+          top: -6px;
+          left: 50%;
+          margin-left: -6px;
+          border: 6px solid transparent;
+          border-top: 0;
+          border-bottom-color: #2c3e50;
+        }
+      </style>
   </head>
   <body>
     <div class="container">
+      <div id="key-warning" style="display:none;background:#fff4e5;border:1px solid #ffd8a8;color:#8a5300;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:14px;">
+        <span id="key-warning-text"></span>
+        <a href="/settings" style="color:#8a5300;font-weight:600;text-decoration:underline;">前往设置 →</a>
+      </div>
       <header>
+        <!-- 设置入口：不放在功能按钮区，避免与「保存/AI报告/下载」并列 -->
+        <a id="settings-gear" class="settings-gear" href="/settings"
+           title="设置：API Key 与 POI 权重" aria-label="设置">⚙️</a>
         <h1>城脉</h1>
-        <p class="slogan">
-          <span class="slogan-line">打通城市一刻钟便民生活圈<span class="slogan-highlight dudian">堵点</span></span>
-          <span class="slogan-line">畅通城市居民生活<span class="slogan-highlight qimai">气脉</span></span>
-        </p>
       </header>
       
       <div class="main-content">
@@ -573,45 +663,65 @@
           <h2 class="search-title">查询住宅区信息</h2>
           <div class="search-box">
             <input id="name" type="text" placeholder="输入住宅区名称" />
-            <button id="query-btn" onclick="queryName()">查询</button>
+            <button id="query-btn" onclick="runBusy(queryName, '正在选取地点')">选取地点</button>
+          </div>
+
+          <div class="radius-row">
+            <label for="radius">POI 搜索半径</label>
+            <input id="radius" type="number" value="1200" min="100" max="50000" step="100" />
+            <span class="unit">米</span>
+            <span class="hint-icon-wrap">
+              <button type="button" class="hint-icon" aria-label="半径说明"
+                      onclick="toggleRadiusHint(event)">?</button>
+              <span id="radius-hint" class="hint-popup">
+                默认 <strong>1200 米</strong>，可自行设置，范围 <strong>100–50000 米</strong>。<br>
+                该半径决定拉取住宅区周边 POI（学校、医院、商超等）的搜索范围：
+                半径越大覆盖越广，但 POI 数量、请求耗时与配额消耗也随之增加。
+              </span>
+            </span>
           </div>
         </section>
         
         <section class="action-section">
           <div class="action-buttons">
-            <button id="save-btn" class="action-btn save-btn" onclick="saveData()" disabled>保存到云端</button>
+            <button id="save-btn" class="action-btn save-btn" onclick="runBusy(saveData, '正在保存到云端')" disabled>保存到云端</button>
             <button id="ai-btn" class="action-btn ai-btn" onclick="showAIModal()" disabled>AI生成报告</button>
             <button id="download-btn" class="action-btn download-btn" onclick="showDownloadOptions()" disabled>下载到本地</button>
           </div>
           
           <div id="download-options" class="download-options" style="display: none;">
             <h4>选择下载方式</h4>
-            <div class="platform-buttons">
-              <button class="platform-btn active" onclick="selectPlatform('windows')">Windows</button>
-              <button class="platform-btn" onclick="selectPlatform('linux')">Linux/Mac</button>
-              <button class="platform-btn" onclick="selectPlatform('android')">Android</button>
-              <button class="platform-btn" onclick="selectPlatform('browser')">浏览器下载</button>
-            </div>
-            
-            <div id="download-instructions" class="download-instructions">
-              <strong>Windows 下载说明：</strong><br>
-              1. 点击"开始下载"按钮<br>
-              2. 浏览器会自动下载ZIP压缩包<br>
-              3. 解压到任意文件夹即可查看报告<br>
-              4. 或者右键链接选择"另存为"
-            </div>
-            
-            <!-- 修复：使用响应式按钮容器 -->
+
+            <!-- 原 Windows / Linux-Mac / Android 三个按钮动作完全相同（都是下载同一个 ZIP），
+                 差别只在解压说明；已合并为一个「打包下载 ZIP」，
+                 解压说明移到右侧「?」图标里。真的不同的只有「逐个下载文件」。 -->
             <div class="download-buttons-container">
-              <button class="action-btn save-btn" onclick="downloadFiles()">开始下载</button>
-              <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6;">取消</button>
+              <button class="action-btn save-btn" onclick="runBusy(downloadZip, '正在下载')">打包下载 ZIP</button>
+              <button class="action-btn" onclick="runBusy(showFileList, '正在读取文件列表')" style="background: #ff9a00;">逐个下载文件</button>
+              <span class="hint-icon-wrap">
+                <button type="button" class="hint-icon" aria-label="解压说明"
+                        onclick="toggleUnzipHint(event)">?</button>
+                <span id="unzip-hint" class="hint-popup">
+                  <strong>ZIP 下载后如何解压</strong><br>
+                  · Windows：右键压缩包 →「全部解压缩」<br>
+                  · Linux / macOS：<code>unzip 文件名.zip</code>，或在文件管理器里双击<br>
+                  · Android：用 ZArchiver 等应用解压<br>
+                  解压后用浏览器打开其中的 HTML 报告即可查看。
+                </span>
+              </span>
+              <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6;">关闭</button>
             </div>
+
+            <div id="download-instructions" class="download-instructions">
+              点「打包下载 ZIP」下载全部文件；点「逐个下载文件」可自行挑选单个文件。
+            </div>
+          </div>
           </div>
         </section>
         
         <section class="results-section">
-          <h3>查询结果</h3>
-          <pre id="log">请输入住宅区名称并点击查询按钮...</pre>
+          <h3>操作日志</h3>
+          <pre id="log" data-placeholder="1">请输入住宅区名称并点击「选取地点」按钮…</pre>
         </section>
       </div>
       
@@ -621,11 +731,74 @@
     </div>
 
     <script>
-      const API = 'http://47.112.146.115';
+      const API = '';  // 同源：由同一容器的 Flask 提供接口
+
+      // POI 搜索半径：默认 1200 米，允许用户自行设置
+      const DEFAULT_RADIUS = 1200;
+      const MIN_RADIUS = 100;
+      const MAX_RADIUS = 50000;   // 高德周边搜索的上限
+
+      // 说明气泡：点「?」图标才展开，点别处收起
+      let openHintId = null;
+
+      function toggleHint(id, ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        const el = document.getElementById(id);
+        if (!el) return;
+        const willOpen = el.style.display !== 'block';
+        closeAllHints();
+        if (willOpen) {
+          el.style.display = 'block';
+          openHintId = id;
+        }
+      }
+
+      function toggleRadiusHint(ev) { toggleHint('radius-hint', ev); }
+      function toggleUnzipHint(ev)  { toggleHint('unzip-hint', ev); }
+
+      function closeAllHints() {
+        ['radius-hint', 'unzip-hint'].forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        openHintId = null;
+      }
+
+      document.addEventListener('click', function (e) {
+        if (!openHintId) return;
+        if (e.target && e.target.closest && e.target.closest('.hint-icon-wrap')) return;
+        closeAllHints();
+      });
+
+      function getRadius() {
+        const el = document.getElementById('radius');
+        let v = parseInt(el && el.value, 10);
+        if (!Number.isFinite(v)) v = DEFAULT_RADIUS;
+        if (v < MIN_RADIUS) v = MIN_RADIUS;
+        if (v > MAX_RADIUS) v = MAX_RADIUS;
+        if (el) el.value = v;      // 越界时回写到输入框，让用户看到实际用值
+        return v;
+      }
+
+      // 检查两个 API Key 的配置状态，缺哪个就点名提示哪个（均可在「设置」里填写）
+      Promise.all([
+        fetch(`${API}/api/settings/amap-key`).then(r => r.json()).catch(() => null),
+        fetch(`${API}/api/settings/deepseek-key`).then(r => r.json()).catch(() => null)
+      ]).then(([amap, ds]) => {
+        const missing = [];
+        if (amap && !amap.configured) missing.push('高德 API Key（住宅区查询 / POI 拉取）');
+        if (ds && !ds.configured) missing.push('（可选）DeepSeek API Key —— 仅影响 AI 生成报告');
+        if (!missing.length) return;
+        const el = document.getElementById('key-warning');
+        const tx = document.getElementById('key-warning-text');
+        if (el && tx) {
+          tx.textContent = '尚未配置：' + missing.join('；') + '。';
+          el.style.display = 'block';
+        }
+      }).catch(() => {});
       let lastResult = null;
       let candidates = [];
       let currentSaveDir = '';
-      let selectedPlatform = 'windows';
       let currentResidentialName = '';
 
       // 确保所有请求使用UTF-8编码
@@ -709,7 +882,7 @@
 
 请用中文生成规范的Markdown格式报告，结构清晰，数据准确，建议具有可操作性。不要在正文前后加上“\`\`\`markdown”“\`\`\`”等额外标记。“-”列举的各项的前面要有空行，不然无法正常分段。</textarea>
           <div class="modal-buttons">
-            <button class="modal-btn confirm-btn" onclick="generateAIReport()">生成报告</button>
+            <button class="modal-btn confirm-btn" onclick="runBusy(generateAIReport, '正在生成 AI 报告')">生成报告</button>
             <button class="modal-btn cancel-btn" onclick="closeAIModal()">取消</button>
           </div>
         `;
@@ -779,57 +952,12 @@
 
         const subpath = currentSaveDir.split('/').pop();
         const rid = subpath.split('_')[0];
-        const reportUrl = `${API}/download/${subpath}/ai_report_${rid}.html?name=${encodeURIComponent(currentResidentialName)}`;
+        const reportUrl = `${API}/preview/${subpath}/ai_report_${rid}.html`;
         
         window.open(reportUrl, '_blank');
       }
 
       // 选择平台
-      function selectPlatform(platform) {
-        selectedPlatform = platform;
-        
-        // 更新按钮状态
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-          btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-        
-        // 更新说明文字
-        const instructions = document.getElementById('download-instructions');
-        switch(platform) {
-          case 'windows':
-            instructions.innerHTML = `
-              <strong>Windows 下载说明：</strong><br>
-              1. 点击"开始下载"按钮<br>
-              2. 浏览器会自动下载ZIP压缩包<br>
-              3. 解压到任意文件夹即可查看报告<br>
-              4. 或者右键链接选择"另存为"
-            `;
-            break;
-          case 'linux':
-            instructions.innerHTML = `
-              <strong>Linux/Mac 下载说明：</strong><br>
-              1. 点击"开始下载"获取ZIP文件<br>
-              2. 使用命令解压: <code>unzip 文件名.zip</code><br>
-              3. 或在桌面环境中双击解压<br>
-              4. 使用浏览器打开HTML报告文件
-            `;
-            break;
-          case 'android':
-            instructions.innerHTML = `
-              <strong>Android 下载说明：</strong><br>
-              1. 点击"开始下载"按钮<br>
-              2. 使用文件管理器应用打开下载目录<br>
-              3. 安装ZArchiver等解压软件<br>
-              4. 解压后使用浏览器打开HTML文件
-            `;
-            break;
-          case 'browser':
-            // 浏览器下载模式 - 显示文件列表
-            showFileList();
-            break;
-        }
-      }
 
       // 显示下载选项
       function showDownloadOptions() {
@@ -879,9 +1007,9 @@
                 </div>
               `).join('')}
               
-              <div style="margin-top: 15px; text-align: center;">
-                <button class="action-btn save-btn" onclick="downloadZip()" style="margin-right: 10px;">打包下载全部</button>
-                <button class="action-btn" onclick="previewReport()" style="background: #ff9a00; margin-right: 10px;">预览报告</button>
+              <div class="download-buttons-container">
+                <button class="action-btn save-btn" onclick="downloadZip()">打包下载全部</button>
+                <button class="action-btn" onclick="previewReport()" style="background: #ff9a00;">预览报告</button>
                 <button class="action-btn" onclick="previewAIReport()" style="background: #ff9a00;">预览AI报告</button>
               </div>
               
@@ -913,40 +1041,136 @@
       }
 
       // 下载单个文件
-      function downloadSingleFile(url) {
-        const downloadLink = document.createElement('a');
-        downloadLink.href = API + url;
-        downloadLink.style.display = 'none';
-        downloadLink.target = '_blank';
-        
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+      // ---------- 操作互斥：任一操作进行中禁用相关按钮，避免并发出错 ----------
+      const BUSY_BUTTON_IDS = ['save-btn', 'ai-btn', 'download-btn', 'query-btn'];
+      const BUSY_MAX_MS = 10 * 60 * 1000;   // 看门狗上限，避免请求卡死导致按钮永久禁用
+      let busyDepth = 0;
+      let busyWatchdog = null;
+
+      function applyIdleButtonStates() {
+        // 这里刻意**不恢复"操作前的快照"**：应用自身在操作过程中会调用
+        // updateButtonStates() 改变 save/ai/download 的可用状态，若把旧快照写回去，
+        // 就会把它的新状态覆盖掉 —— 典型现象是「保存成功后按钮反而全灰」。
+        // 因此交由应用自己的 updateButtonStates() 决定这三个业务按钮；
+        // query-btn 与页头的设置齿轮由应用不管，我在这里复位。
+        if (typeof updateButtonStates === 'function') {
+          try { updateButtonStates(); } catch (e) { console.error(e); }
+        }
+        ['query-btn'].forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) el.disabled = false;
+        });
+        const gear = document.getElementById('settings-gear');
+        if (gear) gear.classList.remove('disabled');
+        document.body.style.cursor = '';
+      }
+
+      function setBusy(on, label) {
+        if (on) {
+          busyDepth += 1;
+          if (busyDepth > 1) return;          // 已由外层持有
+          BUSY_BUTTON_IDS.forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.disabled = true;
+          });
+          // 设置入口在页头（不是按钮），操作期间用 class 禁止点击
+          const gear = document.getElementById('settings-gear');
+          if (gear) gear.classList.add('disabled');
+          document.body.style.cursor = 'progress';
+          if (label && typeof log === 'function') log(label + '…');
+          if (busyWatchdog) clearTimeout(busyWatchdog);
+          busyWatchdog = setTimeout(function () {
+            console.warn('[CityVeins] 操作超时，强制解除按钮禁用');
+            busyDepth = 0;
+            busyWatchdog = null;
+            applyIdleButtonStates();
+          }, BUSY_MAX_MS);
+        } else {
+          if (busyDepth === 0) return;
+          busyDepth -= 1;
+          if (busyDepth > 0) return;          // 仍有外层操作在进行
+          if (busyWatchdog) { clearTimeout(busyWatchdog); busyWatchdog = null; }
+          applyIdleButtonStates();
+        }
+      }
+
+      async function runBusy(fn, label) {
+        setBusy(true, label);
+        try {
+          return await fn();
+        } catch (e) {
+          console.error(e);
+          alert('操作失败：' + (e && e.message ? e.message : e));
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      // ---------- 下载：必须走 blob: + download 属性 ----------
+      // 懒猫的文件拦截器钩住 HTMLAnchorElement.prototype.click，判定条件是
+      //   anchor instanceof HTMLAnchorElement && Boolean(anchor.download)
+      //   && anchor.href.startsWith("blob:")
+      // 原先的实现直接用 http 地址、且从不设置 download 属性，两个条件都不满足，
+      // 所以拦截器永远不触发。这里改为「取回内容 → Blob → blob: 地址 → 带 download 点击」。
+      function fileNameFromUrl(url) {
+        try {
+          const seg = String(url).split('?')[0].split('#')[0].split('/').filter(Boolean).pop();
+          return decodeURIComponent(seg || 'download');
+        } catch (e) {
+          return 'download';
+        }
+      }
+
+      async function triggerDownload(url, filename) {
+        setBusy(true, '正在下载');
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const blob = await res.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename || fileNameFromUrl(url);
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          const name = filename || fileNameFromUrl(url);
+          try {
+            a.click();
+            // 补一条完成日志，让「正在下载…」后面有明确结果
+            log('已发起下载：' + name + '（如弹出保存位置选择，请选择要保存到的地方）');
+          } finally {
+            document.body.removeChild(a);
+            // 拦截器命中时会自行 revoke；这里延迟兜底释放，避免影响拦截器读取
+            setTimeout(function () {
+              try { URL.revokeObjectURL(blobUrl); } catch (e) {}
+            }, 60000);
+          }
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function downloadSingleFile(url) {
+        try {
+          await triggerDownload(API + url);
+        } catch (e) {
+          alert('下载失败：' + (e && e.message ? e.message : e));
+        }
       }
 
       // 打包下载
-      function downloadZip() {
+      async function downloadZip() {
         if (!currentSaveDir) {
           alert('没有可下载的数据');
           return;
         }
-
         const subpath = currentSaveDir.split('/').pop();
-        const zipUrl = `${API}/download-zip/${subpath}`;
-        
-        const downloadLink = document.createElement('a');
-        downloadLink.href = zipUrl;
-        downloadLink.style.display = 'none';
-        
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        log('开始下载ZIP压缩包...\n文件将保存到浏览器的默认下载目录');
-        
-        setTimeout(() => {
-          alert('ZIP压缩包下载已开始！文件通常保存在"下载"文件夹中');
-        }, 1000);
+        try {
+          await triggerDownload(API + '/download-zip/' + subpath, subpath + '.zip');
+          log('已发起下载：' + subpath + '.zip');
+        } catch (e) {
+          alert('下载失败：' + (e && e.message ? e.message : e));
+        }
       }
 
       // 预览报告
@@ -957,26 +1181,12 @@
         }
 
         const subpath = currentSaveDir.split('/').pop();
-        const reportUrl = `${API}/download/${subpath}/report_${subpath.split('_')[0]}.html?name=${encodeURIComponent(currentResidentialName)}`;
+        const reportUrl = `${API}/preview/${subpath}/report_${subpath.split('_')[0]}.html`;
         
         window.open(reportUrl, '_blank');
       }
 
       // 下载文件
-      function downloadFiles() {
-        if (!currentSaveDir) {
-          alert('没有可下载的数据');
-          return;
-        }
-
-        if (selectedPlatform === 'browser') {
-          // 浏览器下载模式已经在selectPlatform中处理
-          return;
-        } else {
-          // 打包下载模式
-          downloadZip();
-        }
-      }
 
       async function queryName() {
         const name = document.getElementById('name').value.trim();
@@ -1069,7 +1279,7 @@
           address: String(r.address || ''),
           lng: r.longitude ? parseFloat(r.longitude) : null,
           lat: r.latitude ? parseFloat(r.latitude) : null,
-          radius: 1200,
+          radius: getRadius(),
           threshold: 0.4,
           filter_poi: true
         };
@@ -1108,8 +1318,33 @@
         }
       }
 
+      // 操作日志：追加显示（原来用 textContent 覆盖，永远只有一行，滚动条因此形同虚设）
+      const LOG_MAX_LINES = 500;
+
       function log(txt) {
-        document.getElementById('log').textContent = txt;
+        const el = document.getElementById('log');
+        if (!el) return;
+
+        // 首条日志前清掉占位提示
+        if (el.dataset.placeholder === '1') {
+          el.textContent = '';
+          el.dataset.placeholder = '0';
+        }
+
+        const d = new Date();
+        const p2 = function (n) { return String(n).padStart(2, '0'); };
+        const ts = p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds());
+
+        el.textContent += '[' + ts + '] ' + String(txt) + '\n';
+
+        // 只保留最近若干行，避免长时间使用后无限增长
+        const lines = el.textContent.split('\n');
+        if (lines.length > LOG_MAX_LINES) {
+          el.textContent = lines.slice(lines.length - LOG_MAX_LINES).join('\n');
+        }
+
+        // 始终滚动到底部，看到最新一条
+        el.scrollTop = el.scrollHeight;
       }
 
       // 按回车键查询
