@@ -291,7 +291,32 @@ ls /lzcapp/var/output/web_save/L460203_20260918_195639/poi_L460203_unique.csv   
 已经能真正跑出 AI 报告（返回 `html_ok: true`），绝对路径写法同样正常，
 非法 `save_dir` 返回 400。
 
-## 八、以后改这块要注意
+## 八、页面留白的几条硬规矩（用户反复提过，别再犯）
+
+1. **不要在页面底部加返回链接。** 页头已经有返回按钮了，底部再来一个是噪音。
+   四个设置相关页面（`/settings`、`/settings/amap`、`/settings/deepseek`、`/weights`）
+   底部原本各有一条「← 返回城脉首页」，已全部删除，`.foot` 样式规则一并清掉。
+   每个页面**全页只保留页头那一个** `class="back"`：
+   子页指向 `/settings`，`/settings` 与 `/records` 指向 `/`。
+   验收断言在 `verify_settings_split.py` 的 5b 段。
+2. **不要在页脚塞入口。** 首页页脚只留那行版权；曾经加的「记录袋 · 设置」已撤。
+3. **首页功能按钮的文案要短。** 记录袋按钮就叫「记录袋」，
+   不要写成「记录袋（云端已保存的数据）」。
+4. **设置项拆开后，说明也要跟着拆。** `/settings/amap` 只讲高德，
+   `/settings/deepseek` 只讲 DeepSeek —— 原来那张「还没有 Key？」帮助卡里
+   高德和 DeepSeek 两套步骤挤在一起，两边都照抄了一遍，属于没拆干净。
+   验收断言在 `verify_settings_split.py` 的 5c 段
+   （直接断言：高德页出现 0 次 DeepSeek、DeepSeek 页出现 0 次高德）。
+
+### 附带修掉的一个结构性缺陷
+
+按行切片生成的那三个页面（amap / deepseek / weights）**各多出 2 个 `</div>`**：
+`TAIL_UI` 片段自带 `</div></div>` 收尾，而生成模板又补了一次。
+HTML 解析器容错所以看不出问题，但嵌套是错的，迟早会咬人。
+现在 `verify_settings_split.py` 之外，另有一段自查逻辑按 `<body>` 之后
+统计 `<div>` / `</div>` 数量，五个页面全部平衡。
+
+## 九、以后改这块要注意
 
 - **别在应用里用 `window.open` / `location.href` 打开报告或文件** ——
   安卓上会把页面顶掉，内存里的结果就没了。预览一律走站内弹层，

@@ -131,29 +131,23 @@
 
 <div class="card">
         <h2>还没有高德 Key？</h2>
-        <p style="font-size:13.5px;color:#2c3e50;font-weight:600;margin-bottom:4px">高德地图</p>
         <ol>
-          <li>打开 <a href="https://console.amap.com/dev/key/app" target="_blank" rel="noopener">高德开放平台控制台</a></li>
+          <li>打开 <a href="https://console.amap.com/dev/key/app" target="_blank" rel="noopener">高德开放平台控制台</a>（需先注册并实名认证）</li>
           <li>「应用管理 → 我的应用 → 创建新应用」</li>
-          <li>添加 Key，服务平台选择 <strong>Web 服务</strong>（不是 Web 端 JS API）</li>
-          <li>若该 Key 设置了 <strong>IP 白名单</strong>，需把本机/本盒子的出口公网 IP 加进去</li>
-          <li>复制生成的 Key，填到上面并保存</li>
+          <li>在应用里「添加 Key」，服务平台选择 <strong>Web 服务</strong>
+              —— 注意不是「Web 端 (JS API)」，选错了城脉调不通</li>
+          <li>若该 Key 设了 <strong>IP 白名单</strong>，要把本设备的出口公网 IP 加进去；
+              不加白名单就不受此限制</li>
+          <li>复制生成的 Key，填到上面的输入框里保存</li>
         </ol>
-        <p style="font-size:13.5px;color:#2c3e50;font-weight:600;margin:14px 0 4px">DeepSeek</p>
-        <ol>
-          <li>打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">DeepSeek 开放平台 · API Keys</a></li>
-          <li>创建 API Key（以 <code>sk-</code> 开头的一串字符），复制</li>
-          <li>填到上面的 DeepSeek 输入框并保存</li>
-        </ol>
+        <p class="muted" style="margin-top:12px">
+          高德「Web 服务」有免费额度，日常查询足够用；用量超额后需要在控制台自行充值。
+        </p>
       </div>
 
-    <p class="muted" style="text-align:center;margin-top:20px">
-      <a href="/">← 返回城脉首页</a>
-    </p>
   </div>
 </div>
-  </div>
-</div>
+
 <script>
 const API = '';
 
