@@ -95,9 +95,13 @@ L430722_20260918_195210/
 
 ### 页面能做什么
 
+- 入口：首页「下载到本地」→ 展开区底部的「📦 打开记录袋」（页脚另有一个低调链接）
 - 全部记录按时间**倒序**列出；显示住宅区名、ID、保存时间、加权总分、POI 数、
   覆盖大类/中类、文件数、占用空间
-- **预览评估报告 / 预览 AI 报告**：站内弹层，和首页同一套逻辑（不开新窗口）
+- **按钮文案随实际状态切换**：已有报告 → 「预览评估报告 / 预览 AI 报告」；
+  没有报告 → 「生成评估报告 / 生成 AI 报告」，点了**真去生成**，成功后自动预览。
+  数据不足以生成时按钮置灰，并说明缺什么（`missing_for_generate`）。
+  预览走站内弹层，和首页同一套逻辑（不开新窗口）
 - **文件清单**：展开后逐个文件预览 / 下载
 - **下载全部（ZIP）**：把整条记录打成 `<记录目录>.zip`
 - **删除**：需要二次确认（`confirm()` + 后端强制 `?confirm=1`）
@@ -112,6 +116,8 @@ L430722_20260918_195210/
 | GET | `/api/records` | 全部记录（倒序） |
 | GET | `/api/records/<rid>/<ts>` | 单条记录 + 文件清单 |
 | GET | `/records/<rid>/<ts>/zip` | 打包下载（流式，临时文件用完即删） |
+| GET | `/api/records/default-ai-prompt` | AI 报告默认提示词（供生成弹窗预填） |
+| POST | `/api/records/<rid>/<ts>/generate-report` | 重建评估报告（不联网、不重拉 POI） |
 | POST | `/api/records/<rid>/<ts>/delete?confirm=1` | 删除整条记录 |
 
 ### 几个刻意的设计
@@ -129,6 +135,13 @@ L430722_20260918_195210/
 - **空记录不打空包**：目录里没有文件时返回 404 并说明原因，而不是给一个空 zip。
 - **超大记录拦下来**：单条超过 512 MB 时返回 413，提示改用逐个下载，
   避免一个请求把内存和磁盘打满。
+- **重建报告不给 `/report` 接口用**：`app.py` 的 `/report` 写的是
+  `{rid}_评估报告.md`，而 `/save` 写的是 `report_{rid}.md`，两种命名会共存且
+  记录袋只认后者。所以生成接口自己调 `generate_markdown_report()`，
+  文件名与 `/save` 对齐。
+- **重建报告不消耗高德配额**：输入全部来自记录目录里的
+  summary.json / stats_*.json / score_*.csv，不重新查询、不重新拉 POI。
+  只有 AI 报告要联网（走 DeepSeek）。
 
 ## 四、验证
 
@@ -210,12 +223,46 @@ lzc-docker exec cloudlazycatappcityveins-app-1 \
 
 `~/deploy_cityveins.sh` 已经把这两步串起来了。
 
-## 六、以后改这块要注意
+## 六、设置页拆分：列表页 + 各自独立的设置页
+
+用户要求：「点开设置按钮之后应该展示设置列表，高德 api 和 deepseek api 也要分成
+独立的设置项，点击设置项再专门设置」「跟权重设置页面不要混在一起」。
+
+原来的 `/settings` 是一张长表单：两个 Key 卡片 + 整张权重表全挤在一页，
+顶部只有两个锚点 tab。现在拆成：
+
+| 路径 | 内容 |
+|---|---|
+| `/settings` | **设置列表页**：三项各一格，点进去才是设置。只读状态摘要，不含任何输入框 |
+| `/settings/amap` | 高德 API Key（必填）—— 只有它自己的输入框与帮助 |
+| `/settings/deepseek` | DeepSeek API Key（可选·强烈推荐）—— 只有它自己 |
+| `/weights` | POI 权重（原来嵌在 `/settings` 里，之前 **404**，这次一并补齐） |
+
+拆法（可复现，不是手抄）：`settings.html` 原文件按行切成
+CSS / header / keys-UI / weights-UI / tail / 各段 JS，
+`weights.html` = 原权重 UI + 原权重 JS，`amap.html` / `deepseek.html` =
+原对应 Key 卡片 + 原 Key JS（`KINDS` 只保留自己那一项，启动只 load 自己），
+`settings.html` 重写为列表页。这样权重那套已经验证过的交互一行代码都没变。
+
+路由：`settings_api` 增加 `/settings/amap`、`/settings/deepseek`；
+`weights_api` 增加 `/weights`（它之前只有 `/api/weights`，没有页面 ——
+首页页脚曾经挂过一个指向 `/weights` 的链接就是 404，已修正）。
+
+`Dockerfile` 必须为每个新页面补 `COPY`（`amap.html` / `deepseek.html` /
+`weights.html`）—— 上一轮就因为漏 COPY `records_api.py` 导致整个进程起不来。
+
+## 七、以后改这块要注意
 
 - **别在应用里用 `window.open` / `location.href` 打开报告或文件** ——
   安卓上会把页面顶掉，内存里的结果就没了。预览一律走站内弹层，
   下载一律走 blob + `a.download`（懒猫拦截器只认这条路）。
-- **新增的按钮不要放在 `.header-links` 之外**，页头右上角那条是唯一的入口带；
-  设置齿轮与记录袋入口都在里面，改布局时一起调。
+- **记录袋入口的位置只有一处：首页功能按钮列的第 4 个按钮**
+  （`.action-buttons` 里，紧跟「下载到本地」）。它是 `<a>` 但套了 `.action-btn`
+  外观，且**始终可点** —— 不依赖本次会话有没有查询结果。
+  两个踩过的坑，别再犯：
+    1. 别放进「下载到本地」的展开区（`#download-options`）—— 用户要的是"按钮"，
+       不是展开区里的附属链接；
+    2. 别再往页头或页脚加入口 —— 页头要留给标题，页脚用户明确说"莫名其妙"。
+  改动后跑 `verify_http.py`，H 段有 6 条断言专门盯这个位置与"全页只有一个入口"。
 - `lazycat/backend/app/` 是 buildscript 生成的（gitignore 里忽略），
   **不要直接改**；要改前端就改项目根的 `index.html`。

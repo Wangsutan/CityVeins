@@ -32,13 +32,26 @@
       
       /* 修改：将蓝色渐变改为橙色/黄色暖色渐变 */
       header {
-        position: relative;          /* 供右上角入口定位 */
+        position: relative;          /* 供右上角齿轮定位 */
         background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
         color: white;
         padding: 16px 20px;
         text-align: center;
       }
-      /* 设置齿轮与「记录袋」入口的样式见文件末尾（统一放在 .header-links 里同排） */
+      .settings-gear {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        font-size: 20px;
+        line-height: 1;
+        text-decoration: none;
+        padding: 6px 8px;
+        border-radius: 8px;
+        opacity: .9;
+      }
+      .settings-gear:hover { background: rgba(255, 255, 255, .18); opacity: 1; }
+      .settings-gear.disabled { opacity: .35; pointer-events: none; }
       
       h1 {
         font-size: 2rem;
@@ -631,48 +644,15 @@
           border-bottom-color: #2c3e50;
         }
 
-        /* 页头右上角：本轮记录袋入口 + 原有设置齿轮（同一排） */
-        .header-links {
-          position: absolute;
-          top: 50%;
-          right: 14px;
-          transform: translateY(-50%);
-          display: flex;
-          gap: 6px;
-          align-items: center;
+        /* 记录袋按钮：与「保存到云端 / AI生成报告 / 下载到本地」同一列的第 4 个按钮。
+           <a> 不能像 <button> 那样自带居中，所以这里补上 block + 居中 + 盒模型。 */
+        .records-btn {
+          line-height: 1.4;
+          font-weight: 500;
         }
-        .settings-gear {
-          position: static;
-          top: auto;
-          right: auto;
-          transform: none;
-          font-size: 20px;
-          line-height: 1;
-          text-decoration: none;
-          padding: 6px 8px;
-          border-radius: 8px;
-          opacity: .9;
-        }
-        .settings-gear:hover { background: rgba(255, 255, 255, .18); opacity: 1; }
-        .settings-gear.disabled { opacity: .35; pointer-events: none; }
-        .records-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          background: rgba(255, 255, 255, .2);
-          color: #fff;
-          border: 1px solid rgba(255, 255, 255, .55);
-          border-radius: 999px;
-          padding: 5px 12px;
-          font-size: 12.5px;
-          line-height: 1.3;
-          text-decoration: none;
-          white-space: nowrap;
-        }
-        .records-link:hover { background: rgba(255, 255, 255, .34); }
-        @media (max-width: 380px) {
-          .records-link { font-size: 11.5px; padding: 4px 9px; }
-          .settings-gear { font-size: 18px; }
+        .records-btn:hover {
+          filter: brightness(1.07);
+          transform: translateY(-1px);
         }
 
         /* 报告内置预览：整屏弹层里用 iframe 打开，不跳转、不开新窗口。
@@ -759,12 +739,11 @@
         <a href="/settings" style="color:#8a5300;font-weight:600;text-decoration:underline;">前往设置 →</a>
       </div>
       <header>
-        <!-- 设置入口与「记录袋」入口：不放在功能按钮区，避免与「保存/AI报告/下载」并列 -->
-        <span class="header-links">
-          <a class="records-link" href="/records" title="记录袋：云端已保存的全部数据">📦 记录袋</a>
-          <a id="settings-gear" class="settings-gear" href="/settings"
-             title="设置：API Key 与 POI 权重" aria-label="设置">⚙️</a>
-        </span>
+        <!-- 设置入口：不放在功能按钮区，避免与「保存/AI报告/下载」并列。
+             记录袋入口刻意不放页头 —— 页头空间该留给标题，记录袋属于「下载」
+             这一族操作，放在「下载到本地」展开区里更顺手（见 download-options）。 -->
+        <a id="settings-gear" class="settings-gear" href="/settings"
+           title="设置：API Key 与 POI 权重" aria-label="设置">⚙️</a>
         <h1>城脉</h1>
       </header>
       
@@ -797,6 +776,14 @@
             <button id="save-btn" class="action-btn save-btn" onclick="runBusy(saveData, '正在保存到云端')" disabled>保存到云端</button>
             <button id="ai-btn" class="action-btn ai-btn" onclick="showAIModal()" disabled>AI生成报告</button>
             <button id="download-btn" class="action-btn download-btn" onclick="showDownloadOptions()" disabled>下载到本地</button>
+            <!-- 记录袋：云端已保存的全部数据。跟上面三个一样是操作按钮，不是
+                 「下载到本地」展开区里的附属链接 —— 所以直接排在同一列里，
+                 并且**始终可点**（它不依赖本次会话有没有查询结果）。 -->
+            <a href="/records" class="action-btn records-btn"
+               style="background:linear-gradient(135deg,#466fa1 0%,#3c608c 100%);color:#fff;
+                      display:block;text-align:center;text-decoration:none;box-sizing:border-box;">
+              记录袋（云端已保存的数据）
+            </a>
           </div>
           
           <div id="download-options" class="download-options" style="display: none;">
@@ -822,9 +809,8 @@
               <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6;">关闭</button>
             </div>
 
-            <div class="download-instructions" id="download-instructions">
-              点「打包下载 ZIP」下载全部文件；点「逐个下载文件」可自行挑选单个文件。<br>
-              这些文件都已经存在云端，随时可以在 <a href="/records">记录袋</a> 里重新找到并下载。
+            <div id="download-instructions" class="download-instructions">
+              点「打包下载 ZIP」下载全部文件；点「逐个下载文件」可自行挑选单个文件。
             </div>
           </div>
           </div>
@@ -838,11 +824,6 @@
       
       <footer>
         <p>城脉 · 城市生活圈分析平台 © 2025</p>
-        <p style="margin-top:6px;font-size:0.9em;">
-          <a href="/records" style="color:#466fa1;">记录袋（云端已保存的数据）</a>
-          <span style="opacity:.5;"> · </span>
-          <a href="/settings" style="color:#466fa1;">设置</a>
-        </p>
       </footer>
     </div>
 

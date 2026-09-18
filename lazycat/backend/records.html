@@ -293,6 +293,27 @@
       badges.push('<span class="badge">' + esc(r.file_count) + ' 个文件</span>');
       badges.push('<span class="badge">' + esc(fmtSize(r.total_bytes)) + '</span>');
 
+      // 按钮文案随实际状态切换：
+      //   已有报告 → 「预览…」（点了就看）
+      //   没有报告 → 「生成…」（点了真去生成，成功后自动预览）
+      // 数据不足以生成时置灰并说明缺什么。
+      const canReport = r.can_generate_report !== false;
+      const canAi = r.can_generate_ai_report !== false;
+      const reportBtn = r.has_report
+        ? '<button type="button" class="primary" data-act="preview" ' +
+          (r.report_preview_url ? '' : 'disabled') + '>预览评估报告</button>'
+        : '<button type="button" class="primary" data-act="gen-report" ' +
+          (canReport ? '' : 'disabled title="缺少生成所需的数据"') + '>生成评估报告</button>';
+      const aiBtn = r.has_ai_report
+        ? '<button type="button" class="amber" data-act="preview-ai" ' +
+          (r.ai_report_preview_url ? '' : 'disabled') + '>预览 AI 报告</button>'
+        : '<button type="button" class="amber" data-act="gen-ai" ' +
+          (canAi ? '' : 'disabled title="缺少生成所需的数据"') + '>生成 AI 报告</button>';
+
+      if (!r.has_report && !canReport) {
+        badges.push('<span class="badge warn">无法生成报告</span>');
+      }
+
       return '' +
       '<div class="rec" data-idx="' + i + '">' +
         '<div class="rec-head">' +
@@ -310,8 +331,8 @@
                 (r.mid_category_count === null || r.mid_category_count === undefined ? '—' : r.mid_category_count)) + '</div></div>' +
         '</div>' +
         '<div class="rec-actions">' +
-          '<button type="button" class="primary" data-act="preview" ' + (r.report_preview_url ? '' : 'disabled') + '>预览评估报告</button>' +
-          '<button type="button" class="amber" data-act="preview-ai" ' + (r.ai_report_preview_url ? '' : 'disabled') + '>预览 AI 报告</button>' +
+          reportBtn +
+          aiBtn +
           '<button type="button" data-act="files">文件清单</button>' +
           '<button type="button" data-act="zip">下载全部（ZIP）</button>' +
           '<button type="button" class="danger" data-act="delete">删除</button>' +
@@ -372,6 +393,142 @@
     previewCtx = null;
   }
 
+  // ---------- 生成报告 ----------
+  // 后端接口：
+  //   POST /api/records/<rid>/<ts>/generate-report   重建评估报告（不联网、不重拉 POI）
+  //   POST /ai-report                                生成 AI 报告（走 DeepSeek，较慢）
+  function setBtnBusy(btn, busy, busyText) {
+    if (!btn) return;
+    if (busy) {
+      btn.dataset.label = btn.textContent;
+      btn.textContent = busyText || '处理中…';
+      btn.disabled = true;
+    } else if (btn.dataset.label) {
+      btn.textContent = btn.dataset.label;
+      btn.disabled = false;
+    }
+  }
+
+  async function postJson(url, payload) {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8',
+                 'Accept': 'application/json; charset=utf-8' },
+      body: JSON.stringify(payload || {})
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) { data = {}; }
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  }
+
+  async function generateReport(r, btn) {
+    setBtnBusy(btn, true, '正在生成…');
+    toast('正在生成评估报告（不重新拉取 POI）…', 60000);
+    try {
+      const data = await postJson(
+        API + '/api/records/' + encodeURIComponent(r.rid) + '/' + r.ts + '/generate-report', {});
+      toast('评估报告已生成' + (data.html_ok === false ? '（HTML 转换失败，Markdown 已保存）' : ''));
+      await load(false);
+      const fresh = RECORDS.find(function (x) { return x.dir === r.dir; });
+      if (fresh && fresh.report_preview_url) {
+        openPreview(fresh.report_preview_url,
+                    (fresh.name || fresh.rid) + ' · 评估报告',
+                    fresh.report_preview_url.replace('/preview/', '/download/'));
+      }
+    } catch (e) {
+      toast('生成失败：' + (e && e.message ? e.message : e), 5000);
+      setBtnBusy(btn, false);
+    }
+  }
+
+  // AI 报告：默认提示词从后端拿（与首页那份是同一个来源，避免两边各写一份）
+  let aiPromptCache = null;
+
+  async function defaultAiPrompt() {
+    if (aiPromptCache) return aiPromptCache;
+    try {
+      const res = await fetch(API + '/api/records/default-ai-prompt');
+      const d = await res.json();
+      aiPromptCache = d.prompt || '';
+    } catch (e) {
+      aiPromptCache = '';
+    }
+    return aiPromptCache;
+  }
+
+  async function askAiPrompt(r) {
+    const existing = document.getElementById('ai-prompt-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'ai-prompt-modal';
+    modal.className = 'overlay open';
+    modal.innerHTML =
+      '<div class="sheet" style="height:auto;max-width:760px;">' +
+        '<div class="sheet-head">' +
+          '<span class="t">生成 AI 报告 · ' + esc(r.name || r.rid) + '</span>' +
+          '<span class="ops">' +
+            '<button type="button" data-pm="cancel">取消</button>' +
+          '</span>' +
+        '</div>' +
+        '<div style="padding:16px 18px;overflow:auto;">' +
+          '<div class="records-entry-hint" style="margin:0 0 9px;">' +
+            '将读取该记录已保存的 POI 与统计结果交给 DeepSeek 分析，' +
+            '不会重新拉取高德数据。生成通常需要十几秒到一分钟。' +
+          '</div>' +
+          '<textarea id="ai-prompt-text" style="width:100%;height:260px;padding:11px 13px;' +
+            'border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;' +
+            'font-family:inherit;line-height:1.6;resize:vertical;"></textarea>' +
+          '<div style="display:flex;gap:9px;margin-top:12px;">' +
+            '<button type="button" class="primary" data-pm="go" style="padding:10px 18px;' +
+              'border:1px solid #466fa1;border-radius:8px;background:#466fa1;color:#fff;' +
+              'font-size:14px;font-family:inherit;cursor:pointer;">' +
+              '开始生成</button>' +
+            '<button type="button" data-pm="cancel" style="padding:10px 18px;' +
+              'border:1px solid #d8e0ea;border-radius:8px;background:#fff;' +
+              'font-size:14px;font-family:inherit;cursor:pointer;">取消</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(modal);
+
+    const ta = document.getElementById('ai-prompt-text');
+    ta.value = await defaultAiPrompt();
+
+    modal.addEventListener('click', async function (ev) {
+      const btn = ev.target.closest ? ev.target.closest('[data-pm]') : null;
+      const act = btn ? btn.dataset.pm : (ev.target === modal ? 'cancel' : null);
+      if (!act) return;
+      if (act === 'cancel') { modal.remove(); return; }
+      const prompt = ta.value.trim();
+      if (!prompt) { toast('提示词不能为空'); return; }
+      modal.remove();
+      await generateAiReport(r, prompt);
+    });
+  }
+
+  async function generateAiReport(r, prompt) {
+    toast('正在生成 AI 报告，请稍候…', 120000);
+    try {
+      const data = await postJson(API + '/ai-report', {
+        residential_id: r.rid,
+        save_dir: r.dir,
+        prompt: prompt
+      });
+      toast('AI 报告已生成' + (data.html_ok === false ? '（HTML 转换失败，Markdown 已保存）' : ''));
+      await load(false);
+      const fresh = RECORDS.find(function (x) { return x.dir === r.dir; });
+      if (fresh && fresh.ai_report_preview_url) {
+        openPreview(fresh.ai_report_preview_url,
+                    (fresh.name || fresh.rid) + ' · AI 分析报告',
+                    fresh.ai_report_preview_url.replace('/preview/', '/download/'));
+      }
+    } catch (e) {
+      toast('生成失败：' + (e && e.message ? e.message : e), 6000);
+    }
+  }
+
   // ---------- 删除 ----------
   async function deleteRecord(rid, ts, name) {
     if (!confirm('确定删除「' + name + '」这条云端记录吗？\n目录 ' + rid + '_' + ts + ' 会被永久删除，无法恢复。')) {
@@ -415,6 +572,10 @@
       openPreview(r.report_preview_url, (r.name || r.rid) + ' · 评估报告', r.report_preview_url.replace('/preview/', '/download/'));
     } else if (act === 'preview-ai') {
       openPreview(r.ai_report_preview_url, (r.name || r.rid) + ' · AI 分析报告', r.ai_report_preview_url.replace('/preview/', '/download/'));
+    } else if (act === 'gen-report') {
+      generateReport(r, btn);
+    } else if (act === 'gen-ai') {
+      askAiPrompt(r);
     } else if (act === 'files') {
       toggleFiles(idx, r.rid, r.ts);
     } else if (act === 'zip') {

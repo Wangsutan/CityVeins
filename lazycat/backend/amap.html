@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设置 · 城脉</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Helvetica Neue',Arial,'PingFang SC','Microsoft YaHei',sans-serif;
+    background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+    color:#333;line-height:1.65;min-height:100vh;padding:15px;
+  }
+  .container{max-width:1180px;margin:0 auto;background:#fff;border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);overflow:hidden}
+  header{background:linear-gradient(135deg,#466fa1 0%,#73bed3 100%);color:#fff;padding:20px 26px}
+  header .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  header h1{font-size:20px;font-weight:600}
+  header p{font-size:13px;opacity:.9;margin-top:5px}
+  header a.back{flex:0 0 auto;display:inline-block;background:rgba(255,255,255,.18);color:#fff;
+    text-decoration:none;border:1px solid rgba(255,255,255,.55);border-radius:8px;
+    padding:8px 15px;font-size:13.5px;white-space:nowrap}
+  nav.tabs{display:flex;gap:8px;padding:12px 26px;border-bottom:1px solid #eef1f5;background:#fafbfd;
+    position:sticky;top:0;z-index:10;flex-wrap:wrap}
+  nav.tabs a{font-size:13.5px;text-decoration:none;color:#466fa1;border:1px solid #d8e0ea;
+    background:#fff;border-radius:999px;padding:5px 14px}
+  nav.tabs a:hover{background:#eef2f7}
+  .body{padding:20px 26px 30px}
+  section{scroll-margin-top:64px}
+  section + section{margin-top:26px}
+  .card{border:1px solid #e3e8ef;border-radius:10px;padding:16px 18px;margin-bottom:16px}
+  .card h2{font-size:15px;margin-bottom:10px;color:#2c3e50;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;font-weight:400;color:#7f8c8d;border:1px solid #e3e8ef;border-radius:999px;padding:1px 8px}
+  .status{display:flex;align-items:center;gap:10px;font-size:14.5px}
+  .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+  .dot.ok{background:#2ecc71}
+  .dot.no{background:#e67e22}
+  .muted{color:#7f8c8d;font-size:13px}
+  .warn{background:#fff7e6;border:1px solid #ffd8a8;color:#8a5300;border-radius:8px;
+    padding:11px 14px;font-size:13.5px;margin-bottom:14px;line-height:1.7}
+  label{display:block;font-size:13.5px;color:#2c3e50;margin-bottom:8px;font-weight:600}
+  input[type=text],input[type=password],select{padding:7px 10px;border:1px solid #d8e0ea;
+    border-radius:7px;font-size:13.5px;font-family:inherit}
+  .keyinput{width:100%;padding:11px 13px;border-radius:8px;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px}
+  input[type=number]{padding:6px 9px;border:1px solid #d8e0ea;border-radius:7px;
+    font-size:13px;width:92px;text-align:right;font-family:ui-monospace,Menlo,Consolas,monospace}
+  input.dirty{border-color:#ffb74d;background:#fffaf0}
+  input:focus{outline:none;border-color:#466fa1;box-shadow:0 0 0 3px rgba(70,111,161,.12)}
+  .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  button{border:0;border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer;font-family:inherit}
+  button:hover{opacity:.9}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .primary{background:#466fa1;color:#fff}
+  .ghost{background:#eef2f7;color:#466fa1;border:1px solid #d8e0ea}
+  .danger{background:#fdecea;color:#c0392b;border:1px solid #f5c6c2}
+  .msg{margin-top:12px;font-size:13.5px;padding:10px 13px;border-radius:8px;display:none}
+  .msg.ok{display:block;background:#eafaf1;color:#1e8449;border:1px solid #c8ebd8}
+  .msg.err{display:block;background:#fdecea;color:#c0392b;border:1px solid #f5c6c2}
+  ol{margin:8px 0 0 20px;font-size:13.5px;color:#5c6672}
+  ol li{margin:5px 0}
+  a{color:#466fa1}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;
+    background:#f2f5f9;padding:1px 5px;border-radius:4px}
+  .stats{display:flex;gap:22px;flex-wrap:wrap;font-size:13.5px;color:#2c3e50}
+  .stats b{font-size:17px;color:#466fa1}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:7px 8px;border-bottom:1px solid #eef1f5;text-align:left;vertical-align:middle}
+  th{background:#f7f9fc;font-weight:600;color:#2c3e50;position:sticky;top:0;z-index:2}
+  tr.is-bigcat{background:#fcfdff}
+  .badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;
+    border:1px solid #d8e0ea;color:#5c6672;background:#f2f5f9;white-space:nowrap}
+  .badge.scope{color:#1e8449;border-color:#c8ebd8;background:#eafaf1}
+  .badge.noscope{color:#95a5a6;border-color:#e3e8ef;background:#f7f9fc}
+  .badge.dirty{color:#8a5300;border-color:#ffd8a8;background:#fff7e6}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .toolbar input[type=text]{flex:1 1 240px}
+  .tablewrap{max-height:56vh;overflow:auto;border:1px solid #eef1f5;border-radius:8px}
+  @media (max-width:640px){
+    .body{padding:16px}
+    nav.tabs{padding:10px 16px}
+    .tablewrap{max-height:46vh}
+    th:nth-child(3),td:nth-child(3){display:none}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="row">
+      <div>
+        <h1>城脉 · 高德 API</h1>
+        <p>必填 · 住宅区查询 / POI 拉取 / 评分与报告</p>
+      </div>
+      <a class="back" href="/settings">← 返回设置</a>
+    </div>
+  </header>
+  <div class="body">
+      <div class="card" style="border-color:#ffd8a8;background:#fffaf2">
+        <h2 style="margin-bottom:6px">这个 Key 是必填的</h2>
+        <p class="muted" style="margin:0">
+          住宅区查询、周边 POI 拉取、生活圈评分与评估报告全都依赖高德地图「Web 服务」类型的 Key。
+          <strong>不填就只能看界面，做不了任何查询。</strong>
+          在 <a href="https://console.amap.com/dev/key/app" target="_blank" rel="noopener">高德开放平台</a>
+          免费申请；若该 Key 设了 IP 白名单，记得把本设备的公网出口 IP 加进去。
+        </p>
+      </div>
+
+<div class="card">
+        <h2>高德地图 API Key <span class="tag">必填 · 住宅区查询 / POI 拉取</span></h2>
+        <div class="status">
+          <span id="dot-amap" class="dot no"></span>
+          <span id="status-amap">读取中…</span>
+        </div>
+        <p class="muted" id="src-amap" style="margin-top:8px"></p>
+        <div style="margin-top:16px">
+          <label for="key-amap">Web 服务 Key</label>
+          <input id="key-amap" class="keyinput" type="password" autocomplete="off" spellcheck="false"
+                 placeholder="在此粘贴你的高德 Web 服务 Key">
+        </div>
+        <div class="row">
+          <button id="save-amap" class="primary" onclick="saveKey('amap')">保存</button>
+          <button class="ghost" onclick="toggleKeyVisible('amap')">显示 / 隐藏</button>
+          <button class="danger" onclick="clearKey('amap')">清除</button>
+        </div>
+        <div id="msg-amap" class="msg"></div>
+        <p class="muted" style="margin-top:14px">
+          保存于服务器端持久化目录，<strong>不会回传浏览器</strong>（状态只显示长度）。
+        </p>
+      </div>
+
+<div class="card">
+        <h2>还没有高德 Key？</h2>
+        <p style="font-size:13.5px;color:#2c3e50;font-weight:600;margin-bottom:4px">高德地图</p>
+        <ol>
+          <li>打开 <a href="https://console.amap.com/dev/key/app" target="_blank" rel="noopener">高德开放平台控制台</a></li>
+          <li>「应用管理 → 我的应用 → 创建新应用」</li>
+          <li>添加 Key，服务平台选择 <strong>Web 服务</strong>（不是 Web 端 JS API）</li>
+          <li>若该 Key 设置了 <strong>IP 白名单</strong>，需把本机/本盒子的出口公网 IP 加进去</li>
+          <li>复制生成的 Key，填到上面并保存</li>
+        </ol>
+        <p style="font-size:13.5px;color:#2c3e50;font-weight:600;margin:14px 0 4px">DeepSeek</p>
+        <ol>
+          <li>打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">DeepSeek 开放平台 · API Keys</a></li>
+          <li>创建 API Key（以 <code>sk-</code> 开头的一串字符），复制</li>
+          <li>填到上面的 DeepSeek 输入框并保存</li>
+        </ol>
+      </div>
+
+    <p class="muted" style="text-align:center;margin-top:20px">
+      <a href="/">← 返回城脉首页</a>
+    </p>
+  </div>
+</div>
+  </div>
+</div>
+<script>
+const API = '';
+
+function $(id){ return document.getElementById(id); }
+
+/* ==================== API Key ==================== */
+const KINDS = {
+  amap: {endpoint: '/api/settings/amap-key',     label: '高德 API Key'},
+};
+
+function showKeyMsg(kind, text, ok){
+  const el = $('msg-' + kind);
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+  el.textContent = text;
+}
+
+function renderKeyStatus(kind, d){
+  const dot = $('dot-' + kind), txt = $('status-' + kind), src = $('src-' + kind);
+  if (d.configured) {
+    dot.className = 'dot ok';
+    txt.innerHTML = '已配置 · 长度 ' + d.length + ' 位' +
+                    (kind === 'ds' && d.env_active === false
+                       ? ' <span class="muted">（尚未注入运行环境）</span>' : '');
+  } else {
+    dot.className = 'dot no';
+    txt.textContent = kind === 'ds'
+      ? '未配置（可选）—— 仅「AI 生成报告」不可用'
+      : '未配置 —— 查询与 POI 拉取将失败';
+  }
+  src.textContent = '密钥文件：' + d.source + (d.writable ? '' : '（当前不可写，请检查挂载）');
+}
+
+async function loadKeyStatus(kind){
+  try {
+    const res = await fetch(API + KINDS[kind].endpoint);
+    renderKeyStatus(kind, await res.json());
+  } catch (e) {
+    $('status-' + kind).textContent = '读取状态失败：' + e;
+  }
+}
+
+async function saveKey(kind){
+  const input = $('key-' + kind);
+  const key = input.value.trim();
+  if (!key) { showKeyMsg(kind, '请先填写密钥', false); return; }
+  const btn = $('save-' + kind);
+  btn.disabled = true;
+  try {
+    const res = await fetch(API + KINDS[kind].endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({key: key})
+    });
+    const d = await res.json();
+    if (!res.ok) { showKeyMsg(kind, d.error || '保存失败', false); return; }
+    input.value = '';
+    showKeyMsg(kind, '已保存。', true);
+    loadKeyStatus(kind);
+  } catch (e) {
+    showKeyMsg(kind, '保存失败：' + e, false);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function clearKey(kind){
+  if (!confirm('确定清除已保存的' + KINDS[kind].label + '？')) return;
+  try {
+    const res = await fetch(API + KINDS[kind].endpoint, {method: 'DELETE'});
+    const d = await res.json();
+    if (!res.ok) { showKeyMsg(kind, d.error || '清除失败', false); return; }
+    showKeyMsg(kind, '已清除。', true);
+    loadKeyStatus(kind);
+  } catch (e) {
+    showKeyMsg(kind, '清除失败：' + e, false);
+  }
+}
+
+function toggleKeyVisible(kind){
+  const input = $('key-' + kind);
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+/* ==================== 启动 ==================== */
+loadKeyStatus('amap');
+</script>
+</body>
+</html>

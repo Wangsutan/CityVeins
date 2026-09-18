@@ -89,7 +89,20 @@ def _key_meta(key: str) -> dict:
 
 @settings_bp.route("/settings")
 def settings_page():
+    """设置列表页：每个设置项各占一格，点进去才是那个项目自己的页面。"""
     return send_from_directory(HERE, "settings.html")
+
+
+@settings_bp.route("/settings/amap")
+def amap_settings_page():
+    """高德 API Key 独立设置页（原来和 DeepSeek、权重挤在同一页）。"""
+    return send_from_directory(HERE, "amap.html")
+
+
+@settings_bp.route("/settings/deepseek")
+def deepseek_settings_page():
+    """DeepSeek API Key 独立设置页。"""
+    return send_from_directory(HERE, "deepseek.html")
 
 
 @settings_bp.route("/api/settings/amap-key", methods=["GET"])

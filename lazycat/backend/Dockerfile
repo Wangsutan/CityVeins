@@ -35,6 +35,10 @@ COPY run_lazycat.py /app/sources/run_lazycat.py
 COPY settings_api.py /app/sources/settings_api.py
 COPY weights_api.py /app/sources/weights_api.py
 COPY settings.html /app/sources/settings.html
+# 设置列表页里的两个独立子页，以及独立的权重页
+COPY amap.html /app/sources/amap.html
+COPY deepseek.html /app/sources/deepseek.html
+COPY weights.html /app/sources/weights.html
 # 记录袋：云端已形成数据的列表页 + 接口
 COPY records_api.py /app/sources/records_api.py
 COPY records.html /app/sources/records.html

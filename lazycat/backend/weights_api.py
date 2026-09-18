@@ -1,4 +1,6 @@
-"""权重查看/编辑接口（页面已并入统一设置页 /settings）。
+"""权重查看/编辑页与接口（/weights 与 /api/weights）。
+
+页面已从「统一设置页」拆出来：/settings 现在只是设置项列表，权重有自己的独立页面。
 
 要点（两列权重的区别，决定了本页面的设计）：
 
@@ -21,11 +23,18 @@
 import os
 import tempfile
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_from_directory
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 weights_bp = Blueprint("cityveins_weights", __name__)
+
+
+@weights_bp.route("/weights")
+def weights_page():
+    """权重页（原先嵌在 /settings 里，现已独立）。"""
+    return send_from_directory(HERE, "weights.html")
+
 
 # 与 utils/poi/poi_filter.filter_poi_types 的默认值保持一致
 CATEGORY_THRESHOLD = 0.4

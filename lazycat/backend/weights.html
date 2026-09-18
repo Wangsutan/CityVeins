@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设置 · 城脉</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Helvetica Neue',Arial,'PingFang SC','Microsoft YaHei',sans-serif;
+    background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+    color:#333;line-height:1.65;min-height:100vh;padding:15px;
+  }
+  .container{max-width:1180px;margin:0 auto;background:#fff;border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);overflow:hidden}
+  header{background:linear-gradient(135deg,#466fa1 0%,#73bed3 100%);color:#fff;padding:20px 26px}
+  header .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  header h1{font-size:20px;font-weight:600}
+  header p{font-size:13px;opacity:.9;margin-top:5px}
+  header a.back{flex:0 0 auto;display:inline-block;background:rgba(255,255,255,.18);color:#fff;
+    text-decoration:none;border:1px solid rgba(255,255,255,.55);border-radius:8px;
+    padding:8px 15px;font-size:13.5px;white-space:nowrap}
+  nav.tabs{display:flex;gap:8px;padding:12px 26px;border-bottom:1px solid #eef1f5;background:#fafbfd;
+    position:sticky;top:0;z-index:10;flex-wrap:wrap}
+  nav.tabs a{font-size:13.5px;text-decoration:none;color:#466fa1;border:1px solid #d8e0ea;
+    background:#fff;border-radius:999px;padding:5px 14px}
+  nav.tabs a:hover{background:#eef2f7}
+  .body{padding:20px 26px 30px}
+  section{scroll-margin-top:64px}
+  section + section{margin-top:26px}
+  .card{border:1px solid #e3e8ef;border-radius:10px;padding:16px 18px;margin-bottom:16px}
+  .card h2{font-size:15px;margin-bottom:10px;color:#2c3e50;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;font-weight:400;color:#7f8c8d;border:1px solid #e3e8ef;border-radius:999px;padding:1px 8px}
+  .status{display:flex;align-items:center;gap:10px;font-size:14.5px}
+  .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+  .dot.ok{background:#2ecc71}
+  .dot.no{background:#e67e22}
+  .muted{color:#7f8c8d;font-size:13px}
+  .warn{background:#fff7e6;border:1px solid #ffd8a8;color:#8a5300;border-radius:8px;
+    padding:11px 14px;font-size:13.5px;margin-bottom:14px;line-height:1.7}
+  label{display:block;font-size:13.5px;color:#2c3e50;margin-bottom:8px;font-weight:600}
+  input[type=text],input[type=password],select{padding:7px 10px;border:1px solid #d8e0ea;
+    border-radius:7px;font-size:13.5px;font-family:inherit}
+  .keyinput{width:100%;padding:11px 13px;border-radius:8px;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px}
+  input[type=number]{padding:6px 9px;border:1px solid #d8e0ea;border-radius:7px;
+    font-size:13px;width:92px;text-align:right;font-family:ui-monospace,Menlo,Consolas,monospace}
+  input.dirty{border-color:#ffb74d;background:#fffaf0}
+  input:focus{outline:none;border-color:#466fa1;box-shadow:0 0 0 3px rgba(70,111,161,.12)}
+  .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  button{border:0;border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer;font-family:inherit}
+  button:hover{opacity:.9}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .primary{background:#466fa1;color:#fff}
+  .ghost{background:#eef2f7;color:#466fa1;border:1px solid #d8e0ea}
+  .danger{background:#fdecea;color:#c0392b;border:1px solid #f5c6c2}
+  .msg{margin-top:12px;font-size:13.5px;padding:10px 13px;border-radius:8px;display:none}
+  .msg.ok{display:block;background:#eafaf1;color:#1e8449;border:1px solid #c8ebd8}
+  .msg.err{display:block;background:#fdecea;color:#c0392b;border:1px solid #f5c6c2}
+  ol{margin:8px 0 0 20px;font-size:13.5px;color:#5c6672}
+  ol li{margin:5px 0}
+  a{color:#466fa1}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;
+    background:#f2f5f9;padding:1px 5px;border-radius:4px}
+  .stats{display:flex;gap:22px;flex-wrap:wrap;font-size:13.5px;color:#2c3e50}
+  .stats b{font-size:17px;color:#466fa1}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:7px 8px;border-bottom:1px solid #eef1f5;text-align:left;vertical-align:middle}
+  th{background:#f7f9fc;font-weight:600;color:#2c3e50;position:sticky;top:0;z-index:2}
+  tr.is-bigcat{background:#fcfdff}
+  .badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;
+    border:1px solid #d8e0ea;color:#5c6672;background:#f2f5f9;white-space:nowrap}
+  .badge.scope{color:#1e8449;border-color:#c8ebd8;background:#eafaf1}
+  .badge.noscope{color:#95a5a6;border-color:#e3e8ef;background:#f7f9fc}
+  .badge.dirty{color:#8a5300;border-color:#ffd8a8;background:#fff7e6}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .toolbar input[type=text]{flex:1 1 240px}
+  .tablewrap{max-height:56vh;overflow:auto;border:1px solid #eef1f5;border-radius:8px}
+  @media (max-width:640px){
+    .body{padding:16px}
+    nav.tabs{padding:10px 16px}
+    .tablewrap{max-height:46vh}
+    th:nth-child(3),td:nth-child(3){display:none}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="row">
+      <div>
+        <h1>城脉 · POI 权重</h1>
+        <p>决定拉取哪些业态、以及各类在评分里占多少</p>
+      </div>
+      <a class="back" href="/settings">← 返回设置</a>
+    </div>
+  </header>
+  <div class="body">
+    <!-- ==================== 权重 ==================== -->
+    <section id="weights">
+      <div class="warn">
+        <strong>两列权重的区别（重要）</strong><br>
+        · <strong>客制化权重</strong>：只影响<strong>评分</strong>。留空表示使用基础权重。改它不会改变抓取范围，是推荐的调整方式。<br>
+        · <strong>基础权重</strong>：既影响评分，<strong>也决定抓取范围</strong> —— 系统按「大类权重 ≥
+        <span id="thr">0.4</span>」决定该大类下的 POI 是否被抓取。修改大类行的基础权重会直接改变下一次抓取收录哪些业态。
+      </div>
+
+      <div class="card">
+        <h2>概览</h2>
+        <div class="stats" id="stats"><span class="muted">读取中…</span></div>
+        <p class="muted" id="path" style="margin-top:8px"></p>
+      </div>
+
+      <div class="card">
+        <h2>大类一览（抓取范围）</h2>
+        <div class="tablewrap" style="max-height:280px">
+          <table>
+            <thead><tr><th>大类</th><th>基础权重</th><th>是否纳入抓取</th><th>条目数</th></tr></thead>
+            <tbody id="bigcats"><tr><td colspan="4" class="muted">读取中…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>权重明细</h2>
+        <div class="toolbar">
+          <input type="text" id="q" placeholder="搜索：类型码 / 大类 / 中类 / 小类" oninput="renderWeights()">
+          <select id="bigfilter" onchange="renderWeights()"><option value="">全部大类</option></select>
+          <label class="muted" style="display:flex;align-items:center;gap:6px;margin:0">
+            <input type="checkbox" id="onlyCustom" onchange="renderWeights()"> 只看已客制化
+          </label>
+          <button class="primary" id="saveBtn" onclick="saveWeights()" disabled>保存改动</button>
+          <button class="danger" onclick="resetCustom()">清空全部客制化权重</button>
+          <span class="badge dirty" id="dirty" style="display:none">未保存 0 项</span>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:92px">类型码</th>
+                <th>大类</th>
+                <th>中类 / 小类</th>
+                <th style="width:120px">基础权重</th>
+                <th style="width:130px">客制化权重</th>
+                <th style="width:96px">生效权重</th>
+              </tr>
+            </thead>
+            <tbody id="rows"><tr><td colspan="6" class="muted">读取中…</td></tr></tbody>
+          </table>
+        </div>
+        <p class="muted" id="count" style="margin-top:8px"></p>
+        <div id="msg" class="msg"></div>
+      </div>
+    </section>
+
+
+    <p class="muted" style="text-align:center;margin-top:20px">
+      <a href="/">← 返回城脉首页</a>
+    </p>
+  </div>
+</div>
+  </div>
+</div>
+<script>
+const API = '';
+
+function $(id){ return document.getElementById(id); }
+
+/* ==================== API Key ==================== */
+/* ==================== 权重 ==================== */
+let ALL = [], BIGCATS = [], THRESHOLD = 0.4, DIRTY = new Map();
+
+function fmt(v){ return (v === null || v === undefined) ? '—' : Number(v).toFixed(2); }
+function showWeightMsg(t, ok){
+  const el = $('msg');
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+  el.textContent = t;
+}
+
+async function loadWeights(){
+  try {
+    const res = await fetch(API + '/api/weights');
+    const d = await res.json();
+    if (!res.ok) { showWeightMsg(d.error || '读取失败', false); return; }
+    ALL = d.rows; BIGCATS = d.bigcats; THRESHOLD = d.threshold;
+    $('thr').textContent = d.threshold;
+    $('stats').innerHTML =
+      '<span>条目总数 <b>' + d.stats.total + '</b></span>' +
+      '<span>已客制化 <b>' + d.stats.customized + '</b></span>' +
+      '<span>大类数 <b>' + d.stats.bigcats + '</b></span>' +
+      '<span>抓取阈值 <b>≥ ' + d.threshold + '</b></span>';
+    $('path').textContent = '权重文件：' + d.path + (d.is_symlink ? '（持久化，容器重建不丢）' : '（未持久化）');
+
+    $('bigfilter').innerHTML = '<option value="">全部大类</option>' +
+      BIGCATS.map(b => '<option value="' + b.big + '">' + b.big + '（' + b.rows + '）</option>').join('');
+
+    $('bigcats').innerHTML = BIGCATS.map(b =>
+      '<tr><td>' + b.big + '</td>' +
+      '<td>' + (b.base === null ? '—' : b.base.toFixed(2)) + '</td>' +
+      '<td>' + (b.in_scope
+        ? '<span class="badge scope">已纳入</span>'
+        : '<span class="badge noscope">未纳入</span>') + '</td>' +
+      '<td>' + b.rows + '</td></tr>').join('');
+
+    renderWeights();
+  } catch (e) {
+    showWeightMsg('读取失败：' + e, false);
+  }
+}
+
+function renderWeights(){
+  const q = $('q').value.trim().toLowerCase();
+  const big = $('bigfilter').value;
+  const onlyCustom = $('onlyCustom').checked;
+
+  const list = ALL.filter(r => {
+    if (big && r.big !== big) return false;
+    if (onlyCustom && !(r.custom !== null && r.custom !== undefined)) return false;
+    if (!q) return true;
+    return (r.code + ' ' + r.big + ' ' + r.mid + ' ' + r.small).toLowerCase().includes(q);
+  });
+
+  $('count').textContent = '显示 ' + list.length + ' / ' + ALL.length + ' 条';
+
+  $('rows').innerHTML = list.map(r => {
+    const d = DIRTY.get(r.code) || {};
+    const custom = ('custom' in d) ? d.custom : r.custom;
+    const base   = ('base' in d) ? d.base : r.base;
+    const eff = (custom !== null && custom !== undefined && custom !== '') ? custom : base;
+    const isBig = (r.mid === r.big);
+    const dirty = ('custom' in d) || ('base' in d);
+    return '<tr class="' + (isBig ? 'is-bigcat' : '') + '">' +
+      '<td><code>' + r.code + '</code></td>' +
+      '<td>' + r.big + (isBig ? ' <span class="badge">大类行</span>' : '') + '</td>' +
+      '<td class="muted">' + (r.mid === r.small ? r.mid : (r.mid + ' / ' + r.small)) + '</td>' +
+      '<td><input type="number" step="0.05" min="-2" max="2" value="' + (base === null ? '' : base) + '"' +
+        (dirty ? ' class="dirty"' : '') +
+        ' onchange="setBase(\'' + r.code + '\', this.value)"></td>' +
+      '<td><input type="number" step="0.05" min="-2" max="2" placeholder="（基础权重）" value="' +
+        (custom === null || custom === undefined ? '' : custom) + '"' +
+        (('custom' in d) ? ' class="dirty"' : '') +
+        ' onchange="setCustom(\'' + r.code + '\', this.value)"></td>' +
+      '<td><code>' + fmt(eff) + '</code></td>' +
+      '</tr>';
+  }).join('') || '<tr><td colspan="6" class="muted">没有匹配的条目</td></tr>';
+
+  const n = DIRTY.size;
+  $('saveBtn').disabled = n === 0;
+  const badge = $('dirty');
+  badge.style.display = n ? 'inline-block' : 'none';
+  badge.textContent = '未保存 ' + n + ' 项';
+}
+
+function setCustom(code, val){
+  const r = ALL.find(x => x.code === code);
+  const target = (val === '') ? null : Number(val);
+  if (target !== null && Number.isNaN(target)) { alert('请输入数字'); renderWeights(); return; }
+  const before = r.custom;
+  const next = new Map(DIRTY);
+  const d = Object.assign({}, next.get(code) || {});
+  if (target === before) { delete d.custom; } else { d.custom = target; }
+  if (Object.keys(d).length) next.set(code, d); else next.delete(code);
+  DIRTY = next;
+  renderWeights();
+}
+
+function setBase(code, val){
+  const r = ALL.find(x => x.code === code);
+  const target = (val === '') ? null : Number(val);
+  if (target === null || Number.isNaN(target)) { alert('基础权重必须填写数字'); renderWeights(); return; }
+  const isBigRow = (r.mid === r.big);
+  if (isBigRow && target < THRESHOLD && (r.base === null || r.base >= THRESHOLD)) {
+    if (!confirm('「' + r.big + '」是大类行。把基础权重改到 ' + THRESHOLD +
+                 ' 以下会让该大类下的所有 POI 在下次抓取时被排除。确定继续？')) { renderWeights(); return; }
+  }
+  const before = r.base;
+  const next = new Map(DIRTY);
+  const d = Object.assign({}, next.get(code) || {});
+  if (target === before) { delete d.base; } else { d.base = target; }
+  if (Object.keys(d).length) next.set(code, d); else next.delete(code);
+  DIRTY = next;
+  renderWeights();
+}
+
+async function saveWeights(){
+  if (!DIRTY.size) return;
+  const updates = [];
+  DIRTY.forEach((v, code) => {
+    const item = {code: code};
+    if ('custom' in v) item.custom = v.custom;
+    if ('base' in v) item.base = v.base;
+    updates.push(item);
+  });
+  $('saveBtn').disabled = true;
+  try {
+    const res = await fetch(API + '/api/weights', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({updates: updates})
+    });
+    const d = await res.json();
+    if (!res.ok) { showWeightMsg(d.error || '保存失败', false); $('saveBtn').disabled = false; return; }
+    DIRTY = new Map();
+    showWeightMsg('已保存 ' + d.applied + ' 项改动' +
+      (d.rejected && d.rejected.length ? '；' + d.rejected.length + ' 项被拒绝（' +
+        d.rejected.map(r => r.code + ':' + r.reason).join('；') + '）' : '') +
+      '。下次评分/抓取即生效。', true);
+    await loadWeights();
+  } catch (e) {
+    showWeightMsg('保存失败：' + e, false);
+    $('saveBtn').disabled = false;
+  }
+}
+
+async function resetCustom(){
+  if (!confirm('确定清空全部「客制化权重」？基础权重不受影响。')) return;
+  try {
+    const res = await fetch(API + '/api/weights/reset', {method: 'POST'});
+    const d = await res.json();
+    if (!res.ok) { showWeightMsg(d.error || '操作失败', false); return; }
+    DIRTY = new Map();
+    showWeightMsg('已清空全部客制化权重，恢复为基础权重。', true);
+    await loadWeights();
+  } catch (e) {
+    showWeightMsg('操作失败：' + e, false);
+  }
+}
+
+/* ==================== 启动 ==================== */
+loadWeights();
+</script>
+</body>
+</html>

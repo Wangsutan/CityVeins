@@ -25,15 +25,24 @@
 """
 
 import datetime
-import glob
 import io
+import json
 import os
 import re
 import shutil
+import sys
 import tempfile
 import zipfile
 
-from flask import Blueprint, abort, jsonify, request, send_file, send_from_directory
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    request,
+    send_file,
+    send_from_directory,
+)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -92,8 +101,6 @@ def _resolve_record(rid: str, ts: str) -> str:
 
 
 def _read_summary(path: str):
-    import json
-
     try:
         with open(os.path.join(path, "summary.json"), "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -158,6 +165,55 @@ DISPLAY_NAMES = {
     "stats": "统计信息",
     "other": "其他文件",
 }
+
+# AI 报告的默认提示词。
+# 注意：首页 index.html 里有个一模一样的副本（更早就有，供「AI生成报告」用），
+# 两边必须保持一致；记录袋从这里取，避免再抄第三份。
+DEFAULT_AI_PROMPT = """作为商务局工作人员，根据上级关于推进社区一刻钟生活圈建设的工作部署，现提供某社区15分钟生活圈范围内的POI数据清单（附后）。
+
+请基于这些数据，对以下关键业态进行专项分析：
+
+分析维度
+
+1. 基础生活服务
+
+    一菜一早：生鲜菜市场、早餐店等
+
+    便民商业：便利店、小型超市等
+
+2. 重点民生服务
+
+    一老一小：养老机构、托育中心、老年活动场所
+
+    医疗保障：药店、诊所、社区卫生站
+
+3. 生活配套服务
+
+    一洗一修：洗衣店、洗车店、维修点、缝补店
+
+    个人服务：理发店、美容店等
+
+4. 文体教育服务
+
+    教育培训：少儿培训机构、课外辅导机构
+
+    健身休闲：健身房、体育场馆、活动中心
+
+分析要求
+
+    数量统计：各业态POI总数统计
+
+    覆盖评估：分析是否满足社区居民基本需求
+
+    质量分析：重点列举知名品牌或规模较大的POI
+
+    缺口识别：指出存在的不足和服务盲区
+
+    改进建议：提出具体可行的优化建议
+
+报告格式
+
+请用中文生成规范的Markdown格式报告，结构清晰，数据准确，建议具有可操作性。不要在正文前后加上“```markdown”“```”等额外标记。“-”列举的各项的前面要有空行，不然无法正常分段。"""
 
 
 def _list_files(path: str, dirname: str):
@@ -226,6 +282,23 @@ def _build_record(dirname: str):
     if not name:
         name = _name_from_report(path, rid, files)
 
+    # 「不能生成」时要说清缺什么，否则按钮灰着用户不知道为什么
+    missing = []
+    need = {
+        "summary.json": "汇总信息 summary.json",
+        f"stats_{rid}.json": "统计信息 stats_*.json",
+        f"score_{rid}.csv": "评分数据 score_*.csv",
+    }
+    present = {f["name"] for f in files}
+    for fname, label in need.items():
+        if fname not in present:
+            missing.append(label)
+    if f"poi_{rid}_unique.csv" not in present:
+        missing.append("POI 数据 poi_*_unique.csv（AI 报告需要）")
+
+    has_all_for_report = all(f in present for f in need)
+    has_poi = f"poi_{rid}_unique.csv" in present
+
     return {
         "dir": dirname,
         "rid": rid,
@@ -247,6 +320,11 @@ def _build_record(dirname: str):
         "report_preview_url": report["preview_url"] if report else None,
         "ai_report_preview_url": ai_report["preview_url"] if ai_report else None,
         "zip_url": f"/records/{rid}/{ts}/zip",
+        # 生成能力的判据：数据够不够重建报告。前端据此决定按钮是
+        # 「预览…」还是「生成…」，以及能不能点。
+        "can_generate_report": has_all_for_report,
+        "can_generate_ai_report": has_all_for_report and has_poi,
+        "missing_for_generate": missing,
         # 目录建了但没写成（例如保存中途失败）：没报告、或没有 summary.json
         "incomplete": (not summary) or (report is None),
     }
@@ -333,6 +411,97 @@ def record_zip(rid, ts):
         as_attachment=True,
         download_name=f"{dirname}.zip",
     )
+
+
+@records_bp.route("/api/records/default-ai-prompt")
+def get_default_ai_prompt():
+    """AI 报告的默认提示词，供记录袋的生成弹窗预填。
+
+    提示词全文只在后端存一份（DEFAULT_AI_PROMPT），首页 index.html 里那份是更早就
+    有的副本；记录袋从这里取，避免同一个长文案出现第三份。
+    """
+    return jsonify({"prompt": DEFAULT_AI_PROMPT})
+
+
+@records_bp.route("/api/records/<rid>/<ts>/generate-report", methods=["POST"])
+def generate_report(rid, ts):
+    """重新生成评估报告（Markdown + HTML）。
+
+    记录袋里有些记录只留下了数据、报告文件缺失或被清理掉了，这个接口让它们能就地
+    重建，不必回首页重跑一遍查询+拉 POI（那要重新消耗高德配额）。
+
+    走的是 `/save` 里同一个 generate_markdown_report()，输入全部来自该记录目录内的
+    summary.json / stats_*.json / score_*.csv，因此不联网、不用重拉 POI。
+    输出文件名与 `/save` 保持一致（report_{rid}.md/.html），
+    不用 app.py `/report` 那套 `{rid}_评估报告.md` —— 否则同一个目录里会同时出现
+    两种命名的报告，列表是按 report_ / ai_report_ 前缀识别的，另一种会漏掉。
+    """
+    path = _resolve_record(rid, ts)
+    dirname = f"{rid}_{ts}"
+
+    # 派生模块在 /app/sources，容器启动时已在 sys.path 上；本地测试时手动补
+    for candidate in (os.path.dirname(HERE), HERE):
+        if candidate not in sys.path:
+            sys.path.insert(0, candidate)
+    try:
+        from generate_report_fixed import generate_markdown_report, markdown_to_html
+    except Exception as exc:                      # noqa: BLE001
+        return jsonify({"error": f"报告生成模块不可用：{exc}"}), 500
+
+    # 先确认输入齐不齐，缺什么直接点名回报，别等里面抛 KeyError
+    present = {f["name"] for f in _list_files(path, dirname)[0]}
+    required = ["summary.json", f"stats_{rid}.json", f"score_{rid}.csv"]
+    missing = [n for n in required if n not in present]
+    if missing:
+        return jsonify({
+            "error": "缺少生成报告所需的数据：" + "、".join(missing),
+            "missing": missing,
+        }), 409
+
+    summary = _read_summary(path)
+    all_files, _ = _list_files(path, dirname)
+
+    # 名字的解析顺序：
+    #   1) summary.json 的 residential_name（生成过一次报告后会被写回，见下）
+    #   2) 已有报告首行标题（删掉报告但留下数据的记录，靠这一步仍能拿到中文名）
+    #   3) 退回 ID
+    name = str(summary.get("residential_name") or "").strip()
+    if not name:
+        name = _name_from_report(path, rid, all_files)
+
+    md_path = os.path.join(path, f"report_{rid}.md")
+    html_path = os.path.join(path, f"report_{rid}.html")
+    try:
+        with open(md_path, "w", encoding="utf-8") as f:
+            f.write(generate_markdown_report(rid, path, name))
+        html_ok = bool(markdown_to_html(md_path, html_path))
+    except Exception as exc:                      # noqa: BLE001
+        return jsonify({"error": f"生成报告失败：{exc}"}), 500
+
+    # 把名字回写进 summary.json：以后即便报告又被删掉，列表也还知道这是哪个小区，
+    # 而且再次生成时标题不会再退化成 ID。只加一个键，不动 summary 里原有字段。
+    if name and name != rid:
+        try:
+            new_summary = dict(summary)
+            new_summary["residential_name"] = name
+            tmp = md_path + ".summary.tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(new_summary, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, os.path.join(path, "summary.json"))
+        except Exception as exc:                  # noqa: BLE001
+            current_app.logger.warning(
+                "[records] 回写 residential_name 失败（不影响已生成的报告）：%r", exc
+            )
+
+    rec = _build_record(dirname) or {}
+    return jsonify({
+        "ok": True,
+        "html_ok": html_ok,
+        "name": name,
+        "markdown_url": f"/download/{dirname}/report_{rid}.md",
+        "html_url": f"/download/{dirname}/report_{rid}.html",
+        "record": rec,
+    })
 
 
 @records_bp.route("/api/records/<rid>/<ts>/delete", methods=["POST"])
