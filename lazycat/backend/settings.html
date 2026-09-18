@@ -44,6 +44,7 @@
   .item.amap .icon{background:#fff1e0}
   .item.ds .icon{background:#e9f2ff}
   .item.weights .icon{background:#eaf6ec}
+  .item.ziphelp .icon{background:#f3ecff}
   .item .main{flex:1 1 auto;min-width:0}
   .item .title{font-size:15.5px;font-weight:600;color:#2c3e50;display:flex;align-items:center;
     gap:8px;flex-wrap:wrap}
@@ -110,6 +111,16 @@
         <span class="arrow">›</span>
       </a>
 
+      <a class="item ziphelp" href="/settings/zip">
+        <span class="icon">🗜️</span>
+        <span class="main">
+          <span class="title">ZIP 使用说明 <span class="tag">下载后怎么解压</span></span>
+          <span class="desc">Windows / macOS / Linux / 安卓 各自的解压方式</span>
+          <span class="state">点进去看详情</span>
+        </span>
+        <span class="arrow">›</span>
+      </a>
+
       <a class="item weights" href="/weights">
         <span class="icon">⚖️</span>
         <span class="main">
@@ -124,6 +135,7 @@
   </div>
 </div>
 
+<script src="/static/cityveins-common.js"></script>
 <script>
 const API = '';
 
@@ -166,6 +178,8 @@ async function loadSummary(){
 }
 
 loadSummary();
+  // 返回按钮：从哪进回哪
+  window.CV && window.CV.initBackButton();
 </script>
 </body>
 </html>

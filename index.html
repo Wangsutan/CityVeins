@@ -274,6 +274,94 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       }
       
+      /* 选取地址（住宅区候选）弹层：头与按钮固定在上下，只有中间的候选列表滚动。
+         原来是复用 .modal —— 整个弹层 overflow-y:auto，候选一多按钮就被顶出屏幕。
+         （.modal 保留给 AI 生成报告那个对话框用，不去动它。） */
+      .picker {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        width: 92%;
+        max-width: 560px;
+        max-height: min(80vh, 640px);
+        background: #fff;
+        border: 2px solid #ff9a00;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;          /* 关键：外层不滚，滚动交给 .picker-body */
+      }
+      .picker-head {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 13px 16px;
+        border-bottom: 1px solid #eef2f7;
+      }
+      .picker-head h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        color: #2c3e50;
+        text-align: left;
+      }
+      .picker-head .picker-close {
+        flex: 0 0 auto;
+        border: none;
+        background: transparent;
+        color: #95a5a6;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+      .picker-head .picker-close:hover { background: #f2f6fb; color: #2c3e50; }
+      .picker-body {
+        flex: 1 1 auto;
+        min-height: 0;             /* 不加这句 flex 子项不会收缩，滚动条出不来 */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 16px;
+      }
+      .picker-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        padding: 10px 12px;
+        margin-bottom: 6px;
+        border-radius: 8px;
+        border: 1px solid #e3e8ef;
+        cursor: pointer;
+        transition: background .15s, border-color .15s;
+      }
+      .picker-row:hover { background: #f7fafd; border-color: #cfdcec; }
+      .picker-row input { margin-top: 3px; flex: 0 0 auto; }
+      .picker-row .picker-text { min-width: 0; }
+      .picker-row .picker-name { font-weight: 600; color: #2c3e50; word-break: break-all; }
+      .picker-row .picker-meta { font-size: 12.5px; color: #7a8694; margin-top: 2px; word-break: break-all; }
+      /* 按钮区固定在下沿，永远看得见 */
+      .picker-foot {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 10px;
+        padding: 12px 16px;
+        border-top: 1px solid #eef2f7;
+        background: #fafcff;
+      }
+      .picker-foot .modal-btn { max-width: none; }
+      @media (max-width: 480px) {
+        .picker { width: 100%; max-width: none; max-height: 100vh; height: 100%;
+                  border-radius: 0; border-width: 0; top: 0; left: 0; transform: none; }
+        .picker-body { padding: 10px 12px; }
+        .picker-foot { padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
+        .picker-foot .modal-btn { flex: 1; }
+      }
+
       .modal h3 {
         margin-bottom: 15px;
         color: #2c3e50;
@@ -577,26 +665,6 @@
         }
         .hint-icon:hover { background: #e2e9f3; }
 
-        /* 「打包下载 ZIP」按钮右上角的小问号。
-           按钮本身要 position:relative 才能挂住它；问号用 pointer-events:none，
-           点它等于点按钮本身，展开解压说明由按钮的 onclick 负责。 */
-        #download-btn {
-          position: relative;
-          overflow: visible;
-        }
-        .zip-hint-wrap {
-          position: absolute;
-          top: -7px;
-          right: -7px;
-          z-index: 2;
-          pointer-events: none;
-        }
-        /* 弹层是 fixed 定位，父级绝不能有 transform，否则它就不再相对视口 */
-        #download-btn,
-        #download-btn:active,
-        #download-btn:hover {
-          transform: none;
-        }
         /* 说明气泡：相对**视口**定位（fixed），不嵌在卡片里，
            这样 .container 的 overflow:hidden 裁不到它。
            具体 left / top 由 JS 的 positionHint() 夹在视口内并算出箭头位置 ——
@@ -629,15 +697,16 @@
           border-bottom-color: #2c3e50;
         }
 
-        /* 记录袋按钮：与「保存到云端 / AI生成报告 / 下载到本地」同一列的第 4 个按钮。
-           <a> 不能像 <button> 那样自带居中，所以这里补上 block + 居中 + 盒模型。 */
+        /* 记录袋按钮：排在「保存到云端 / AI生成报告 / 打包下载 ZIP / 逐个下载文件」之后。
+           颜色单独给一个蓝，与下载按钮的蓝区分开。 */
         .records-btn {
-          line-height: 1.4;
+          background: linear-gradient(135deg, #466fa1 0%, #3c608c 100%);
+          color: #fff;
           font-weight: 500;
+          line-height: 1.4;
         }
-        .records-btn:hover {
-          filter: brightness(1.07);
-          transform: translateY(-1px);
+        .records-btn:disabled {
+          background: #bdc3c7;      /* 与其它按钮的禁用态一致 */
         }
 
         /* 报告内置预览：整屏弹层里用 iframe 打开，不跳转、不开新窗口。
@@ -759,23 +828,15 @@
                  「打包下载 ZIP / 逐个下载文件」）。现在两者都直接排在这一列里，
                  展开区整个删掉 —— 少一层嵌套，也就没有「展开后收不回去」的问题了。
                  ZIP 上的「?」用 pointer-events:none，点它等于点按钮本身。 -->
-            <button id="download-btn" class="action-btn download-btn" onclick="runBusy(downloadZip, '正在下载')" disabled>
-              打包下载 ZIP
-              <span class="hint-icon-wrap zip-hint-wrap">
-                <button type="button" class="hint-icon" aria-label="解压说明"
-                        onclick="toggleUnzipHint(event)">?</button>
-              </span>
-            </button>
+            <button id="download-btn" class="action-btn download-btn"
+                    onclick="runBusy(downloadZip, '正在下载')" disabled>打包下载 ZIP</button>
             <button id="files-btn" class="action-btn" onclick="openRecordFiles()" disabled>逐个下载文件</button>
 
-            <!-- 记录袋：云端已保存的全部数据。跟上面几个一样是操作按钮，不是
-                 「下载到本地」展开区里的附属链接 —— 所以直接排在同一列里，
-                 并且**始终可点**（它不依赖本次会话有没有查询结果）。 -->
-            <a href="/records" class="action-btn records-btn"
-               style="background:linear-gradient(135deg,#466fa1 0%,#3c608c 100%);color:#fff;
-                      display:block;text-align:center;text-decoration:none;box-sizing:border-box;">
-              记录袋
-            </a>
+            <!-- 记录袋：云端已保存的全部数据。跟上面几个一样是操作按钮，排在同一列里。
+                 用 <button> 而不是 <a> —— 拉取数据（查询/保存/下载/AI 报告）期间要把它
+                 置灰拦住：跳走会把页面里的结果和进行中的请求一起丢掉。 -->
+            <button id="records-btn" class="action-btn records-btn"
+                    onclick="location.href='/records'">记录袋</button>
           </div>
 
           <div class="download-instructions" id="download-instructions">
@@ -822,16 +883,18 @@
       该半径决定拉取住宅区周边 POI（学校、医院、商超等）的搜索范围：
       半径越大覆盖越广，但 POI 数量、请求耗时与配额消耗也随之增加。
     </span>
-    <span id="unzip-hint" class="hint-popup">
-      <strong>ZIP 下载后如何解压</strong><br>
-      · Windows：右键压缩包 →「全部解压缩」<br>
-      · Linux / macOS：<code>unzip 文件名.zip</code>，或在文件管理器里双击<br>
-      · Android：用 ZArchiver 等应用解压<br>
-      解压后用浏览器打开其中的 HTML 报告即可查看。
-    </span>
-
+    <script src="/static/cityveins-common.js"></script>
     <script>
       const API = '';  // 同源：由同一容器的 Flask 提供接口
+
+      // 把候选住宅区的名称/地址塞进 innerHTML 前必须转义。
+      // 公共模块里也有一份（CV.esc），这里保留本地实现是为了不依赖它 ——
+      // 万一那个文件没加载上，选地址这条核心流程也不该崩。
+      function esc(s) {
+        return String(s === null || s === undefined ? '' : s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
 
       // POI 搜索半径：默认 1200 米，允许用户自行设置
       const DEFAULT_RADIUS = 1200;
@@ -900,7 +963,7 @@
       }
 
       function closeAllHints() {
-        ['radius-hint', 'unzip-hint'].forEach(function (id) {
+        ['radius-hint'].forEach(function (id) {
           const el = document.getElementById(id);
           if (!el) return;
           el.style.display = 'none';
@@ -928,7 +991,6 @@
       });
 
       function toggleRadiusHint(ev) { toggleHint('radius-hint', ev); }
-      function toggleUnzipHint(ev)  { toggleHint('unzip-hint', ev); }
 
       function getRadius() {
         const el = document.getElementById('radius');
@@ -1036,6 +1098,7 @@
         const aiBtn = document.getElementById('ai-btn');
         const downloadBtn = document.getElementById('download-btn');
         const filesBtn = document.getElementById('files-btn');
+        const recordsBtn = document.getElementById('records-btn');
         const hasResult = lastResult && lastResult.result;
         
         saveBtn.disabled = !hasResult;
@@ -1044,6 +1107,13 @@
         // 所以都等 currentSaveDir 有了才可用。
         downloadBtn.disabled = !currentSaveDir;
         if (filesBtn) filesBtn.disabled = !currentSaveDir;
+        // 记录袋本身不依赖本次会话的结果，**平时始终可用**；
+        // 它只在「有操作正在进行」时被 setBusy 置灰 —— 所以这里不要动它。
+        // （见 busyDepth 那一段：拉取数据期间跳走会同时丢掉页面状态和进行中的请求。）
+        // 注意用 typeof：busyDepth 用 let 声明在本函数之后，
+        // 脚本末尾那次调用若直接读它会撞上暂时性死区。
+        if (recordsBtn && typeof busyDepth === 'undefined') recordsBtn.disabled = false;
+        else if (recordsBtn && busyDepth === 0) recordsBtn.disabled = false;
       }
 
       // 显示AI生成报告模态框
@@ -1275,7 +1345,9 @@
 
       // 下载单个文件
       // ---------- 操作互斥：任一操作进行中禁用相关按钮，避免并发出错 ----------
-      const BUSY_BUTTON_IDS = ['save-btn', 'ai-btn', 'download-btn', 'files-btn', 'query-btn'];
+      // records-btn 也在里面：拉取数据期间禁止跳走（会丢页面状态与进行中的请求）
+      const BUSY_BUTTON_IDS = ['save-btn', 'ai-btn', 'download-btn', 'files-btn',
+                               'query-btn', 'records-btn'];
       const BUSY_MAX_MS = 10 * 60 * 1000;   // 看门狗上限，避免请求卡死导致按钮永久禁用
       let busyDepth = 0;
       let busyWatchdog = null;
@@ -1455,21 +1527,44 @@
 
       function showPicker(list) {
         const existingPicker = document.getElementById('picker');
-        if (existingPicker) {
-          existingPicker.remove();
-        }
+        if (existingPicker) existingPicker.remove();
 
         const picker = document.createElement('div');
         picker.id = 'picker';
-        picker.className = 'modal';
-        picker.innerHTML = `<h3>找到多个住宅区，请选择：</h3>` +
-          list.map((c, i) =>
-            `<label style="display: block; padding: 10px 12px; margin-bottom: 6px; border-radius: 6px; transition: background 0.2s; cursor: pointer;"><input type="radio" name="pick" value="${i}"> ${c.name} - ${c.address} (ID: ${c.id})</label>`
-          ).join('') +
-          `<div class="modal-buttons">
-            <button class="modal-btn confirm-btn" onclick="confirmPick()">确定</button>
-            <button class="modal-btn cancel-btn" onclick="cancelPick()">取消</button>
-          </div>`;
+        picker.className = 'picker';
+        picker.setAttribute('role', 'dialog');
+        picker.setAttribute('aria-label', '选择住宅区');
+        picker.innerHTML =
+          '<div class="picker-head">' +
+            '<h3>找到多个住宅区，请选择</h3>' +
+            '<button type="button" class="picker-close" data-pick="cancel" aria-label="取消">×</button>' +
+          '</div>' +
+          '<div class="picker-body">' +
+            list.map(function (c, i) {
+              return '<label class="picker-row">' +
+                '<input type="radio" name="pick" value="' + i + '">' +
+                '<span class="picker-text">' +
+                  '<span class="picker-name">' + esc(c.name) + '</span>' +
+                  '<span class="picker-meta">' + esc(c.address || '（无地址）') +
+                    ' · ID ' + esc(c.id) + '</span>' +
+                '</span>' +
+              '</label>';
+            }).join('') +
+          '</div>' +
+          // 按钮放在滚动容器**外面**，所以候选再多也不会被顶出屏幕
+          '<div class="picker-foot">' +
+            '<button type="button" class="modal-btn confirm-btn" data-pick="ok">确定</button>' +
+            '<button type="button" class="modal-btn cancel-btn" data-pick="cancel">取消</button>' +
+          '</div>';
+
+        // 事件用 addEventListener 而不是内联 onclick：与其它弹层保持一致的写法
+        picker.addEventListener('click', function (ev) {
+          const btn = ev.target.closest ? ev.target.closest('[data-pick]') : null;
+          if (!btn) return;
+          if (btn.dataset.pick === 'ok') confirmPick();
+          else cancelPick();
+        });
+
         document.body.appendChild(picker);
       }
 

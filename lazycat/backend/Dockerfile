@@ -39,10 +39,13 @@ COPY settings.html /app/sources/settings.html
 COPY amap.html /app/sources/amap.html
 COPY deepseek.html /app/sources/deepseek.html
 COPY weights.html /app/sources/weights.html
+COPY ziphelp.html /app/sources/ziphelp.html
 # 记录袋：云端已形成数据的列表页 + 单条记录的文件清单页 + 接口
 COPY records_api.py /app/sources/records_api.py
 COPY records.html /app/sources/records.html
 COPY record_files.html /app/sources/record_files.html
+# 两个页面共用的前端模块（下载 / 站内预览 / 文件行渲染 / 智能返回）
+COPY cityveins-common.js /app/sources/cityveins-common.js
 COPY run.sh /app/run.sh
 RUN chmod +x /app/run.sh
 

@@ -157,6 +157,7 @@
   </div>
 </div>
 
+<script src="/static/cityveins-common.js"></script>
 <script>
 const API = '';
 
@@ -324,6 +325,8 @@ async function resetCustom(){
 
 /* ==================== 启动 ==================== */
 loadWeights();
+  // 返回按钮：从哪进回哪
+  window.CV && window.CV.initBackButton();
 </script>
 </body>
 </html>

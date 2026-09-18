@@ -148,6 +148,7 @@
   </div>
 </div>
 
+<script src="/static/cityveins-common.js"></script>
 <script>
 const API = '';
 
@@ -233,6 +234,8 @@ function toggleKeyVisible(kind){
 
 /* ==================== 启动 ==================== */
 loadKeyStatus('ds');
+  // 返回按钮：从哪进回哪
+  window.CV && window.CV.initBackButton();
 </script>
 </body>
 </html>

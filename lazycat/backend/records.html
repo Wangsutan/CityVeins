@@ -179,6 +179,7 @@
 
 <div id="toast" class="toast"></div>
 
+<script src="/static/cityveins-common.js"></script>
 <script>
   const API = '';                 // 同源
   let RECORDS = [];
@@ -187,71 +188,11 @@
   // 而不是让用户点了才报错
   let aiKeyReady = null;          // null=还没查到
 
-  const $ = function (id) { return document.getElementById(id); };
-
-  function toast(msg, ms) {
-    const el = $('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(el._t);
-    el._t = setTimeout(function () { el.classList.remove('show'); }, ms || 2200);
-  }
-
-  function showErr(msg) {
-    const el = $('err');
-    el.textContent = msg;
-    el.classList.add('open');
-  }
-
-  function clearErr() { $('err').classList.remove('open'); }
-
-  function fmtSize(bytes) {
-    if (!bytes && bytes !== 0) return '—';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let i = 0, v = Number(bytes);
-    while (v >= 1024 && i < units.length - 1) { v /= 1024; i += 1; }
-    return (i === 0 ? v : v.toFixed(v >= 100 ? 0 : 1)) + ' ' + units[i];
-  }
-
-  function esc(s) {
-    return String(s === null || s === undefined ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
-  function fmtScore(v) {
-    const n = Number(v);
-    return Number.isFinite(n) ? n.toFixed(2) + ' 分' : '—';
-  }
-
-  // ---------- 懒猫拦截器要求：blob: + download 属性 ----------
-  async function fetchBlob(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return await res.blob();
-  }
-
-  async function triggerDownload(url, filename) {
-    toast('正在取回文件…', 60000);
-    try {
-      const blob = await fetchBlob(url);
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename || 'download';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      try {
-        a.click();
-        toast('已发起下载：' + a.download);
-      } finally {
-        document.body.removeChild(a);
-        setTimeout(function () { try { URL.revokeObjectURL(blobUrl); } catch (e) {} }, 60000);
-      }
-    } catch (e) {
-      toast('下载失败：' + (e && e.message ? e.message : e), 4000);
-    }
-  }
+  // 通用工具（$ / esc / fmtSize / fmtScore / toast / showErr / clearErr /
+  // 下载 / 站内预览弹层 / 文件行渲染）都在 /static/cityveins-common.js 里，
+  // 与「文件清单」页共用同一份实现。
+  const CV = window.CV;
+  const $ = CV.$;
 
   // ---------- 渲染 ----------
   function filtered() {
@@ -270,7 +211,7 @@
     $('s-count').textContent = RECORDS.length;
     $('s-ai').textContent = RECORDS.filter(function (r) { return r.has_ai_report; }).length;
     const total = RECORDS.reduce(function (a, r) { return a + (r.total_bytes || 0); }, 0);
-    $('s-size').textContent = fmtSize(total);
+    $('s-size').textContent = CV.fmtSize(total);
     $('s-last').textContent = RECORDS.length ? RECORDS[0].created : '—';
   }
 
@@ -293,8 +234,8 @@
       if (r.has_ai_report) badges.push('<span class="badge ai">含 AI 报告</span>');
       if (!r.has_report) badges.push('<span class="badge warn">报告缺失</span>');
       if (r.incomplete) badges.push('<span class="badge warn">可能未写完</span>');
-      badges.push('<span class="badge">' + esc(r.file_count) + ' 个文件</span>');
-      badges.push('<span class="badge">' + esc(fmtSize(r.total_bytes)) + '</span>');
+      badges.push('<span class="badge">' + CV.esc(r.file_count) + ' 个文件</span>');
+      badges.push('<span class="badge">' + CV.esc(CV.fmtSize(r.total_bytes)) + '</span>');
 
       // 按钮文案随实际状态切换：
       //   已有报告 → 「预览…」（点了就看）
@@ -315,7 +256,7 @@
         ? '<button type="button" class="amber" data-act="preview-ai" ' +
           (r.ai_report_preview_url ? '' : 'disabled') + '>预览 AI 报告</button>'
         : '<button type="button" class="amber" data-act="gen-ai" ' +
-          ((canAi && !aiNoKey) ? '' : 'disabled title="' + esc(aiTip) + '"') +
+          ((canAi && !aiNoKey) ? '' : 'disabled title="' + CV.esc(aiTip) + '"') +
           '>生成 AI 报告</button>';
 
       if (!r.has_report && !canReport) {
@@ -326,16 +267,16 @@
       '<div class="rec" data-idx="' + i + '">' +
         '<div class="rec-head">' +
           '<div>' +
-            '<div class="rec-title">' + esc(r.name || r.rid) + '</div>' +
-            '<div class="rec-sub">ID ' + esc(r.rid) + ' · 保存于 ' + esc(r.created) + '</div>' +
+            '<div class="rec-title">' + CV.esc(r.name || r.rid) + '</div>' +
+            '<div class="rec-sub">ID ' + CV.esc(r.rid) + ' · 保存于 ' + CV.esc(r.created) + '</div>' +
           '</div>' +
           '<div class="badges">' + badges.join('') + '</div>' +
         '</div>' +
         '<div class="metrics">' +
-          '<div class="metric"><div class="k">加权总分</div><div class="v score">' + esc(fmtScore(r.total_score)) + '</div></div>' +
-          '<div class="metric"><div class="k">POI 总数</div><div class="v">' + esc(r.poi_count === null || r.poi_count === undefined ? '—' : r.poi_count + ' 个') + '</div></div>' +
+          '<div class="metric"><div class="k">加权总分</div><div class="v score">' + CV.esc(CV.fmtScore(r.total_score)) + '</div></div>' +
+          '<div class="metric"><div class="k">POI 总数</div><div class="v">' + CV.esc(r.poi_count === null || r.poi_count === undefined ? '—' : r.poi_count + ' 个') + '</div></div>' +
           '<div class="metric"><div class="k">覆盖大类 / 中类</div><div class="v">' +
-            esc((r.big_category_count === null || r.big_category_count === undefined ? '—' : r.big_category_count) + ' / ' +
+            CV.esc((r.big_category_count === null || r.big_category_count === undefined ? '—' : r.big_category_count) + ' / ' +
                 (r.mid_category_count === null || r.mid_category_count === undefined ? '—' : r.mid_category_count)) + '</div></div>' +
         '</div>' +
         '<div class="rec-actions">' +
@@ -365,41 +306,23 @@
         box.innerHTML = '<div class="file-meta" style="padding:6px 10px;">这个记录目录是空的。</div>';
         return;
       }
-      box.innerHTML = data.files.map(function (f) {
-        const canPreview = (f.ext === '.html' || f.ext === '.md' || f.ext === '.json' || f.ext === '.csv');
-        return '<div class="file-row">' +
-          '<div>' +
-            '<div class="file-name">' + esc(f.display_name) + '</div>' +
-            '<div class="file-meta">' + esc(f.name) + ' · ' + fmtSize(f.size_bytes) + ' · ' + esc(f.mtime) + '</div>' +
-          '</div>' +
-          '<div class="file-ops">' +
-            (canPreview ? '<button type="button" data-fprev="' + esc(f.preview_url) + '" data-fname="' + esc(f.name) + '">预览</button>' : '') +
-            '<button type="button" data-fdl="' + esc(f.download_url) + '" data-fname="' + esc(f.name) + '">下载</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
+      box.innerHTML = CV.fileRows(data.files, {
+        emptyText: '这个记录目录是空的。',
+      });
     } catch (e) {
-      box.innerHTML = '<div class="file-meta" style="padding:6px 10px;color:#b3261e;">读取失败：' + esc(e.message) + '</div>';
+      box.innerHTML = '<div class="file-meta" style="padding:6px 10px;color:#b3261e;">读取失败：' + CV.esc(e.message) + '</div>';
     }
   }
 
   // ---------- 预览：站内弹层，不用 window.open ----------
   // 与首页同理：安卓上开新窗口/外部浏览器会把当前页面顶掉，
   // 所以预览一律在同一页面里用 iframe 打开。
+  // 站内预览弹层：实现搬到公共模块（与文件清单页共用）。
+  // 仍然不用 window.open —— 安卓上会把当前 WebView 顶掉、页面里的结果就丢了。
   function openPreview(url, title, downloadUrl) {
-    previewCtx = { url: url, downloadUrl: downloadUrl, name: title };
-    $('preview-title').textContent = title;
-    $('preview-frame').src = url;
-    $('preview-overlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    CV.openPreview(url, title, downloadUrl);
   }
-
-  function closePreview() {
-    $('preview-overlay').classList.remove('open');
-    $('preview-frame').src = 'about:blank';   // 停掉里面的请求
-    document.body.style.overflow = '';
-    previewCtx = null;
-  }
+  function closePreview() { CV.closePreview(); }
 
   // ---------- 生成报告 ----------
   // 后端接口：
@@ -432,11 +355,11 @@
 
   async function generateReport(r, btn) {
     setBtnBusy(btn, true, '正在生成…');
-    toast('正在生成评估报告（不重新拉取 POI）…', 60000);
+    CV.toast('正在生成评估报告（不重新拉取 POI）…', 60000);
     try {
       const data = await postJson(
         API + '/api/records/' + encodeURIComponent(r.rid) + '/' + r.ts + '/generate-report', {});
-      toast('评估报告已生成' + (data.html_ok === false ? '（HTML 转换失败，Markdown 已保存）' : ''));
+      CV.toast('评估报告已生成' + (data.html_ok === false ? '（HTML 转换失败，Markdown 已保存）' : ''));
       await load(false);
       const fresh = RECORDS.find(function (x) { return x.dir === r.dir; });
       if (fresh && fresh.report_preview_url) {
@@ -445,7 +368,7 @@
                     fresh.report_preview_url.replace('/preview/', '/download/'));
       }
     } catch (e) {
-      toast('生成失败：' + (e && e.message ? e.message : e), 5000);
+      CV.toast('生成失败：' + (e && e.message ? e.message : e), 5000);
       setBtnBusy(btn, false);
     }
   }
@@ -475,7 +398,7 @@
     modal.innerHTML =
       '<div class="sheet" style="height:auto;max-width:760px;">' +
         '<div class="sheet-head">' +
-          '<span class="t">生成 AI 报告 · ' + esc(r.name || r.rid) + '</span>' +
+          '<span class="t">生成 AI 报告 · ' + CV.esc(r.name || r.rid) + '</span>' +
           '<span class="ops">' +
             '<button type="button" data-pm="cancel">取消</button>' +
           '</span>' +
@@ -517,14 +440,14 @@
   }
 
   async function generateAiReport(r, prompt) {
-    toast('正在生成 AI 报告，请稍候…', 120000);
+    CV.toast('正在生成 AI 报告，请稍候…', 120000);
     try {
       const data = await postJson(API + '/ai-report', {
         residential_id: r.rid,
         save_dir: r.dir,
         prompt: prompt
       });
-      toast('AI 报告已生成' + (data.html_ok === false ? '（HTML 转换失败，Markdown 已保存）' : ''));
+      CV.toast('AI 报告已生成' + (data.html_ok === false ? '（HTML 转换失败，Markdown 已保存）' : ''));
       await load(false);
       const fresh = RECORDS.find(function (x) { return x.dir === r.dir; });
       if (fresh && fresh.ai_report_preview_url) {
@@ -533,7 +456,7 @@
                     fresh.ai_report_preview_url.replace('/preview/', '/download/'));
       }
     } catch (e) {
-      toast('生成失败：' + (e && e.message ? e.message : e), 6000);
+      CV.toast('生成失败：' + (e && e.message ? e.message : e), 6000);
     }
   }
 
@@ -547,27 +470,20 @@
                               '/delete?confirm=1', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
-      toast('已删除：' + name);
+      CV.toast('已删除：' + name);
       await load(true);
     } catch (e) {
-      toast('删除失败：' + (e && e.message ? e.message : e), 4000);
+      CV.toast('删除失败：' + (e && e.message ? e.message : e), 4000);
     }
   }
 
   // ---------- 事件 ----------
+  // 记录行上的操作按钮（预览/生成/清单/下载/删除）。
+  // 注意：文件名那一行的「预览 / 下载」不在这里处理 —— 那部分由公共模块的
+  // CV.bindFileRowClicks 统一接管（data-fprev / data-fdl 约定），两页行为一致。
   $('list').addEventListener('click', function (ev) {
     const btn = ev.target.closest ? ev.target.closest('button') : null;
     if (!btn) return;
-
-    // 文件清单里的「预览 / 下载」
-    if (btn.dataset.fprev) {
-      openPreview(btn.dataset.fprev, btn.dataset.fname, btn.dataset.fprev.replace('/preview/', '/download/'));
-      return;
-    }
-    if (btn.dataset.fdl) {
-      triggerDownload(btn.dataset.fdl, btn.dataset.fname);
-      return;
-    }
 
     const act = btn.dataset.act;
     if (!act) return;
@@ -587,7 +503,7 @@
     } else if (act === 'files') {
       toggleFiles(idx, r.rid, r.ts);
     } else if (act === 'zip') {
-      triggerDownload(API + r.zip_url, r.dir + '.zip');
+      CV.triggerDownload(API + r.zip_url, r.dir + '.zip');
     } else if (act === 'delete') {
       deleteRecord(r.rid, r.ts, r.name || r.rid);
     }
@@ -595,7 +511,7 @@
 
   $('preview-close').addEventListener('click', closePreview);
   $('preview-download').addEventListener('click', function () {
-    if (previewCtx) triggerDownload(previewCtx.downloadUrl, previewCtx.name.replace(/[·\s]+/g, '_') + '.html');
+    if (previewCtx) CV.triggerDownload(previewCtx.downloadUrl, previewCtx.name.replace(/[·\s]+/g, '_') + '.html');
   });
   $('preview-overlay').addEventListener('click', function (ev) {
     if (ev.target === $('preview-overlay')) closePreview();
@@ -620,7 +536,7 @@
 
   async function load(manual) {
     if (manual) toast('正在刷新…', 900);
-    clearErr();
+    CV.clearErr();
     if (aiKeyReady === null) await checkAiKey();
     $('list').innerHTML = '<div class="empty">正在读取云端记录…</div>';
     try {
@@ -635,9 +551,15 @@
       RECORDS = [];
       renderStats();
       $('list').innerHTML = '';
-      showErr('读取云端记录失败：' + (e && e.message ? e.message : e));
+      CV.showErr('读取云端记录失败：' + (e && e.message ? e.message : e));
     }
   }
+
+  // 文件行的「预览 / 下载」走公共模块，与「文件清单」页同一套实现
+  CV.bindFileRowClicks($('list'));
+  CV.initPreview();
+  // 返回按钮：从哪进回哪（记录袋一般从首页的按钮进来，所以回首页）
+  CV.initBackButton();
 
   load(false);
 </script>

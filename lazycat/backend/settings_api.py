@@ -105,6 +105,17 @@ def deepseek_settings_page():
     return send_from_directory(HERE, "deepseek.html")
 
 
+@settings_bp.route("/settings/zip")
+def zip_help_page():
+    """ZIP 使用说明（各系统怎么解压）。
+
+    原先这段说明挂在首页「打包下载 ZIP」按钮上的一个小问号气泡里，
+    挤在按钮角上、又容易被忽略；现在收进设置里做成独立一项，
+    要看详情点进来即可，主页面上不再出现。
+    """
+    return send_from_directory(HERE, "ziphelp.html")
+
+
 @settings_bp.route("/api/settings/amap-key", methods=["GET"])
 def get_amap_key():
     key = _read_key()
@@ -262,8 +273,18 @@ def preview_saved_file(subpath, filename):
     if not os.path.isfile(target):
         abort(404)
 
-    # .md 以纯文本呈现（浏览器会直接显示，不会下载）
-    # 只给基础类型，charset 交给 Flask 追加（否则会出现重复的 charset 参数）
-    mimetype = "text/plain" if filename.lower().endswith(".md") else None
+    # 一律以纯文本呈现，浏览器才会**直接显示**而不是弹下载框。
+    #
+    # 这里必须显式覆盖，不能只靠 send_from_directory 猜 mimetype：
+    #   · .csv → text/csv，浏览器对它有「下载」的默认处置，preview 会变成下载
+    #   · .json → application/json，Chrome 会下载，Firefox 才内联（行为不一致）
+    #   · .md  → 本来就有映射到 text/markdown，同样不保证内联
+    # 所以除 HTML 保持 text/html 外，其余可预览类型统一按 text/plain 发。
+    # 只给基础类型，charset 交给 Flask 追加（否则会出现重复的 charset 参数）。
+    lower = filename.lower()
+    if lower.endswith(".html") or lower.endswith(".htm"):
+        mimetype = None            # 保持 text/html，iframe 里正常渲染
+    else:
+        mimetype = "text/plain"
     return send_from_directory(dir_path, filename,
                                as_attachment=False, mimetype=mimetype)

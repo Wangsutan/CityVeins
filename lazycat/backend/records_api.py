@@ -350,6 +350,22 @@ def _build_record(dirname: str):
 # ---------------------------------------------------------------------------
 # 页面
 # ---------------------------------------------------------------------------
+@records_bp.route("/static/cityveins-common.js")
+def common_js():
+    """记录袋与文件清单页共用的前端模块。
+
+    抽出来的原因：这两页本来各写了一份几乎一样的工具函数与文件行渲染
+    （fmtSize / esc / toast / triggerDownload / 预览弹层 / 文件行 HTML），
+    改一处要记得同步另一处。现在共用这一份，但两个页面本身保持独立 ——
+    一个管「记录」，一个管「记录里的文件」。
+
+    不加版本号、直接发文件：这是内网单机应用，浏览器缓存带来的收益
+    远小于「改了没生效」的困惑；真要强制刷新，用 Ctrl+F5 即可。
+    """
+    return send_from_directory(HERE, "cityveins-common.js",
+                               mimetype="application/javascript")
+
+
 @records_bp.route("/records")
 def records_page():
     return send_from_directory(HERE, "records.html")
