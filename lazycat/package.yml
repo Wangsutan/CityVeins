@@ -4,6 +4,9 @@ name: 城脉 CityVeins
 description: >-
   城市生活圈（15 分钟生活圈）评估平台：按 ID、名称或坐标查询住宅区，
   拉取周边 POI，按可配置权重计算生活圈得分，并生成 Markdown / HTML 评估报告。
+
+  使用前需自备一个高德地图「Web 服务」API Key（在应用内设置页填写，
+  不内置任何密钥）；可选配置 DeepSeek API Key 以启用 AI 分析报告。
 author: wangsutan
 license: MIT
 
@@ -20,9 +23,13 @@ locales:
     description: >-
       城市生活圈（15 分钟生活圈）评估平台。查询住宅区 → 拉取周边 POI →
       按权重计算生活圈得分 → 生成评估报告，全流程在浏览器里完成。
+      需自备高德地图「Web 服务」API Key（应用内设置页填写，不内置密钥）；
+      可选配置 DeepSeek API Key 启用 AI 分析报告。
   en-US:
     name: CityVeins
     description: >-
       A 15-minute life-circle evaluation platform: query a residential area,
       fetch surrounding POIs, compute a weighted life-circle score and generate
-      a Markdown/HTML report — all in the browser.
+      a Markdown/HTML report — all in the browser. You need your own Amap
+      (Gaode) "Web Service" API key, entered in the in-app settings page
+      (no keys are bundled); an optional DeepSeek API key enables AI reports.

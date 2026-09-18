@@ -1,5 +1,59 @@
 # CityVeins 懒猫 lpk 清单
 # application = Web 界面 + Flask 接口（同一容器，容器内 :8000）
+usage: >
+  城脉 · 城市生活圈（15 分钟生活圈）评估平台。
+
+
+  【使用前必须先配置高德地图 API Key】
+
+  本应用不内置任何密钥，需要你自备一个高德「Web 服务」Key，否则查询住宅区与拉取 POI 都会失败：
+
+  · 打开 https://console.amap.com/dev/key/app ，创建应用并添加 Key，
+  服务平台请选择「Web 服务」（不是「Web 端 JS API」）。
+
+  · 回到本应用，点右上角齿轮 ⚙️ 进入设置页，把 Key 粘到「高德地图 API Key」并保存。
+
+  · 若该 Key 开启了 IP 白名单，需把本设备（懒猫微服）的出口公网 IP 加入白名单，
+  否则查询会返回 INVALID_USER_IP。
+
+
+  【基本流程】
+
+  1. 在首页输入住宅区名称，点「选取地点」——这一步只是确定要分析的位置。
+
+  2. 选定后点「保存到云端」——这一步才真正拉取周边 POI、按权重计算生活圈得分、
+  并生成评估报告。它会按 POI 分类逐类发起周边搜索请求，通常需要几十秒，请耐心等待。
+
+  3. 「AI 生成报告」为可选功能，需另配 DeepSeek API Key（设置页可填）。
+  不填也能正常查询、拉 POI、算分与生成常规报告；填上后 AI 会把 POI 数据
+  转成可读的分析结论，强烈推荐。
+
+  4. 「下载到本地」可打包下载全部文件，也可逐个挑选；点旁边的「?」查看解压说明。
+
+
+  【关于 POI 权重】
+
+  设置页可查看与修改 900 余条 POI 类型的权重。两类权重作用不同：
+
+  · 客制化权重：只影响评分，留空表示使用基础权重，是推荐的调整方式。
+
+  · 基础权重：既影响评分，也影响抓取范围 —— 系统按「大类权重 ≥ 0.4」决定
+  该大类下的 POI 是否被抓取，修改大类行会改变下次抓取收录哪些业态。
+
+
+  【数据说明】
+
+  受上述抓取范围限制，本应用当前覆盖大类权重 ≥ 0.4 的 10 个大类
+  （医疗保健、科教文化、购物服务、交通设施、生活服务等）；餐饮服务、
+  住宿服务等 14 个大类不在抓取范围内。因此报告中「未覆盖业态为 0」
+  不代表现实中缺失，AI 报告会如实区分这两种情况。
+
+
+  Before use, you must configure your own Amap (Gaode) "Web Service" API key:
+  create one at https://console.amap.com/dev/key/app and paste it into the
+  settings page (gear icon, top-right). If the key has an IP allowlist, add this
+  device's public egress IP. An optional DeepSeek API key enables AI reports.
+
 application:
   subdomain: cityveins
   image: embed:app-runtime
