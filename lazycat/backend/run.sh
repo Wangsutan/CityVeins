@@ -16,16 +16,34 @@ mkdir -p /lzcapp/var/config 2>/dev/null || true
 #   · 原 utils/file/key_loader.py 无需任何改动即可读到
 # 首次运行时用镜像内自带的 key.txt 做种子（若存在），否则建成空文件。
 KEY_PERSIST=/lzcapp/var/config/amap_key.txt
+KEY_SEED=/app/data/key/key.txt
+
+# 必须先把目录建出来。踩过的坑（线上实测）：
+#   data/key/ 里除 .gitkeep 外没有任何被 git 跟踪的文件，lzc 的构建通道又不保留
+#   空目录，所以镜像里 **根本没有 /app/data/key/** —— 那样下面的 `ln -sfn` 会因为
+#   父目录不存在而失败（还被 `|| true` 吞掉），结果 key.txt 始终不存在，
+#   key_loader 读不到任何密钥；表现是「重新部署之后高德 Key 就丢了」。
+#   持久化文件其实一直都在，只是应用看不见它。
+mkdir -p /app/data/key 2>/dev/null || true
+
 if [ ! -f "$KEY_PERSIST" ]; then
-  if [ -s /app/data/key/key.txt ] && [ ! -L /app/data/key/key.txt ]; then
-    cp /app/data/key/key.txt "$KEY_PERSIST" 2>/dev/null || true
-  else
-    : > "$KEY_PERSIST"
+  if [ -s "$KEY_SEED" ] && [ ! -L "$KEY_SEED" ]; then
+    cp "$KEY_SEED" "$KEY_PERSIST" 2>/dev/null || true
   fi
+  # 用 touch 而不是 `: >` —— 万一上面某步失败，这里也不会把已经写好的密钥抹掉
+  [ -f "$KEY_PERSIST" ] || touch "$KEY_PERSIST" 2>/dev/null || true
 fi
 chmod 600 "$KEY_PERSIST" 2>/dev/null || true
-rm -f /app/data/key/key.txt 2>/dev/null || true
-ln -sfn "$KEY_PERSIST" /app/data/key/key.txt 2>/dev/null || true
+rm -f "$KEY_SEED" 2>/dev/null || true
+ln -sfn "$KEY_PERSIST" "$KEY_SEED" 2>/dev/null || true
+
+# 启动自检：这一步失败不会拦住应用（核心功能不该因为密钥读不到就起不来），
+# 但会在容器日志里留下明确的线索，不至于又变成"Key 莫名消失"。
+if [ -r "$KEY_SEED" ]; then
+  echo "[cityveins] 高德 Key 已就绪：$KEY_SEED -> $KEY_PERSIST ($(wc -c < "$KEY_SEED" 2>/dev/null || echo 0) 字节)"
+else
+  echo "[cityveins] 警告：读不到 $KEY_SEED，高德相关接口会报未配置密钥；持久化文件 $KEY_PERSIST 是否非空：$([ -s "$KEY_PERSIST" ] && echo 是 || echo 否)"
+fi
 
 # --- DeepSeek API Key 持久化（AI 报告用）---------------------------------
 # 注意：lzc 的构建通道会丢弃 .env 这类隐藏文件（实测镜像内 /app/.env 不存在），

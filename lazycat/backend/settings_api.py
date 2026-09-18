@@ -95,11 +95,19 @@ def settings_page():
 @settings_bp.route("/api/settings/amap-key", methods=["GET"])
 def get_amap_key():
     key = _read_key()
+    target = _target_path()
+    # writable 之前查的是"软链所在目录"，真正要写的是 realpath 所在目录
+    # （/lzcapp/var/config），两者在容器里不是一个地方，会给出误导性的 false。
+    directory = os.path.dirname(target) or "."
     return jsonify({
         **_key_meta(key),
-        "source": _target_path(),
+        "source": target,
         "symlinked": os.path.islink(KEY_FILE),
-        "writable": os.access(os.path.dirname(_target_path()) or ".", os.W_OK),
+        # 直观暴露"文件到底在不在"：曾经因为 /app/data/key/ 目录在镜像里不存在，
+        # 软链一直建不起来，持久化里明明有密钥、应用却报未配置。
+        "source_exists": os.path.isfile(target),
+        "readable": os.access(KEY_FILE, os.R_OK),
+        "writable": os.access(directory, os.W_OK),
     })
 
 
