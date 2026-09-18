@@ -7,7 +7,8 @@ __main__ 里绑定 127.0.0.1:8000。容器里需要同一个进程既提供接�
 
   1) 把项目根的 index.html 以同源方式挂在 "/"
   2) 注册高德 API Key 设置页（原项目前端完全没有填写密钥的入口）
-  3) 绑定 0.0.0.0 与 PORT 环境变量
+  3) 注册「记录袋」列表页（云端已形成数据的清单 + 按条预览/下载）
+  4) 绑定 0.0.0.0 与 PORT 环境变量
 
 app.py 本身未作任何修改。
 """
@@ -18,23 +19,46 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from app import app                       # noqa: E402  Flask 实例
-from weights_api import weights_bp        # noqa: E402  权重页/接口
-from settings_api import (                # noqa: E402  密钥设置页/接口
-    apply_deepseek_env,
-    settings_bp,
-)
 from flask import send_from_directory     # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
 
+
+def _register(module_name, attr, label):
+    """注册一个补丁层蓝图，**失败不致命**。
+
+    踩过的坑：records_api.py 加进来时，Dockerfile 忘了 COPY 它，
+    于是这里的 `from records_api import records_bp` 直接 ImportError，
+    整个进程起不来 —— 表现是「所有路由都 Connection refused」，
+    比缺一个页面严重得多。所以补丁层一律各自容错：
+    导入或注册失败只打日志（前端也看不到那个入口），核心功能照常。
+    """
+    try:
+        mod = __import__(module_name, fromlist=[attr])
+        app.register_blueprint(getattr(mod, attr))
+        return True
+    except Exception as exc:                  # noqa: BLE001 故意兜住所有异常
+        app.logger.error(
+            "[cityveins] 补丁层 %s(%s) 加载失败，已跳过：%r", module_name, label, exc
+        )
+        return False
+
+
 # 高德 / DeepSeek Key 设置页：/settings 与 /api/settings/*-key
-app.register_blueprint(settings_bp)
+_register("settings_api", "settings_bp", "设置页")
 
 # 权重查看/编辑页：/weights 与 /api/weights
-app.register_blueprint(weights_bp)
+_register("weights_api", "weights_bp", "权重页")
+
+# 已形成的数据列表页：/records 与 /api/records*
+_register("records_api", "records_bp", "记录袋")
 
 # 把持久化的 DeepSeek Key 注入环境变量，供 /ai-report 使用
-apply_deepseek_env()
+try:
+    from settings_api import apply_deepseek_env   # noqa: E402
+    apply_deepseek_env()
+except Exception as exc:                          # noqa: BLE001
+    app.logger.error("[cityveins] DeepSeek Key 注入失败：%r", exc)
 
 
 

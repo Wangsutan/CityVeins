@@ -29,11 +29,15 @@ RUN pip3 install --no-cache-dir --break-system-packages \
 # 项目本体（由 lzc-build.yml 的 buildscript 拷入 backend/app/）
 COPY app /app
 
-# 懒猫部署补丁层
+# 懒猫部署补丁层（backend/ 目录下的文件，各自显式 COPY —— 不要用 `COPY . .`，
+# 否则会把 backend/app/ 里的构建产物和缓存一起塞进镜像）
 COPY run_lazycat.py /app/sources/run_lazycat.py
 COPY settings_api.py /app/sources/settings_api.py
 COPY weights_api.py /app/sources/weights_api.py
 COPY settings.html /app/sources/settings.html
+# 记录袋：云端已形成数据的列表页 + 接口
+COPY records_api.py /app/sources/records_api.py
+COPY records.html /app/sources/records.html
 COPY run.sh /app/run.sh
 RUN chmod +x /app/run.sh
 

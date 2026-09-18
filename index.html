@@ -32,26 +32,13 @@
       
       /* 修改：将蓝色渐变改为橙色/黄色暖色渐变 */
       header {
-        position: relative;          /* 供右上角齿轮定位 */
+        position: relative;          /* 供右上角入口定位 */
         background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
         color: white;
         padding: 16px 20px;
         text-align: center;
       }
-      .settings-gear {
-        position: absolute;
-        top: 50%;
-        right: 14px;
-        transform: translateY(-50%);
-        font-size: 20px;
-        line-height: 1;
-        text-decoration: none;
-        padding: 6px 8px;
-        border-radius: 8px;
-        opacity: .9;
-      }
-      .settings-gear:hover { background: rgba(255, 255, 255, .18); opacity: 1; }
-      .settings-gear.disabled { opacity: .35; pointer-events: none; }
+      /* 设置齿轮与「记录袋」入口的样式见文件末尾（统一放在 .header-links 里同排） */
       
       h1 {
         font-size: 2rem;
@@ -643,6 +630,126 @@
           border-top: 0;
           border-bottom-color: #2c3e50;
         }
+
+        /* 页头右上角：本轮记录袋入口 + 原有设置齿轮（同一排） */
+        .header-links {
+          position: absolute;
+          top: 50%;
+          right: 14px;
+          transform: translateY(-50%);
+          display: flex;
+          gap: 6px;
+          align-items: center;
+        }
+        .settings-gear {
+          position: static;
+          top: auto;
+          right: auto;
+          transform: none;
+          font-size: 20px;
+          line-height: 1;
+          text-decoration: none;
+          padding: 6px 8px;
+          border-radius: 8px;
+          opacity: .9;
+        }
+        .settings-gear:hover { background: rgba(255, 255, 255, .18); opacity: 1; }
+        .settings-gear.disabled { opacity: .35; pointer-events: none; }
+        .records-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: rgba(255, 255, 255, .2);
+          color: #fff;
+          border: 1px solid rgba(255, 255, 255, .55);
+          border-radius: 999px;
+          padding: 5px 12px;
+          font-size: 12.5px;
+          line-height: 1.3;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+        .records-link:hover { background: rgba(255, 255, 255, .34); }
+        @media (max-width: 380px) {
+          .records-link { font-size: 11.5px; padding: 4px 9px; }
+          .settings-gear { font-size: 18px; }
+        }
+
+        /* 报告内置预览：整屏弹层里用 iframe 打开，不跳转、不开新窗口。
+           安卓上 window.open / 系统外部浏览器会把当前页面顶掉或重载，
+           页面一重载内存里的结果就没了 —— 所以预览一律走站内弹层。 */
+        .preview-overlay {
+          display: none;
+          position: fixed;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          background: rgba(20, 28, 40, .6);
+          z-index: 120;
+          align-items: center;
+          justify-content: center;
+          padding: 14px;
+        }
+        .preview-box {
+          background: #fff;
+          border-radius: 12px;
+          width: 100%;
+          max-width: 980px;
+          height: 88%;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-shadow: 0 18px 46px rgba(0, 0, 0, .35);
+        }
+        .preview-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          padding: 11px 15px;
+          background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+          color: #fff;
+        }
+        .preview-head .preview-title {
+          font-size: 14.5px;
+          font-weight: 600;
+          word-break: break-all;
+        }
+        .preview-head .preview-actions {
+          display: flex;
+          gap: 7px;
+          flex: 0 0 auto;
+        }
+        .preview-head button {
+          background: rgba(255, 255, 255, .2);
+          color: #fff;
+          border: 1px solid rgba(255, 255, 255, .5);
+          border-radius: 8px;
+          padding: 6px 12px;
+          font-size: 13px;
+          font-family: inherit;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+        .preview-head button:hover { background: rgba(255, 255, 255, .34); }
+        .preview-frame-wrap {
+          flex: 1;
+          min-height: 0;
+          background: #f6f8fb;
+        }
+        .preview-frame-wrap iframe {
+          width: 100%;
+          height: 100%;
+          border: 0;
+          background: #fff;
+          display: block;
+        }
+        @media (max-width: 480px) {
+          .preview-overlay { padding: 0; }
+          .preview-box { height: 100%; border-radius: 0; max-width: none; }
+          .preview-head .preview-title { font-size: 13.5px; }
+        }
       </style>
   </head>
   <body>
@@ -652,9 +759,12 @@
         <a href="/settings" style="color:#8a5300;font-weight:600;text-decoration:underline;">前往设置 →</a>
       </div>
       <header>
-        <!-- 设置入口：不放在功能按钮区，避免与「保存/AI报告/下载」并列 -->
-        <a id="settings-gear" class="settings-gear" href="/settings"
-           title="设置：API Key 与 POI 权重" aria-label="设置">⚙️</a>
+        <!-- 设置入口与「记录袋」入口：不放在功能按钮区，避免与「保存/AI报告/下载」并列 -->
+        <span class="header-links">
+          <a class="records-link" href="/records" title="记录袋：云端已保存的全部数据">📦 记录袋</a>
+          <a id="settings-gear" class="settings-gear" href="/settings"
+             title="设置：API Key 与 POI 权重" aria-label="设置">⚙️</a>
+        </span>
         <h1>城脉</h1>
       </header>
       
@@ -712,8 +822,9 @@
               <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6;">关闭</button>
             </div>
 
-            <div id="download-instructions" class="download-instructions">
-              点「打包下载 ZIP」下载全部文件；点「逐个下载文件」可自行挑选单个文件。
+            <div class="download-instructions" id="download-instructions">
+              点「打包下载 ZIP」下载全部文件；点「逐个下载文件」可自行挑选单个文件。<br>
+              这些文件都已经存在云端，随时可以在 <a href="/records">记录袋</a> 里重新找到并下载。
             </div>
           </div>
           </div>
@@ -727,7 +838,29 @@
       
       <footer>
         <p>城脉 · 城市生活圈分析平台 © 2025</p>
+        <p style="margin-top:6px;font-size:0.9em;">
+          <a href="/records" style="color:#466fa1;">记录袋（云端已保存的数据）</a>
+          <span style="opacity:.5;"> · </span>
+          <a href="/settings" style="color:#466fa1;">设置</a>
+        </p>
       </footer>
+    </div>
+
+    <!-- 报告预览弹层：iframe 加载 /preview/... ，不跳转外部浏览器。
+         安卓上 window.open 会把当前页面顶掉/重载，导致内存里的结果丢失。 -->
+    <div id="preview-overlay" class="preview-overlay">
+      <div class="preview-box">
+        <div class="preview-head">
+          <span class="preview-title" id="preview-title">报告预览</span>
+          <span class="preview-actions">
+            <button type="button" id="preview-download">下载</button>
+            <button type="button" id="preview-close">关闭</button>
+          </span>
+        </div>
+        <div class="preview-frame-wrap">
+          <iframe id="preview-frame" title="报告预览"></iframe>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -800,6 +933,69 @@
       let candidates = [];
       let currentSaveDir = '';
       let currentResidentialName = '';
+
+      // ---------- 会话内持久化 ----------
+      // 只放在内存里的状态，一旦页面被重载就全丢：安卓 WebView 从后台回来、
+      // 系统回收页面、或用户刷新，都会让「查询结果 / 已保存目录」消失，
+      // 按钮跟着变灰。这里把它们同步进 sessionStorage，页面重新加载时恢复。
+      // 用 sessionStorage 而不是 localStorage：关掉标签页即失效，不会把
+      // 上一次的结果跨会话一直摆在那里造成误解。
+      const SESSION_KEY = 'cityveins.session.v1';
+
+      function saveSession() {
+        try {
+          const payload = {
+            lastResult: lastResult,
+            candidates: candidates,
+            currentSaveDir: currentSaveDir,
+            currentResidentialName: currentResidentialName,
+            radius: (function () {
+              const el = document.getElementById('radius');
+              return el ? el.value : null;
+            })(),
+            log: (function () {
+              const el = document.getElementById('log');
+              return el && el.dataset.placeholder !== '1' ? el.textContent.slice(-4000) : '';
+            })()
+          };
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
+        } catch (e) {
+          /* 隐私模式/配额满：不影响主流程 */
+        }
+      }
+
+      function clearSession() {
+        try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+      }
+
+      function restoreSession() {
+        let saved = null;
+        try {
+          saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+        } catch (e) {
+          saved = null;
+        }
+        if (!saved) return false;
+
+        if (saved.currentSaveDir) currentSaveDir = String(saved.currentSaveDir);
+        if (saved.currentResidentialName) currentResidentialName = String(saved.currentResidentialName);
+        if (saved.lastResult && saved.lastResult.result && saved.lastResult.result.length) {
+          lastResult = saved.lastResult;
+        }
+        if (Array.isArray(saved.candidates)) candidates = saved.candidates;
+
+        const radiusEl = document.getElementById('radius');
+        if (radiusEl && saved.radius) radiusEl.value = saved.radius;
+
+        if (saved.log) {
+          const logEl = document.getElementById('log');
+          if (logEl) {
+            logEl.dataset.placeholder = '0';
+            logEl.textContent = saved.log;
+          }
+        }
+        return Boolean(currentSaveDir || lastResult);
+      }
 
       // 确保所有请求使用UTF-8编码
       const defaultHeaders = {
@@ -929,6 +1125,8 @@
           }
           
           log('AI报告生成完成！\n现在可以下载或预览AI生成的报告。');
+          saveSession();
+          updateButtonStates();
           
           // 自动预览AI报告
           setTimeout(() => {
@@ -943,6 +1141,60 @@
         }
       }
 
+      // ---------- 报告预览：站内弹层（不用 window.open）----------
+      // 安卓上 window.open 会把当前页面顶掉或让 WebView 重载，页面一重载
+      // 内存里的 lastResult / currentSaveDir 就全没了 —— 表现为「关掉预览，
+      // 已有的结果就丢掉了」。改成同一页面内的 iframe 弹层后，主页面始终
+      // 不被卸载，结果自然还在。
+      let previewCtx = null;      // { title, url, downloadUrl }
+
+      function openPreviewModal(url, title, downloadUrl) {
+        const overlay = document.getElementById('preview-overlay');
+        const frame = document.getElementById('preview-frame');
+        const titleEl = document.getElementById('preview-title');
+        if (!overlay || !frame) {
+          // 刻意不退回 window.open：安卓上开新窗口/外部浏览器会把当前页面顶掉，
+          // 页面一重载内存里的结果就丢了。宁可不预览，也不能丢数据。
+          alert('预览组件未加载，请改用「下载到本地」保存报告后再查看。');
+          return;
+        }
+        previewCtx = { title: title, url: url, downloadUrl: downloadUrl || url };
+        if (titleEl) titleEl.textContent = title || '报告预览';
+        frame.src = url;
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';   // 弹层期间锁住背景滚动
+      }
+
+      function closePreviewModal() {
+        const overlay = document.getElementById('preview-overlay');
+        const frame = document.getElementById('preview-frame');
+        if (overlay) overlay.style.display = 'none';
+        if (frame) frame.src = 'about:blank';      // 停掉里面的请求
+        document.body.style.overflow = '';
+        previewCtx = null;
+      }
+
+      function initPreviewModal() {
+        const overlay = document.getElementById('preview-overlay');
+        if (!overlay) return;
+        const closeBtn = document.getElementById('preview-close');
+        if (closeBtn) closeBtn.addEventListener('click', closePreviewModal);
+        const dlBtn = document.getElementById('preview-download');
+        if (dlBtn) {
+          dlBtn.addEventListener('click', function () {
+            if (!previewCtx) return;
+            triggerDownload(previewCtx.downloadUrl, previewCtx.title + '.html');
+          });
+        }
+        // 点遮罩空白处关闭
+        overlay.addEventListener('click', function (ev) {
+          if (ev.target === overlay) closePreviewModal();
+        });
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape') closePreviewModal();
+        });
+      }
+
       // 预览AI报告
       function previewAIReport() {
         if (!currentSaveDir) {
@@ -953,8 +1205,9 @@
         const subpath = currentSaveDir.split('/').pop();
         const rid = subpath.split('_')[0];
         const reportUrl = `${API}/preview/${subpath}/ai_report_${rid}.html`;
-        
-        window.open(reportUrl, '_blank');
+
+        openPreviewModal(reportUrl, 'AI 分析报告 · ' + (currentResidentialName || rid),
+                         `${API}/download/${subpath}/ai_report_${rid}.html`);
       }
 
       // 选择平台
@@ -1181,9 +1434,11 @@
         }
 
         const subpath = currentSaveDir.split('/').pop();
-        const reportUrl = `${API}/preview/${subpath}/report_${subpath.split('_')[0]}.html`;
-        
-        window.open(reportUrl, '_blank');
+        const rid = subpath.split('_')[0];
+        const reportUrl = `${API}/preview/${subpath}/report_${rid}.html`;
+
+        openPreviewModal(reportUrl, '评估报告 · ' + (currentResidentialName || rid),
+                         `${API}/download/${subpath}/report_${rid}.html`);
       }
 
       // 下载文件
@@ -1215,6 +1470,7 @@
           log('查询出错：' + e.message);
           console.error('查询错误详情:', e);
           lastResult = null;
+          saveSession();
           updateButtonStates();
         }
       }
@@ -1253,6 +1509,7 @@
         document.getElementById('picker').remove();
         log('已取消选择');
         lastResult = null;
+        saveSession();
         updateButtonStates();
       }
 
@@ -1262,6 +1519,7 @@
         const selected = lastResult.result[0];
         currentResidentialName = selected.name;
         log(`已选择：${selected.name}\n地址：${selected.address}\nID：${selected.id}\n坐标：${selected.longitude}, ${selected.latitude}`);
+        saveSession();
         updateButtonStates();
       }
 
@@ -1300,7 +1558,8 @@
           currentSaveDir = result.save_dir;
           currentResidentialName = payload.name;
           
-          log(`保存完成！\n云端目录：${result.save_dir}\n\n现在可以点击"下载到本地"按钮将数据下载到您的设备。`);
+          log(`保存完成！\n云端目录：${result.save_dir}\n\n现在可以点击"下载到本地"按钮将数据下载到您的设备。\n这些数据随时可以在「记录袋」里重新找到并下载。`);
+          saveSession();
           
           if (result.html_url) {
             // 自动打开报告预览
@@ -1356,6 +1615,23 @@
 
       // 初始化按钮状态
       updateButtonStates();
+
+      // 页面被重载（安卓 WebView 回前台 / 用户刷新）后，把上一次的查询结果、
+      // 已保存目录和日志恢复回来，避免"结果凭空消失、按钮全灰"。
+      initPreviewModal();
+      if (restoreSession()) {
+        log('—— 页面重新加载，已恢复上次的结果与云端目录 ——');
+      }
+      updateButtonStates();
+
+      // 操作日志、半径变化时随手存一次，供上面的恢复使用
+      document.addEventListener('change', function (ev) {
+        if (ev.target && ev.target.id === 'radius') saveSession();
+      });
+      window.addEventListener('pagehide', saveSession);
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') saveSession();
+      });
 
       // 页面加载时确保编码正确
       document.addEventListener('DOMContentLoaded', function() {
