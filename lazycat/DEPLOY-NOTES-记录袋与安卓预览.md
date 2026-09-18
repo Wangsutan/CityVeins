@@ -149,7 +149,68 @@ lzc-docker exec cloudlazycatappcityveins-app-1 sh -c '
   wget -qO- http://127.0.0.1:8000/api/records | head -c 300'
 ```
 
-## 五、以后改这块要注意
+## 五、重新部署会不会丢东西（2026-09-18 追加）
+
+用户问：「重新部署之后，以前的 API 会丢吗」。查实结果如下。
+
+### 1. 接口本身：不会丢
+
+`project deploy` 是**装新包覆盖旧包**（journal 里可见 `PkgUninstalled` →
+`PkgInstalled` 成对出现），路由都写在代码里，跟镜像一起更新，只增不减。
+
+### 2. 数据与密钥：不会丢（但当时确实出问题了）
+
+持久化落在盒子的 `/lzcsys/data/appvar/cloud.lazycat.app.cityveins/`，
+容器里是 `/lzcapp/var`，跟镜像完全分离。**装了三次新包之后**，下面这些都还在，
+时间戳还是最初的：
+
+```
+config/amap_key.txt        32 字节   09-18 11:59    ← 用户填的高德 Key
+config/deepseek_key.txt    35 字节   09-18 12:11    ← 用户填的 DeepSeek Key
+config/poi_weights.csv    117642 字节 09-18 16:49   ← 权重页的改动
+output/web_save/…          最早一条 09-18 12:03     ← 最早那批评估记录
+```
+
+`lzc-cli` 里只有 `lpk uninstall --delete-data` 会删数据
+（`lib/lpk/index.js` 的 `uninstallHandler({pkgId, deleteData})`），
+`project deploy` 从不传这个参数，所以**正常部署不会清数据**。
+
+### 3. 但当时高德 Key 确实读不到了（已修，见 acde440）
+
+`/api/settings/amap-key` 报 `configured: false`，而持久化文件里明明有密钥。
+根因不在部署，是一条潜伏的构建问题：
+
+1. 项目 `.gitignore` 第 135 行忽略了 `data/key/` → 该目录里除 `.gitkeep`
+   外没有任何被 git 跟踪的文件；
+2. **lzc 的构建通道打出的构建上下文 tar 会丢弃点文件** ——
+   实测 `tar tf lzc-build-image-context.tar | grep -c data/key` = **0**，
+   `.gitkeep` 一起没了，于是镜像里 `/app/data/key/` 这个目录根本不存在；
+3. `run.sh` 的 `ln -sfn "$KEY_PERSIST" /app/data/key/key.txt` 因父目录不存在
+   而失败，还被 `|| true` 吞掉 → `key.txt` 永远不出现 →
+   `load_key()` 读成空字符串。
+
+**密钥没丢，是应用看不见它。** 修法：`run.sh` 显式 `mkdir -p /app/data/key`，
+并把 `: > "$KEY_PERSIST"` 换成 `[ -f … ] || touch …`（前者在特定状态下
+会把已写好的密钥清空），再加一行启动自检。
+
+修完后线上实测：`configured:true, length:32, source_exists:true, symlinked:true`，
+并在容器里直连高德 REST API 拿到 `status=1 info=OK`，样例返回「恒大御府 | 道里区」，
+确认是真能用，而不只是"读到了 32 字节"。
+
+### 4. 部署后必须做的两件事
+
+```bash
+# ① project deploy 之后应用会停在 Status_Paused，必须再 start
+lzc-cli project deploy && lzc-cli project start
+
+# ② 确认 Key 活着（别只看页面能不能打开）
+lzc-docker exec cloudlazycatappcityveins-app-1 \
+  wget -qO- http://127.0.0.1:8000/api/settings/amap-key
+```
+
+`~/deploy_cityveins.sh` 已经把这两步串起来了。
+
+## 六、以后改这块要注意
 
 - **别在应用里用 `window.open` / `location.href` 打开报告或文件** ——
   安卓上会把页面顶掉，内存里的结果就没了。预览一律走站内弹层，
