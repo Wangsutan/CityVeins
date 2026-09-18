@@ -192,21 +192,6 @@
         box-shadow: none;
       }
       
-      .download-options {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 15px;
-        border: 1px solid #e9ecef;
-      }
-      
-      .download-options h4 {
-        margin-bottom: 12px;
-        color: #2c3e50;
-        text-align: center;
-        font-size: 1.2rem;
-      }
-      
       .platform-buttons {
         display: flex;
         flex-wrap: wrap;
@@ -413,21 +398,7 @@
         border-top: 1px solid #eee;
       }
 
-      /* 新增：下载按钮容器响应式布局 */
-      .download-buttons-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 15px;
-      }
       
-      .download-buttons-container .action-btn {
-        flex: 1;
-        min-width: 140px;
-        max-width: 200px;
-        margin: 0;
-      }
       
       /* 平板和桌面样式 */
       @media (min-width: 768px) {
@@ -500,9 +471,6 @@
         }
 
         /* 桌面端下载按钮布局 */
-        .download-buttons-container {
-          flex-wrap: nowrap;
-        }
       }
       
       /* 大屏幕样式 */
@@ -551,15 +519,7 @@
         }
 
         /* 小屏幕下载按钮布局优化 */
-        .download-buttons-container {
-          flex-direction: column;
-          align-items: center;
-        }
         
-        .download-buttons-container .action-btn {
-          width: 100%;
-          max-width: 250px;
-        }
       }
 
       /* 超小屏幕优化 */
@@ -616,13 +576,38 @@
           font-family: inherit;
         }
         .hint-icon:hover { background: #e2e9f3; }
+
+        /* 「打包下载 ZIP」按钮右上角的小问号。
+           按钮本身要 position:relative 才能挂住它；问号用 pointer-events:none，
+           点它等于点按钮本身，展开解压说明由按钮的 onclick 负责。 */
+        #download-btn {
+          position: relative;
+          overflow: visible;
+        }
+        .zip-hint-wrap {
+          position: absolute;
+          top: -7px;
+          right: -7px;
+          z-index: 2;
+          pointer-events: none;
+        }
+        /* 弹层是 fixed 定位，父级绝不能有 transform，否则它就不再相对视口 */
+        #download-btn,
+        #download-btn:active,
+        #download-btn:hover {
+          transform: none;
+        }
+        /* 说明气泡：相对**视口**定位（fixed），不嵌在卡片里，
+           这样 .container 的 overflow:hidden 裁不到它。
+           具体 left / top 由 JS 的 positionHint() 夹在视口内并算出箭头位置 ——
+           纯 CSS 做不到「既不越界、箭头又指着图标」。 */
         .hint-popup {
           display: none;
-          position: absolute;
-          top: 30px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: min(340px, 76vw);
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: min(340px, calc(100vw - 24px));
+          max-width: calc(100vw - 24px);
           background: #2c3e50;
           color: #fff;
           font-size: 12.5px;
@@ -630,14 +615,14 @@
           text-align: left;
           padding: 10px 13px;
           border-radius: 8px;
-          z-index: 60;
+          z-index: 90;
           box-shadow: 0 8px 22px rgba(0, 0, 0, .2);
         }
         .hint-popup::before {
           content: '';
           position: absolute;
           top: -6px;
-          left: 50%;
+          left: var(--arrow-left, 50%);
           margin-left: -6px;
           border: 6px solid transparent;
           border-top: 0;
@@ -739,9 +724,8 @@
         <a href="/settings" style="color:#8a5300;font-weight:600;text-decoration:underline;">前往设置 →</a>
       </div>
       <header>
-        <!-- 设置入口：不放在功能按钮区，避免与「保存/AI报告/下载」并列。
-             记录袋入口刻意不放页头 —— 页头空间该留给标题，记录袋属于「下载」
-             这一族操作，放在「下载到本地」展开区里更顺手（见 download-options）。 -->
+        <!-- 页头只留设置齿轮：标题栏空间该留给标题。
+             记录袋与下载相关的入口都在下面的功能按钮列里。 -->
         <a id="settings-gear" class="settings-gear" href="/settings"
            title="设置：API Key 与 POI 权重" aria-label="设置">⚙️</a>
         <h1>城脉</h1>
@@ -762,11 +746,6 @@
             <span class="hint-icon-wrap">
               <button type="button" class="hint-icon" aria-label="半径说明"
                       onclick="toggleRadiusHint(event)">?</button>
-              <span id="radius-hint" class="hint-popup">
-                默认 <strong>1200 米</strong>，可自行设置，范围 <strong>100–50000 米</strong>。<br>
-                该半径决定拉取住宅区周边 POI（学校、医院、商超等）的搜索范围：
-                半径越大覆盖越广，但 POI 数量、请求耗时与配额消耗也随之增加。
-              </span>
             </span>
           </div>
         </section>
@@ -775,8 +754,21 @@
           <div class="action-buttons">
             <button id="save-btn" class="action-btn save-btn" onclick="runBusy(saveData, '正在保存到云端')" disabled>保存到云端</button>
             <button id="ai-btn" class="action-btn ai-btn" onclick="showAIModal()" disabled>AI生成报告</button>
-            <button id="download-btn" class="action-btn download-btn" onclick="showDownloadOptions()" disabled>下载到本地</button>
-            <!-- 记录袋：云端已保存的全部数据。跟上面三个一样是操作按钮，不是
+
+            <!-- 下载相关：原来是一个「下载到本地」按钮 + 一个展开区（里面再放
+                 「打包下载 ZIP / 逐个下载文件」）。现在两者都直接排在这一列里，
+                 展开区整个删掉 —— 少一层嵌套，也就没有「展开后收不回去」的问题了。
+                 ZIP 上的「?」用 pointer-events:none，点它等于点按钮本身。 -->
+            <button id="download-btn" class="action-btn download-btn" onclick="runBusy(downloadZip, '正在下载')" disabled>
+              打包下载 ZIP
+              <span class="hint-icon-wrap zip-hint-wrap">
+                <button type="button" class="hint-icon" aria-label="解压说明"
+                        onclick="toggleUnzipHint(event)">?</button>
+              </span>
+            </button>
+            <button id="files-btn" class="action-btn" onclick="openRecordFiles()" disabled>逐个下载文件</button>
+
+            <!-- 记录袋：云端已保存的全部数据。跟上面几个一样是操作按钮，不是
                  「下载到本地」展开区里的附属链接 —— 所以直接排在同一列里，
                  并且**始终可点**（它不依赖本次会话有没有查询结果）。 -->
             <a href="/records" class="action-btn records-btn"
@@ -785,34 +777,10 @@
               记录袋
             </a>
           </div>
-          
-          <div id="download-options" class="download-options" style="display: none;">
-            <h4>选择下载方式</h4>
 
-            <!-- 原 Windows / Linux-Mac / Android 三个按钮动作完全相同（都是下载同一个 ZIP），
-                 差别只在解压说明；已合并为一个「打包下载 ZIP」，
-                 解压说明移到右侧「?」图标里。真的不同的只有「逐个下载文件」。 -->
-            <div class="download-buttons-container">
-              <button class="action-btn save-btn" onclick="runBusy(downloadZip, '正在下载')">打包下载 ZIP</button>
-              <button id="file-list-toggle" class="action-btn" onclick="runBusy(showFileList, '正在读取文件列表')" style="background: #ff9a00;">逐个下载文件</button>
-              <span class="hint-icon-wrap">
-                <button type="button" class="hint-icon" aria-label="解压说明"
-                        onclick="toggleUnzipHint(event)">?</button>
-                <span id="unzip-hint" class="hint-popup">
-                  <strong>ZIP 下载后如何解压</strong><br>
-                  · Windows：右键压缩包 →「全部解压缩」<br>
-                  · Linux / macOS：<code>unzip 文件名.zip</code>，或在文件管理器里双击<br>
-                  · Android：用 ZArchiver 等应用解压<br>
-                  解压后用浏览器打开其中的 HTML 报告即可查看。
-                </span>
-              </span>
-              <button class="action-btn" onclick="hideDownloadOptions()" style="background: #95a5a6;">关闭</button>
-            </div>
-
-            <div id="download-instructions" class="download-instructions">
-              点「打包下载 ZIP」下载全部文件；点「逐个下载文件」可自行挑选单个文件。
-            </div>
-          </div>
+          <div class="download-instructions" id="download-instructions">
+            点「打包下载 ZIP」下载该住宅区的全部文件；点「逐个下载文件」打开文件清单，
+            可自行挑选单个文件下载或预览报告。
           </div>
         </section>
         
@@ -844,6 +812,24 @@
       </div>
     </div>
 
+    <!-- 说明气泡：刻意放在 <body> 直接子级，不嵌在 .hint-icon-wrap 里。
+         原来是嵌进去 + absolute 定位，而 .container 有 overflow:hidden，
+         于是气泡一旦超出卡片边界就被裁掉 —— 安卓窄屏上「POI 搜索半径」的
+         ? 图标靠近右边界，气泡右半边整块看不见。
+         现在改成 fixed（相对视口），再由 positionHint() 夹在视口内。 -->
+    <span id="radius-hint" class="hint-popup">
+      默认 <strong>1200 米</strong>，可自行设置，范围 <strong>100–50000 米</strong>。<br>
+      该半径决定拉取住宅区周边 POI（学校、医院、商超等）的搜索范围：
+      半径越大覆盖越广，但 POI 数量、请求耗时与配额消耗也随之增加。
+    </span>
+    <span id="unzip-hint" class="hint-popup">
+      <strong>ZIP 下载后如何解压</strong><br>
+      · Windows：右键压缩包 →「全部解压缩」<br>
+      · Linux / macOS：<code>unzip 文件名.zip</code>，或在文件管理器里双击<br>
+      · Android：用 ZArchiver 等应用解压<br>
+      解压后用浏览器打开其中的 HTML 报告即可查看。
+    </span>
+
     <script>
       const API = '';  // 同源：由同一容器的 Flask 提供接口
 
@@ -864,25 +850,85 @@
         if (willOpen) {
           el.style.display = 'block';
           openHintId = id;
+          positionHint(el, ev && ev.currentTarget);
         }
       }
 
-      function toggleRadiusHint(ev) { toggleHint('radius-hint', ev); }
-      function toggleUnzipHint(ev)  { toggleHint('unzip-hint', ev); }
+      /**
+       * 把气泡夹在视口内，并让箭头仍然指向 ? 图标。
+       *
+       * 气泡是 fixed 定位，所以 left / top 都用视口坐标：
+       *   · 水平：默认让气泡中心对齐图标中心；一旦越界就整体平移回来，
+       *     箭头位置做反向补偿 —— 因此箭头永远不会跑到气泡外面。
+       *   · 垂直：优先放在图标下方；下面放不下（安卓上软键盘顶起视口）就翻到
+       *     图标上方，再放不下才夹进视口。
+       *
+       * 纯 CSS 做不到「既不越界、箭头又指着图标」，所以这段用 JS 算。
+       */
+      function positionHint(el, icon) {
+        if (!icon || !icon.getBoundingClientRect) return;
+
+        const margin = 12;                    // 与视口左右边缘留的空隙
+        const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+        const vh = window.innerHeight || document.documentElement.clientHeight || 640;
+        const box = icon.getBoundingClientRect();
+        const w = el.offsetWidth || Math.min(340, vw - margin * 2);
+        const h = el.offsetHeight || 0;
+
+        // --- 水平：先中心对齐，再夹进视口 ---
+        let left = box.left + box.width / 2 - w / 2;
+        const maxLeft = vw - margin - w;
+        if (left > maxLeft) left = maxLeft;
+        if (left < margin) left = margin;
+
+        // 箭头跟随图标；气泡被平移多少，箭头就反向补多少
+        let arrow = box.left + box.width / 2 - left;
+        arrow = Math.max(12, Math.min(w - 12, arrow));
+
+        // --- 垂直：优先下方，放不下翻到上方 ---
+        let top = box.bottom + 8;
+        if (h && (vh - margin - top) < h) {
+          const above = box.top - 8 - h;
+          top = above >= margin ? above : Math.max(margin, vh - margin - h);
+        }
+
+        el.style.left = Math.round(left) + 'px';
+        el.style.top = Math.round(top) + 'px';
+        el.style.setProperty('--arrow-left', Math.round(arrow) + 'px');
+        // 记下触发它的图标，供 resize 时重新定位
+        el._hintIcon = icon;
+      }
 
       function closeAllHints() {
         ['radius-hint', 'unzip-hint'].forEach(function (id) {
           const el = document.getElementById(id);
-          if (el) el.style.display = 'none';
+          if (!el) return;
+          el.style.display = 'none';
+          // 清掉行内定位，免得下次打开先闪一下上次的位置
+          el.style.left = '';
+          el.style.top = '';
+          el.style.removeProperty('--arrow-left');
         });
         openHintId = null;
       }
 
+      // 旋转屏幕 / 软键盘顶起视口之后，气泡要仍在视口内
+      window.addEventListener('resize', function () {
+        if (!openHintId) return;
+        const el = document.getElementById(openHintId);
+        if (el && el._hintIcon) positionHint(el, el._hintIcon);
+      });
+
       document.addEventListener('click', function (e) {
         if (!openHintId) return;
-        if (e.target && e.target.closest && e.target.closest('.hint-icon-wrap')) return;
+        // 点 ? 图标本身不关（那个按钮自己负责 toggle）；
+        // 点气泡内容也不关（可能想选中里面的文字）
+        if (e.target && e.target.closest && e.target.closest('.hint-icon, .hint-popup')) return;
         closeAllHints();
       });
+
+      function toggleRadiusHint(ev) { toggleHint('radius-hint', ev); }
+      function toggleUnzipHint(ev)  { toggleHint('unzip-hint', ev); }
 
       function getRadius() {
         const el = document.getElementById('radius');
@@ -989,11 +1035,15 @@
         const saveBtn = document.getElementById('save-btn');
         const aiBtn = document.getElementById('ai-btn');
         const downloadBtn = document.getElementById('download-btn');
+        const filesBtn = document.getElementById('files-btn');
         const hasResult = lastResult && lastResult.result;
         
         saveBtn.disabled = !hasResult;
         aiBtn.disabled = !currentSaveDir;
+        // 「打包下载 ZIP」与「逐个下载文件」都针对本次保存的那条记录，
+        // 所以都等 currentSaveDir 有了才可用。
         downloadBtn.disabled = !currentSaveDir;
+        if (filesBtn) filesBtn.disabled = !currentSaveDir;
       }
 
       // 显示AI生成报告模态框
@@ -1191,126 +1241,27 @@
                          `${API}/download/${subpath}/ai_report_${rid}.html`);
       }
 
-      // 选择平台
-
-      // 显示下载选项
-      // ---------- 下载区展开/收起 ----------
-      // download-instructions 会被 showFileList() 整体覆写成文件清单，
-      // 所以原始说明文字先记下来，收起时好还原。
-      let filesShownInDownload = false;
-      let dlInstructionsDefault = '';
-      const LOOP_LABEL_SHOW = '逐个下载文件';
-      const LOOP_LABEL_HIDE = '收起文件列表';
-
-      // 这个按钮要靠 id 拿 —— 别用属性选择器，太难读也容易在改 onclick 时失效
-      function loopBtn() {
-        return document.getElementById('file-list-toggle');
-      }
-
-      function showDownloadOptions() {
+      // ---------- 逐个下载文件：跳到独立的文件清单页 ----------
+      // 原来是塞在主页面的一个展开区里（还踩过「展开后收不回去」的坑）。
+      // 现在单独开一个页面，主页面只留按钮，不再动态改自己的 DOM。
+      function openRecordFiles() {
         if (!currentSaveDir) {
           alert('请先保存数据到云端');
           return;
         }
-        const opts = document.getElementById('download-options');
-        const instr = document.getElementById('download-instructions');
-        if (!dlInstructionsDefault && instr) {
-          dlInstructionsDefault = instr.innerHTML;
-        }
-        // 每次展开都回到干净状态：上一轮留下的文件清单不该带出来，
-        // 否则一打开下载区就是一堆上次的文件行。
-        filesShownInDownload = false;
-        if (instr && dlInstructionsDefault) instr.innerHTML = dlInstructionsDefault;
-        const b = loopBtn();
-        if (b) b.textContent = LOOP_LABEL_SHOW;
-        opts.style.display = 'block';
-      }
-
-      // 收起文件清单，但保留整个下载区（关闭按钮在同一个容器里，不能一起藏掉）
-      function collapseFileList() {
-        const instr = document.getElementById('download-instructions');
-        if (instr && dlInstructionsDefault) instr.innerHTML = dlInstructionsDefault;
-        filesShownInDownload = false;
-        const b = loopBtn();
-        if (b) b.textContent = LOOP_LABEL_SHOW;
-      }
-
-      function hideDownloadOptions() {
-        collapseFileList();
-        const opts = document.getElementById('download-options');
-        if (opts) opts.style.display = 'none';
-      }
-
-      // 显示文件列表（再点一次收起 —— 之前只能展开不能收）
-      async function showFileList() {
-        if (!currentSaveDir) {
-          alert('没有可下载的数据');
+        const dir = String(currentSaveDir).split('/').filter(Boolean).pop();
+        // 目录名形如 <住宅区ID>_<YYYYmmdd>_<HHMMSS> —— 里面有**两个**下划线，
+        // 所以只能按第一个下划线切；dir.split('_') 全切会得到 3 段，
+        // 判断 length===2 必然失败（这个坑我踩过一次）。
+        const sep = dir.indexOf('_');
+        const rid = sep > 0 ? dir.slice(0, sep) : '';
+        const ts = sep > 0 ? dir.slice(sep + 1) : '';
+        if (!rid || !ts) {
+          alert('无法识别云端目录，请重新保存');
           return;
         }
-
-        // 已经是展开状态 → 这次点击就是「收起」
-        if (filesShownInDownload) {
-          collapseFileList();
-          return;
-        }
-
-        const subpath = currentSaveDir.split('/').pop();
-        
-        try {
-          const res = await fetch(`${API}/files/${subpath}`);
-          const data = await res.json();
-          
-          if (!res.ok) {
-            throw new Error(data.error || `HTTP ${res.status}`);
-          }
-          
-          const fileListHTML = `
-            <div class="file-list">
-              <strong>选择要下载的文件：</strong><br><br>
-              ${data.files.map(file => `
-                <div class="file-item">
-                  <div class="file-info">
-                    <div class="file-name">${file.display_name}</div>
-                    <div class="file-details">
-                      大小: ${formatFileSize(file.size)} | 修改时间: ${file.mtime}
-                    </div>
-                  </div>
-                  <div class="file-actions">
-                    <button class="download-file-btn" onclick="downloadSingleFile('${file.url}')">下载</button>
-                  </div>
-                </div>
-              `).join('')}
-              
-              <div class="download-buttons-container">
-                <button class="action-btn save-btn" onclick="downloadZip()">打包下载全部</button>
-                <button class="action-btn" onclick="previewReport()" style="background: #ff9a00;">预览报告</button>
-                <button class="action-btn" onclick="previewAIReport()" style="background: #ff9a00;">预览AI报告</button>
-                <button class="action-btn" onclick="collapseFileList()"
-                        style="background: #95a5a6;">收起文件列表</button>
-              </div>
-              
-              <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-                提示：点击"下载"按钮直接下载单个文件，或使用"打包下载全部"下载所有文件；
-                点「收起文件列表」或再点一次上方的「逐个下载文件」都可以收起来。
-              </div>
-            </div>
-          `;
-          
-          document.getElementById('download-instructions').innerHTML = fileListHTML;
-          filesShownInDownload = true;
-          const b = loopBtn();
-          if (b) b.textContent = LOOP_LABEL_HIDE;
-        } catch (e) {
-          console.error('获取文件列表失败:', e);
-          document.getElementById('download-instructions').innerHTML = `
-            <div style="text-align: center; color: #e74c3c;">
-              获取文件列表失败: ${e.message}<br>
-              请尝试其他下载方式
-            </div>
-          `;
-          // 取列表失败时保持「未展开」语义，按钮文案不变，用户可以直接再试
-          filesShownInDownload = false;
-        }
+        // 路由是 /records/<住宅区ID>/<时间戳> 两段式（与 /records/<rid>/<ts>/zip 对齐）
+        location.href = '/records/' + encodeURIComponent(rid) + '/' + encodeURIComponent(ts);
       }
 
       // 格式化文件大小
@@ -1324,7 +1275,7 @@
 
       // 下载单个文件
       // ---------- 操作互斥：任一操作进行中禁用相关按钮，避免并发出错 ----------
-      const BUSY_BUTTON_IDS = ['save-btn', 'ai-btn', 'download-btn', 'query-btn'];
+      const BUSY_BUTTON_IDS = ['save-btn', 'ai-btn', 'download-btn', 'files-btn', 'query-btn'];
       const BUSY_MAX_MS = 10 * 60 * 1000;   // 看门狗上限，避免请求卡死导致按钮永久禁用
       let busyDepth = 0;
       let busyWatchdog = null;
@@ -1469,8 +1420,6 @@
         openPreviewModal(reportUrl, '评估报告 · ' + (currentResidentialName || rid),
                          `${API}/download/${subpath}/report_${rid}.html`);
       }
-
-      // 下载文件
 
       async function queryName() {
         const name = document.getElementById('name').value.trim();

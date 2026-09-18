@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>文件清单 · 城脉</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Helvetica Neue',Arial,'PingFang SC','Microsoft YaHei',sans-serif;
+    background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+    color:#333;line-height:1.65;min-height:100vh;padding:15px;
+    -webkit-text-size-adjust:100%;
+  }
+  .container{max-width:900px;margin:0 auto;background:#fff;border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);overflow:hidden}
+  header{background:linear-gradient(135deg,#466fa1 0%,#73bed3 100%);color:#fff;padding:20px 26px}
+  header .row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+  header h1{font-size:20px;font-weight:600;word-break:break-all}
+  header p{font-size:12.5px;opacity:.92;margin-top:5px;word-break:break-all}
+  header a.back{flex:0 0 auto;display:inline-block;background:rgba(255,255,255,.18);color:#fff;
+    text-decoration:none;border:1px solid rgba(255,255,255,.55);border-radius:8px;
+    padding:9px 16px;font-size:14px;white-space:nowrap}
+  header a.back:hover{background:rgba(255,255,255,.3)}
+  .body{padding:20px 26px 28px}
+
+  .metrics{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px;
+    border:1px solid #e3e8ef;border-radius:10px;padding:13px 16px;background:#fafcff}
+  .metric .k{font-size:12px;color:#7a8694}
+  .metric .v{font-size:15.5px;font-weight:600;color:#2c3e50}
+  .metric .v.score{color:#2f7d43}
+
+  .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar button{
+    padding:10px 16px;border:1px solid #d8e0ea;border-radius:8px;background:#fff;color:#2c3e50;
+    font-size:14px;font-family:inherit;cursor:pointer;
+  }
+  .toolbar button:hover{background:#f2f6fb}
+  .toolbar button.primary{background:#466fa1;border-color:#466fa1;color:#fff}
+  .toolbar button.primary:hover{background:#3c608c}
+  .toolbar button:disabled{opacity:.55;cursor:not-allowed}
+
+  .file-row{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    flex-wrap:wrap;padding:12px 14px;border:1px solid #e3e8ef;border-radius:10px;margin-bottom:9px}
+  .file-name{font-size:14.5px;color:#2c3e50;font-weight:500}
+  .file-meta{font-size:12px;color:#7a8694;margin-top:2px;word-break:break-all}
+  .file-ops{display:flex;gap:7px;flex:0 0 auto}
+  .file-ops button{padding:7px 13px;border:1px solid #d8e0ea;border-radius:7px;background:#fff;
+    font-size:13px;font-family:inherit;cursor:pointer;color:#2c3e50}
+  .file-ops button:hover{background:#eef3fa}
+  .file-ops button.amber{background:#ff9a00;border-color:#ff9a00;color:#fff}
+  .file-ops button.amber:hover{background:#e88c00}
+
+  .empty,.loading{text-align:center;color:#7a8694;padding:36px 16px;font-size:14.5px}
+  .err{background:#fdf2f1;border:1px solid #f0c8c4;color:#b3261e;border-radius:10px;
+    padding:12px 16px;font-size:14px;margin-bottom:16px;display:none}
+  .err.open{display:block}
+
+  .note{font-size:12.5px;color:#7a8694;margin-top:14px;line-height:1.8}
+
+  .overlay{position:fixed;inset:0;background:rgba(20,28,40,.62);z-index:200;
+    display:none;align-items:center;justify-content:center;padding:14px}
+  .overlay.open{display:flex}
+  .sheet{background:#fff;border-radius:12px;width:100%;max-width:980px;height:88vh;
+    display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+  .sheet-head{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:13px 18px;background:linear-gradient(135deg,#466fa1 0%,#73bed3 100%);color:#fff}
+  .sheet-head .t{font-size:15px;font-weight:600;word-break:break-all}
+  .sheet-head .ops{display:flex;gap:8px;flex:0 0 auto}
+  .sheet-head button{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.5);
+    border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:inherit;cursor:pointer;white-space:nowrap}
+  .sheet-head button:hover{background:rgba(255,255,255,.34)}
+  .sheet-body{flex:1;min-height:0;background:#f6f8fb}
+  .sheet-body iframe{width:100%;height:100%;border:0;background:#fff;display:block}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+    background:#2c3e50;color:#fff;padding:11px 20px;border-radius:9px;font-size:13.5px;
+    z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;max-width:88vw;text-align:center}
+  .toast.show{opacity:1}
+
+  @media (max-width:640px){
+    body{padding:10px}
+    .body{padding:16px 14px 22px}
+    header{padding:16px 16px}
+    header h1{font-size:18px}
+    .toolbar button{flex:1 1 44%}
+    .sheet{height:92vh}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="row">
+      <div>
+        <h1 id="title">文件清单</h1>
+        <p id="subtitle">读取中…</p>
+      </div>
+      <!-- 返回记录袋：整条记录都属于那里，所以回那儿而不是首页 -->
+      <a class="back" href="/records">← 返回记录袋</a>
+    </div>
+  </header>
+
+  <div class="body">
+    <div id="err" class="err"></div>
+
+    <div class="metrics" id="metrics" style="display:none"></div>
+
+    <div class="toolbar">
+      <button type="button" class="primary" id="zip-btn">打包下载全部（ZIP）</button>
+      <button type="button" id="report-btn" style="display:none">预览评估报告</button>
+      <button type="button" id="ai-report-btn" style="display:none">预览 AI 报告</button>
+    </div>
+
+    <div id="list"><div class="loading">正在读取文件清单…</div></div>
+
+    <p class="note">
+      点「下载」单独保存某个文件，或「预览」直接在页内打开（报告、Markdown、JSON 都能预览）。
+      想回到这条记录的整体视图，去<a href="/records">记录袋</a>。
+    </p>
+  </div>
+</div>
+
+<div id="preview-overlay" class="overlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <span class="t" id="preview-title">预览</span>
+      <span class="ops">
+        <button type="button" id="preview-download">下载这个文件</button>
+        <button type="button" id="preview-close">关闭</button>
+      </span>
+    </div>
+    <div class="sheet-body"><iframe id="preview-frame" title="预览"></iframe></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const API = '';
+  let REC = null;
+  let previewCtx = null;
+
+  /* ---------- 目录名从 URL 取 ----------
+     路径是 /records/<住宅区ID>/<时间戳> 两段式（与 /records/<rid>/<ts>/zip 对齐）。
+     这里只做格式校验，真正的存在性由接口回答。 */
+  function parseDirFromPath() {
+    const segs = location.pathname.split('/').filter(Boolean);   // ['records', rid, ts]
+    if (segs.length !== 3 || segs[0] !== 'records') return null;
+    const rid = decodeURIComponent(segs[1]);
+    const ts = decodeURIComponent(segs[2]);
+    if (!/^[A-Za-z0-9]+$/.test(rid) || !/^\d{8}_\d{6}$/.test(ts)) return null;
+    return { dir: rid + '_' + ts, rid: rid, ts: ts };
+  }
+
+  const $ = function (id) { return document.getElementById(id); };
+
+  function toast(msg, ms) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.classList.remove('show'); }, ms || 2200);
+  }
+
+  function showErr(msg) {
+    const el = $('err');
+    el.textContent = msg;
+    el.classList.add('open');
+  }
+
+  function fmtSize(bytes) {
+    if (!bytes && bytes !== 0) return '—';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let i = 0, v = Number(bytes);
+    while (v >= 1024 && i < units.length - 1) { v /= 1024; i += 1; }
+    return (i === 0 ? v : v.toFixed(v >= 100 ? 0 : 1)) + ' ' + units[i];
+  }
+
+  function esc(s) {
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ---------- 下载：必须走 blob: + download 属性（懒猫拦截器只认这条） ---------- */
+  async function triggerDownload(url, filename) {
+    toast('正在取回文件…', 60000);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename || 'download';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      try {
+        a.click();
+        toast('已发起下载：' + a.download);
+      } finally {
+        document.body.removeChild(a);
+        setTimeout(function () { try { URL.revokeObjectURL(blobUrl); } catch (e) {} }, 60000);
+      }
+    } catch (e) {
+      toast('下载失败：' + (e && e.message ? e.message : e), 4000);
+    }
+  }
+
+  /* ---------- 预览：站内弹层 ---------- */
+  function openPreview(url, title, downloadUrl) {
+    previewCtx = { url: url, downloadUrl: downloadUrl, name: title };
+    $('preview-title').textContent = title;
+    $('preview-frame').src = url;
+    $('preview-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePreview() {
+    $('preview-overlay').classList.remove('open');
+    $('preview-frame').src = 'about:blank';
+    document.body.style.overflow = '';
+    previewCtx = null;
+  }
+
+  /* ---------- 渲染 ---------- */
+  function renderMetrics(r) {
+    const box = $('metrics');
+    const items = [
+      ['加权总分', (r.total_score === null || r.total_score === undefined)
+        ? '—' : Number(r.total_score).toFixed(2) + ' 分', 'score'],
+      ['POI 总数', (r.poi_count === null || r.poi_count === undefined) ? '—' : r.poi_count + ' 个', ''],
+      ['保存时间', r.created || '—', ''],
+      ['占用空间', fmtSize(r.total_bytes), ''],
+    ];
+    box.innerHTML = items.map(function (it) {
+      return '<div class="metric"><div class="k">' + esc(it[0]) + '</div>' +
+             '<div class="v ' + it[2] + '">' + esc(it[1]) + '</div></div>';
+    }).join('');
+    box.style.display = 'flex';
+  }
+
+  function renderFiles(files) {
+    const box = $('list');
+    if (!files.length) {
+      box.innerHTML = '<div class="empty">这条记录目录是空的（保存可能没写完）。</div>';
+      return;
+    }
+    box.innerHTML = files.map(function (f) {
+      const canPreview = ['.html', '.md', '.json', '.csv'].indexOf(f.ext) !== -1;
+      const isReport = f.kind === 'report' || f.kind === 'ai_report';
+      return '<div class="file-row">' +
+        '<div>' +
+          '<div class="file-name">' + esc(f.display_name) + '</div>' +
+          '<div class="file-meta">' + esc(f.name) + ' · ' + fmtSize(f.size_bytes) +
+            ' · ' + esc(f.mtime) + '</div>' +
+        '</div>' +
+        '<div class="file-ops">' +
+          (canPreview
+            ? '<button type="button" class="' + (isReport ? 'amber' : '') +
+              '" data-prev="' + esc(f.preview_url) + '" data-name="' + esc(f.name) + '">预览</button>'
+            : '') +
+          '<button type="button" data-dl="' + esc(f.download_url) +
+            '" data-name="' + esc(f.name) + '">下载</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ---------- 加载 ---------- */
+  async function load() {
+    const target = parseDirFromPath();
+    if (!target) {
+      showErr('地址里的记录目录名不合法（应形如 L430722_20260918_195210）。');
+      $('list').innerHTML = '';
+      $('subtitle').textContent = '无法识别记录';
+      return;
+    }
+
+    try {
+      const res = await fetch(API + '/api/records/' + encodeURIComponent(target.rid) + '/' + target.ts,
+                              { headers: { 'Accept': 'application/json' } });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.error || ('HTTP ' + res.status));
+      REC = r;
+
+      document.title = (r.name || r.rid) + ' · 文件清单 · 城脉';
+      $('title').textContent = (r.name || r.rid);
+      $('subtitle').textContent = 'ID ' + r.rid + ' · 保存于 ' + r.created +
+        ' · ' + r.file_count + ' 个文件 · ' + fmtSize(r.total_bytes);
+
+      renderMetrics(r);
+      renderFiles(r.files || []);
+
+      if (r.report_preview_url) {
+        const b = $('report-btn');
+        b.style.display = '';
+        b.onclick = function () {
+          openPreview(r.report_preview_url, (r.name || r.rid) + ' · 评估报告',
+                      r.report_preview_url.replace('/preview/', '/download/'));
+        };
+      }
+      if (r.ai_report_preview_url) {
+        const b = $('ai-report-btn');
+        b.style.display = '';
+        b.onclick = function () {
+          openPreview(r.ai_report_preview_url, (r.name || r.rid) + ' · AI 分析报告',
+                      r.ai_report_preview_url.replace('/preview/', '/download/'));
+        };
+      }
+    } catch (e) {
+      showErr('读取文件清单失败：' + (e && e.message ? e.message : e));
+      $('list').innerHTML = '';
+      $('subtitle').textContent = '读取失败';
+    }
+  }
+
+  /* ---------- 事件 ---------- */
+  $('list').addEventListener('click', function (ev) {
+    const btn = ev.target.closest ? ev.target.closest('button') : null;
+    if (!btn) return;
+    if (btn.dataset.prev) {
+      openPreview(btn.dataset.prev, btn.dataset.name,
+                  btn.dataset.prev.replace('/preview/', '/download/'));
+    } else if (btn.dataset.dl) {
+      triggerDownload(btn.dataset.dl, btn.dataset.name);
+    }
+  });
+
+  $('zip-btn').addEventListener('click', function () {
+    const t = parseDirFromPath();
+    if (!t) return;
+    triggerDownload(API + '/records/' + encodeURIComponent(t.rid) + '/' + t.ts + '/zip',
+                    t.dir + '.zip');
+  });
+
+  $('preview-close').addEventListener('click', closePreview);
+  $('preview-download').addEventListener('click', function () {
+    if (previewCtx) triggerDownload(previewCtx.downloadUrl, previewCtx.name);
+  });
+  $('preview-overlay').addEventListener('click', function (ev) {
+    if (ev.target === $('preview-overlay')) closePreview();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') closePreview();
+  });
+
+  load();
+</script>
+</body>
+</html>
