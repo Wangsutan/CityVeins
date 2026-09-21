@@ -331,3 +331,75 @@ HTML 解析器容错所以看不出问题，但嵌套是错的，迟早会咬人
   改动后跑 `verify_http.py`，H 段有 6 条断言专门盯这个位置与"全页只有一个入口"。
 - `lazycat/backend/app/` 是 buildscript 生成的（gitignore 里忽略），
   **不要直接改**；要改前端就改项目根的 `index.html`。
+
+## 十、审核反馈「API 未持久化，一重启就丢失」（2026-09-21，v0.0.3）
+
+### 反馈
+
+商店审核：设置页里填的高德 / DeepSeek Key，**重启应用后要重新填**。
+
+### 根因：密钥没丢，是**写入落点**不在持久化目录里
+
+容器里只有 `/lzcapp/var` 是持久的，其它路径都在容器可写层、重建即回滚。
+实测确认（`lzc-docker inspect` 与容器内 `/proc/mounts`）：
+
+```
+/lzcsys/data/appvar/cloud.lazycat.app.cityveins  →  /lzcapp/var   (btrfs 子卷，重建不丢)
+```
+
+`run.sh` 用软链把三处指过去，但那几步全是 `|| true` 的容错写法
+（容器刚起来时 `/lzcapp/var` 未必就绪，不能让脚本因此退出）。**故障就藏在这个 `|| true` 里**：
+
+- 镜像里**根本没有 `/app/data/key/`**（`data/key/` 里没有受版本控制的文件，
+  lzc 的构建通道又丢弃空目录与点文件）。实测：
+  `lzc-docker run --rm --entrypoint sh $IMG -c 'ls /app/data/key'` → `No such file or directory`。
+- 所以 `ln -sfn /lzcapp/var/config/amap_key.txt /app/data/key/key.txt` 必然失败，并被 `|| true` 吞掉；
+- 于是 `settings_api._write_key()` 里的 `os.path.realpath(KEY_FILE)` 解析出来是
+  `/app/data/key/key.txt`（可写层），`os.makedirs()` 还会把它建出来 —— **保存当场可用**；
+- 重启 / 升级 → 可写层回滚成镜像状态 → Key 没了，得重填。
+
+症状与审核反馈逐字对得上。这条在 `acde440` 修过一次（给 `run.sh` 补 `mkdir -p /app/data/key`），
+但**修法是"别让那一步失败"**，没有兜住"万一它还是失败"：只要 `mkdir`/`ln` 再出任何岔子，
+写入就会静默落回可写层。审核手上的包早于那次修复，所以看到的是原始症状。
+
+### 改法：把持久化做成代码里的保证，而不是启动脚本里的约定
+
+新增 `backend/persist.py`（补丁层，纯标准库）：
+
+| 函数 | 作用 |
+|---|---|
+| `ensure_file_link(link, rel)` | 写入前确认软链存在且指向 `/lzcapp/var`，坏了**当场修**；可写层里的旧内容先搬进持久化目录，不丢已填的 Key |
+| `ensure_dir_link(link, rel)` | 目录版（output、住宅区缓存）；换软链前把目录内容搬进持久化目录 |
+| `is_persistent(path)` / `status(path)` | 落点是否持久化，供接口与页面自查 |
+
+四条通道全部纳入自检：`data/key/key.txt`、`data/poi_weights/高德POI_加权.csv`、
+`data/residential/`、`output/`。接入方式：
+
+1. `settings_api` / `weights_api`：写的一律是 realpath，**且必须落在持久化目录里**；
+   落点不持久就**拒绝写入**并报错（500 + 「密钥落点 … 不在持久化目录 … 内，拒绝写入」）——
+   宁可让用户当场看见失败，也不要他以为存住了、重启后才发现没了。
+   （`persist.py` 若没进镜像，写入同样被拒绝并打日志：这是有意的，Dockerfile 必须 COPY 它。）
+2. `run_lazycat.py`：**在 `import app` 之前**跑 `persist.setup_all()` ——
+   `sources/app.py` 在导入阶段就可能建 `output/`，晚一步就写到可写层去了。
+   启动日志逐条打印结果，出问题不必再靠猜。
+3. 接口回 `persistent` / `persist_root`；设置页与权重页直接显示
+   「持久化 · 应用重启不丢」或「⚠️ 未持久化 · 应用重启即丢」。
+
+### 验证（都在真机上跑过）
+
+| 验证 | 结果 |
+|---|---|
+| 全新持久化目录 → 填 Key → **删掉容器重建** → 再读 | `configured:true, persistent:true`，不需要重填（`verify_persist_restart.sh`） |
+| 线上 `lzc-docker restart`（真实「重启应用」） | 高德 / DeepSeek Key 仍在、`env_active:true`；记录袋 9 条记录、权重文件时间戳不变 |
+| 回归测试 `verify_persist.py` | 本地 33 项全过；**在发布镜像里** 32 项全过（Dockerfile 那条在镜像里跳过） |
+| 故障注入 | 软链缺失、软链被目录占住、旧版本已写进可写层 —— 三种状态都覆盖 |
+| `verify_settings_split.py` 对线上 v0.0.3 | 全部通过 |
+
+回归测试同时断言：Dockerfile 里有 `COPY persist.py`、`run.sh` 里有 `mkdir -p /app/data/key`、
+四个页面都显示持久化状态 —— 都是踩过的坑，别再犯。
+
+### 以后注意
+
+- **新增任何"应用会写"的路径，都要在 `persist.setup_all()` 里挂一条通道**，
+  否则它默认落在容器可写层。判断标准很简单：写进 `/app` 下的东西都会在重启时消失。
+- 别把持久化只写在 `run.sh` 里 —— 脚本的失败是静默的，代码里的拒绝是响亮的。
