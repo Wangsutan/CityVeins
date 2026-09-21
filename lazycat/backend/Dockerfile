@@ -32,6 +32,9 @@ COPY app /app
 # 懒猫部署补丁层（backend/ 目录下的文件，各自显式 COPY —— 不要用 `COPY . .`，
 # 否则会把 backend/app/ 里的构建产物和缓存一起塞进镜像）
 COPY run_lazycat.py /app/sources/run_lazycat.py
+# 持久化保障层：settings_api / weights_api 都依赖它（漏 COPY 会导致密钥与权重
+# 写入被拒绝 —— 这是有意的，宁可报错也不要静默丢数据）
+COPY persist.py /app/sources/persist.py
 COPY settings_api.py /app/sources/settings_api.py
 COPY weights_api.py /app/sources/weights_api.py
 COPY settings.html /app/sources/settings.html

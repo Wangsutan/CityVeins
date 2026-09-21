@@ -178,7 +178,11 @@ function renderKeyStatus(kind, d){
       ? '未配置（可选）—— 仅「AI 生成报告」不可用'
       : '未配置 —— 查询与 POI 拉取将失败';
   }
-  src.textContent = '密钥文件：' + d.source + (d.writable ? '' : '（当前不可写，请检查挂载）');
+  // 落点是否持久化要直说：v0.0.1 曾经把 Key 写进容器可写层，
+  // 表现为「填了能用、应用一重启就要重填」。
+  src.textContent = '密钥文件：' + d.source +
+    (d.persistent ? '（持久化 · 应用重启不丢）' : '（⚠️ 未持久化 · 应用重启即丢）') +
+    (d.writable ? '' : '（当前不可写，请检查挂载）');
 }
 
 async function loadKeyStatus(kind){

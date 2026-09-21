@@ -186,7 +186,10 @@ async function loadWeights(){
       '<span>已客制化 <b>' + d.stats.customized + '</b></span>' +
       '<span>大类数 <b>' + d.stats.bigcats + '</b></span>' +
       '<span>抓取阈值 <b>≥ ' + d.threshold + '</b></span>';
-    $('path').textContent = '权重文件：' + d.path + (d.is_symlink ? '（持久化，容器重建不丢）' : '（未持久化）');
+    // 用接口给的 persistent，而不是只看「是不是软链」：
+    // 软链可能指向可写层里的另一个普通文件，那样看着像持久化、其实不是。
+    $('path').textContent = '权重文件：' + d.path +
+      (d.persistent ? '（持久化，容器重建不丢）' : '（⚠️ 未持久化，重启即回滚）');
 
     $('bigfilter').innerHTML = '<option value="">全部大类</option>' +
       BIGCATS.map(b => '<option value="' + b.big + '">' + b.big + '（' + b.rows + '）</option>').join('');

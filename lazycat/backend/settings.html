@@ -152,7 +152,9 @@ async function loadSummary(){
   try {
     const a = await fetch(API + '/api/settings/amap-key').then(r => r.json());
     setState('state-amap', !!a.configured,
-             a.configured ? ('已配置 · ' + a.length + ' 位') : '未配置 —— 不填无法查询');
+             (a.configured ? ('已配置 · ' + a.length + ' 位') : '未配置 —— 不填无法查询') +
+             (a.persistent === false
+                ? ' · <b style="color:#c0392b">未持久化，应用重启即丢</b>' : ''));
   } catch (e) {
     setState('state-amap', false, '状态读取失败');
   }
@@ -160,7 +162,9 @@ async function loadSummary(){
   try {
     const d = await fetch(API + '/api/settings/deepseek-key').then(r => r.json());
     setState('state-ds', !!d.configured,
-             d.configured ? ('已配置 · ' + d.length + ' 位') : '未配置（可选）—— 仅 AI 报告不可用');
+             (d.configured ? ('已配置 · ' + d.length + ' 位') : '未配置（可选）—— 仅 AI 报告不可用') +
+             (d.persistent === false
+                ? ' · <b style="color:#c0392b">未持久化，应用重启即丢</b>' : ''));
   } catch (e) {
     setState('state-ds', false, '状态读取失败');
   }
@@ -171,7 +175,9 @@ async function loadSummary(){
     const s = w.stats || {};
     setState('state-weights', true,
              '共 ' + (s.total || 0) + ' 条 · 已客制化 ' + (s.customized || 0) +
-             ' 项 · ' + (s.bigcats || 0) + ' 个大类');
+             ' 项 · ' + (s.bigcats || 0) + ' 个大类' +
+             (w.persistent === false
+                ? ' · <b style="color:#c0392b">未持久化，重启即回滚</b>' : ''));
   } catch (e) {
     setState('state-weights', false, '权重表读取失败');
   }

@@ -178,7 +178,10 @@ function renderKeyStatus(kind, d){
       ? '未配置（可选）—— 仅「AI 生成报告」不可用'
       : '未配置 —— 查询与 POI 拉取将失败';
   }
-  src.textContent = '密钥文件：' + d.source + (d.writable ? '' : '（当前不可写，请检查挂载）');
+  // 同 amap.html：落点是否持久化要直说，别让用户以为存住了
+  src.textContent = '密钥文件：' + d.source +
+    (d.persistent ? '（持久化 · 应用重启不丢）' : '（⚠️ 未持久化 · 应用重启即丢）') +
+    (d.writable ? '' : '（当前不可写，请检查挂载）');
 }
 
 async function loadKeyStatus(kind){

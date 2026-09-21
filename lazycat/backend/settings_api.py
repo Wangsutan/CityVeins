@@ -26,13 +26,50 @@ try:
 except Exception:                                    # pragma: no cover
     KEY_FILE = "/app/data/key/key.txt"
 
+# 持久化保障层（persist.py）。它不在时**不放行写入** —— 见 _write_key 的注释：
+# 宁可当场报「无法持久化」，也不要让用户以为存住了、重启后才发现没了。
+try:
+    from persist import (
+        AMAP_REL,
+        DEEPSEEK_REL,
+        PERSIST_ROOT,
+        ensure_file_link,
+        is_persistent,
+        status as persist_status,
+    )
+    PERSIST_READY = True
+except Exception as _exc:                            # pragma: no cover
+    PERSIST_READY = False
+    AMAP_REL = DEEPSEEK_REL = "config/keys.txt"
+    PERSIST_ROOT = os.environ.get("CITYVEINS_PERSIST_ROOT", "/lzcapp/var")
+
+    def ensure_file_link(_link, _rel, seed=True):     # type: ignore[misc]
+        return False, os.path.realpath(_link)
+
+    def is_persistent(path):                          # type: ignore[misc]
+        root = PERSIST_ROOT.rstrip(os.sep)
+        real = os.path.realpath(path)
+        return real == root or real.startswith(root + os.sep)
+
+    def persist_status(path):                         # type: ignore[misc]
+        target = os.path.realpath(path)
+        return {
+            "path": path, "target": target, "symlinked": os.path.islink(path),
+            "persistent": is_persistent(target), "exists": os.path.exists(path),
+            "writable": os.access(os.path.dirname(target) or ".", os.W_OK),
+            "persist_root": PERSIST_ROOT,
+        }
+
+    print(f"[cityveins] persist.py 不可用（{_exc!r}）：密钥写入将被拒绝")
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 settings_bp = Blueprint("cityveins_settings", __name__)
 
 # DeepSeek Key（AI 报告用）持久化路径：与高德 Key 同目录
 DEEPSEEK_KEY_FILE = os.environ.get(
-    "CITYVEINS_DEEPSEEK_KEY_FILE", "/lzcapp/var/config/deepseek_key.txt"
+    "CITYVEINS_DEEPSEEK_KEY_FILE",
+    os.path.join(PERSIST_ROOT, *DEEPSEEK_REL.split("/")),
 )
 # DeepSeek Key 以 sk- 开头（长度宽松校验，不校验具体字符）
 DEEPSEEK_PATTERN = re.compile(r"^sk-[A-Za-z0-9_-]{10,200}$")
@@ -41,12 +78,18 @@ DEEPSEEK_PATTERN = re.compile(r"^sk-[A-Za-z0-9_-]{10,200}$")
 KEY_PATTERN = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
 
 def _target_path() -> str:
-    """写入目标：解析符号链接后的真实路径。
+    """写入目标：解析符号链接后的真实路径（并要求它真的在持久化目录里）。
 
     run.sh 把 /app/data/key/key.txt 软链到持久化目录 /lzcapp/var/config/amap_key.txt。
     若直接对 KEY_FILE 做 os.replace()，替换掉的会是**软链本身**而不是持久化文件——
     写进去的密钥会落在容器可写层，容器重建即丢失。所以必须写到 realpath。
+
+    但「软链没建起来」这件事是会发生的（run.sh 那几步都是 `|| true`；
+    历史上 data/key/ 目录因为不进构建上下文而在镜像里根本不存在，软链必然失败）。
+    那种情况下 realpath 就是 /app/data/key/key.txt —— 可写层。所以这里每次都先
+    让 persist 层确认/修复软链，修不好就不会返回一个非持久路径让上层照写。
     """
+    ensure_file_link(KEY_FILE, AMAP_REL)
     return os.path.realpath(KEY_FILE)
 
 
@@ -60,8 +103,17 @@ def _read_key() -> str:
 
 
 def _write_key(key: str) -> None:
-    """原子写入，权限 0600（密钥文件不应被同容器其它进程读到）。"""
+    """原子写入，权限 0600（密钥文件不应被同容器其它进程读到）。
+
+    写入前先确认落点在持久化目录里：落点不持久的话，密钥重启即丢，
+    与其让用户过一天才发现，不如当场把错误抛回去（接口会显示「无法持久化」）。
+    """
     target = _target_path()
+    if not is_persistent(target):
+        raise RuntimeError(
+            f"密钥落点 {target} 不在持久化目录 {PERSIST_ROOT} 内，拒绝写入"
+            "（否则重启应用后密钥会丢）"
+        )
     directory = os.path.dirname(target) or "."
     os.makedirs(directory, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=directory, prefix=".amap-key-")
@@ -118,20 +170,25 @@ def zip_help_page():
 
 @settings_bp.route("/api/settings/amap-key", methods=["GET"])
 def get_amap_key():
+    # 查状态时顺手自愈一次：软链要是丢了（历史上就丢过），密钥明明在持久化目录里
+    # 也会被报成「未配置」。修好之后再读，报出来的才是真实情况。
+    ensure_file_link(KEY_FILE, AMAP_REL)
     key = _read_key()
-    target = _target_path()
-    # writable 之前查的是"软链所在目录"，真正要写的是 realpath 所在目录
-    # （/lzcapp/var/config），两者在容器里不是一个地方，会给出误导性的 false。
-    directory = os.path.dirname(target) or "."
+    info = persist_status(KEY_FILE)
     return jsonify({
         **_key_meta(key),
-        "source": target,
-        "symlinked": os.path.islink(KEY_FILE),
+        "source": info["target"],
+        "symlinked": info["symlinked"],
         # 直观暴露"文件到底在不在"：曾经因为 /app/data/key/ 目录在镜像里不存在，
         # 软链一直建不起来，持久化里明明有密钥、应用却报未配置。
-        "source_exists": os.path.isfile(target),
+        "source_exists": info["exists"],
         "readable": os.access(KEY_FILE, os.R_OK),
-        "writable": os.access(directory, os.W_OK),
+        # writable 之前查的是"软链所在目录"，真正要写的是 realpath 所在目录
+        # （/lzcapp/var/config），两者在容器里不是一个地方，会给出误导性的 false。
+        "writable": info["writable"],
+        # 写入是否落在持久化目录 —— false 就意味着「重启应用后要重新填」。
+        "persistent": info["persistent"],
+        "persist_root": info["persist_root"],
     })
 
 
@@ -177,6 +234,15 @@ def _read_deepseek() -> str:
 
 
 def _write_deepseek(key: str) -> None:
+    # 默认落点是持久化目录里的绝对路径，但仍确认一次：只有显式用
+    # CITYVEINS_DEEPSEEK_KEY_FILE 指到别处时才放过（那是调用方自己的选择）。
+    if not os.environ.get("CITYVEINS_DEEPSEEK_KEY_FILE") and not is_persistent(
+        DEEPSEEK_KEY_FILE
+    ):
+        raise RuntimeError(
+            f"密钥落点 {DEEPSEEK_KEY_FILE} 不在持久化目录 {PERSIST_ROOT} 内，拒绝写入"
+            "（否则重启应用后密钥会丢）"
+        )
     directory = os.path.dirname(DEEPSEEK_KEY_FILE) or "."
     os.makedirs(directory, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=directory, prefix=".ds-key-")
@@ -208,11 +274,14 @@ def apply_deepseek_env() -> None:
 @settings_bp.route("/api/settings/deepseek-key", methods=["GET"])
 def get_deepseek_key():
     key = _read_deepseek()
+    info = persist_status(DEEPSEEK_KEY_FILE)
     return jsonify({
         **_key_meta(key),
         "source": DEEPSEEK_KEY_FILE,
         "env_active": bool(os.environ.get("DEEPSEEK_API_KEY")),
-        "writable": os.access(os.path.dirname(DEEPSEEK_KEY_FILE) or ".", os.W_OK),
+        "writable": info["writable"],
+        "persistent": info["persistent"],
+        "persist_root": info["persist_root"],
     })
 
 

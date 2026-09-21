@@ -25,6 +25,39 @@ import tempfile
 
 from flask import Blueprint, jsonify, request, send_from_directory
 
+# 持久化保障层（persist.py）：权重写入必须落在 /lzcapp/var，
+# 否则「改完权重、重启应用又变回去」—— 与密钥那条是同一类故障。
+try:
+    from persist import (
+        WEIGHTS_REL,
+        PERSIST_ROOT,
+        ensure_file_link,
+        is_persistent,
+        status as persist_status,
+    )
+except Exception:                                    # pragma: no cover
+    WEIGHTS_REL = "config/poi_weights.csv"
+    PERSIST_ROOT = os.environ.get("CITYVEINS_PERSIST_ROOT", "/lzcapp/var")
+
+    def ensure_file_link(_link, _rel, seed=True):     # type: ignore[misc]
+        return False, os.path.realpath(_link)
+
+    def is_persistent(path):                          # type: ignore[misc]
+        root = PERSIST_ROOT.rstrip(os.sep)
+        real = os.path.realpath(path)
+        return real == root or real.startswith(root + os.sep)
+
+    def persist_status(path):                         # type: ignore[misc]
+        target = os.path.realpath(path)
+        return {
+            "path": path, "target": target, "symlinked": os.path.islink(path),
+            "persistent": is_persistent(target), "exists": os.path.exists(path),
+            "writable": os.access(os.path.dirname(target) or ".", os.W_OK),
+            "persist_root": PERSIST_ROOT,
+        }
+
+    print("[cityveins] persist.py 不可用：权重写入将被拒绝")
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 weights_bp = Blueprint("cityveins_weights", __name__)
@@ -66,10 +99,20 @@ def _load_df():
 
 
 def _atomic_write(df) -> None:
-    """原子写入；注意必须写 realpath，否则会把软链替换成普通文件（持久化失效）。"""
+    """原子写入；注意必须写 realpath，否则会把软链替换成普通文件（持久化失效）。
+
+    写之前先让 persist 层确认/修复软链，并确认落点确实在持久化目录里：
+    落点不持久就直接报错 —— 用户改完权重、重启又变回去，比当场报错糟糕得多。
+    """
     import pandas as pd
 
+    ensure_file_link(_weight_path(), WEIGHTS_REL)
     target = os.path.realpath(_weight_path())
+    if not is_persistent(target):
+        raise RuntimeError(
+            f"权重落点 {target} 不在持久化目录 {PERSIST_ROOT} 内，拒绝写入"
+            "（否则重启应用后改动会丢）"
+        )
     directory = os.path.dirname(target) or "."
     os.makedirs(directory, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=directory, prefix=".weights-", suffix=".csv")
@@ -178,6 +221,9 @@ def get_weights():
         "threshold": CATEGORY_THRESHOLD,
         "path": os.path.realpath(path),
         "is_symlink": os.path.islink(path),
+        # 权重落点是否在持久化目录 —— false 就意味着「改完重启会变回去」
+        "persistent": persist_status(path)["persistent"],
+        "persist_root": PERSIST_ROOT,
     })
 
 

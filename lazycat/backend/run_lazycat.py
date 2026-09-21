@@ -18,10 +18,39 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+# --- 持久化自检：必须赶在 `import app` 之前 -------------------------------
+# sources/app.py 在导入阶段就可能把 output/ 建出来；那一刻 /app/output 若不是
+# 指向 /lzcapp/var/output 的软链，后面所有产物都落在容器可写层，重建即丢。
+# persist.setup_all() 把「密钥 / 权重 / output」三条通道各自检查并尽量修好，
+# 并把结论打到容器日志里 —— 再出问题也不必靠猜。
+try:
+    import persist                          # noqa: E402
+    _PERSIST_REPORT = persist.setup_all()
+except Exception as exc:                    # noqa: BLE001 兜住一切
+    _PERSIST_REPORT = []
+    print(f"[cityveins] 持久化自检失败（不影响启动）：{exc!r}", flush=True)
+
+for _item in _PERSIST_REPORT:
+    print(
+        "[cityveins] 持久化{state}：{path} -> {target}".format(
+            state="就绪" if _item.get("persistent") else "**未生效（重建即丢）**",
+            path=_item.get("path"),
+            target=_item.get("target"),
+        ),
+        flush=True,
+    )
+
 from app import app                       # noqa: E402  Flask 实例
 from flask import send_from_directory     # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
+
+for _item in _PERSIST_REPORT:
+    if not _item.get("persistent"):
+        app.logger.error(
+            "[cityveins] %s 不在持久化目录内（%s），写入会在容器重建后丢失",
+            _item.get("path"), _item.get("target"),
+        )
 
 
 def _register(module_name, attr, label):

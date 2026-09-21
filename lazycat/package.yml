@@ -1,5 +1,5 @@
 package: cloud.lazycat.app.cityveins
-version: 0.0.1
+version: 0.0.2
 name: 城脉 CityVeins
 description: >-
   城市生活圈（15 分钟生活圈）评估平台：按 ID、名称或坐标查询住宅区，
