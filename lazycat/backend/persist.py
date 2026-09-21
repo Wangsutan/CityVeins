@@ -6,10 +6,11 @@
 `/lzcsys/data/appvar/<pkgid>/`，容器重建后原样还在，`/proc/mounts` 里是一个
 btrfs 子卷）；容器内的其它路径都在「可写层」，容器一重建就回滚成镜像里的样子。
 
-城脉有三样东西必须落在 `/lzcapp/var`：
+城脉有四样东西必须落在 `/lzcapp/var`：
 
     /app/data/key/key.txt                    → config/amap_key.txt
     /app/data/poi_weights/高德POI_加权.csv    → config/poi_weights.csv
+    /app/data/residential/                    → data/residential/
     /app/output/                             → output/
 
 `run.sh` 启动时会把它们软链过去。但那几步全是 `|| true` 的容错写法（容器刚起来时
@@ -53,6 +54,11 @@ WEIGHTS_LINK, WEIGHTS_REL = (
 )
 OUTPUT_LINK, OUTPUT_REL = "/app/output", "output"
 DEEPSEEK_REL = "config/deepseek_key.txt"
+
+# 住宅区列表缓存：data/residential/residential_<行政区>.csv。它不算用户数据，
+# 但重启后没了就得重新走高德接口（白花配额），所以一并持久化 ——
+# 这样「应用会写的地方」只剩 /lzcapp/var 一处，说法也简单。
+RESIDENTIAL_LINK, RESIDENTIAL_REL = "/app/data/residential", "data/residential"
 
 
 def _root() -> str:
@@ -150,7 +156,12 @@ def ensure_file_link(link: str, rel: str, seed: bool = True) -> tuple:
 
 
 def _merge_into(src: str, dst: str) -> None:
-    """把 src 目录里的内容搬进 dst（已在 dst 里的文件不覆盖）。"""
+    """把 src 目录里的内容搬进 dst，然后把 src 清空（好换成软链）。
+
+    同名文件以 dst（持久化目录）里的为准：那里才是应用一直在用的那一份。
+    镜像里的同名文件（例如升级后重新出现的输入表）直接删掉 —— 内容在 dst 里还在，
+    而且它必须让位，否则 src 目录清不空、软链也就换不上。
+    """
     for root, _dirs, files in os.walk(src):
         rel = os.path.relpath(root, src)
         out = dst if rel == "." else os.path.join(dst, rel)
@@ -160,12 +171,15 @@ def _merge_into(src: str, dst: str) -> None:
             continue
         for name in files:
             s, d = os.path.join(root, name), os.path.join(out, name)
-            if os.path.exists(d):
-                continue
             try:
-                shutil.move(s, d)
+                if not os.path.exists(d):
+                    shutil.move(s, d)
+                    log.info("[persist] 已把 %s 迁移到 %s", s, d)
+                else:
+                    os.unlink(s)
+                    log.info("[persist] %s 在持久化目录里已有同名文件，镜像里这份删掉", s)
             except (OSError, shutil.Error) as exc:
-                log.warning("[persist] 迁移 %s 失败：%r", s, exc)
+                log.warning("[persist] 处理 %s 失败：%r", s, exc)
 
 
 def ensure_dir_link(link: str, rel: str) -> tuple:
@@ -228,6 +242,7 @@ def setup_all() -> list:
         (AMAP_LINK, AMAP_REL, "file"),
         (WEIGHTS_LINK, WEIGHTS_REL, "file"),
         (OUTPUT_LINK, OUTPUT_REL, "dir"),
+        (RESIDENTIAL_LINK, RESIDENTIAL_REL, "dir"),
     ):
         try:
             ok, target = (
