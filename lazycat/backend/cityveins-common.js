@@ -64,10 +64,13 @@
 
   /* ---------------- 下载 ---------------- */
 
-  // 懒猫的文件拦截器判定条件是
+  // 按懒猫官方「文件选择器 / 下载拦截」标准写法触发下载。
+  // 标准注入脚本（lazycat/content/lazycat-injects/lzc-file-chooser-inject.js，
+  // 与 quotations 同一份）钩住 HTMLAnchorElement.prototype.click，命中条件是
   //   anchor instanceof HTMLAnchorElement && Boolean(anchor.download)
   //   && anchor.href.startsWith("blob:")
-  // 所以必须「取回内容 → Blob → blob: 地址 → 带 download 点击」。
+  // 命中后就地弹出「保存至本地 / 保存至懒猫微服」的选择弹层。
+  // 因此这里只负责按标准产出 blob: + download 锚点，拦截交由官方脚本完成。
   async function triggerDownload(url, filename) {
     toast('正在取回文件…', 60000);
     try {

@@ -76,13 +76,39 @@ application:
   # 懒猫官方「文件选择器 / 下载拦截」：拦截应用内的原生文件入口
   # （<input type=file>、showOpenFilePicker / showSaveFilePicker，以及下载），
   # 让用户选择「本地文件系统 / 懒猫微服（网盘）」。
+  #
+  # 写法与 .88 上已过商店审核的标准项目 quotations 的 lazycat/lzc-manifest.yml
+  # 对齐（id 命名 / diskRoot / text 双语标签 / hooks 全部给全）。
+  # 应用端只需产出「anchor.download 存在且 href 以 blob: 开头」的下载锚点，
+  # 拦截动作由注入脚本完成，见 content/lazycat-injects/lzc-file-chooser-inject.js。
   # 脚本随包分发，见 lzc-build.yml 的 contentdir 与 content/lazycat-injects/。
   injects:
-    - id: file-chooser
+    - id: lzc-file-chooser
       on: browser
       when:
         - /*
       do:
         - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
           params:
+            diskRoot: /_lzc/files/home
             locale: auto
+            text:
+              zh-CN:
+                openTitle: 打开
+                saveTitle: 保存
+                openLocal: 从本地打开
+                openLazyCat: 从懒猫微服打开
+                saveLocal: 保存至本地
+                saveLazyCat: 保存至懒猫微服
+                cancel: 取消
+              en-US:
+                openTitle: Open
+                saveTitle: Save
+                openLocal: Open from local device
+                openLazyCat: Open from LazyCat
+                saveLocal: Save to local device
+                saveLazyCat: Save to LazyCat
+                cancel: Cancel
+            hooks:
+              fileSystemAccess: true
+              fileInput: true

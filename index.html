@@ -1411,12 +1411,15 @@
         }
       }
 
-      // ---------- 下载：必须走 blob: + download 属性 ----------
-      // 懒猫的文件拦截器钩住 HTMLAnchorElement.prototype.click，判定条件是
+      // ---------- 下载：按懒猫官方「文件选择器 / 下载拦截」标准写法触发 ----------
+      // 标准做法（见 lazycat/content/lazycat-injects/lzc-file-chooser-inject.js，
+      // 与 .88 上已过商店审核的 quotations 同一份脚本、同一套 manifest 参数）：
+      // 官方注入脚本钩住 HTMLAnchorElement.prototype.click，命中条件是
       //   anchor instanceof HTMLAnchorElement && Boolean(anchor.download)
       //   && anchor.href.startsWith("blob:")
-      // 原先的实现直接用 http 地址、且从不设置 download 属性，两个条件都不满足，
-      // 所以拦截器永远不触发。这里改为「取回内容 → Blob → blob: 地址 → 带 download 点击」。
+      // 命中后就地弹出「保存至本地 / 保存至懒猫微服」的选择弹层。
+      // 所以应用端只需按标准产出「取回内容 → Blob → blob: 地址 → 带 download 点击」
+      // 这一种下载锚点即可，不需要（也不应该）自己写拦截逻辑。
       function fileNameFromUrl(url) {
         try {
           const seg = String(url).split('?')[0].split('#')[0].split('/').filter(Boolean).pop();
@@ -1442,7 +1445,7 @@
           try {
             a.click();
             // 补一条完成日志，让「正在下载…」后面有明确结果
-            log('已发起下载：' + name + '（如弹出保存位置选择，请选择要保存到的地方）');
+            log('已发起下载：' + name + '（如弹出「保存至本地 / 保存至懒猫微服」，请选择要保存到的地方）');
           } finally {
             document.body.removeChild(a);
             // 拦截器命中时会自行 revoke；这里延迟兜底释放，避免影响拦截器读取

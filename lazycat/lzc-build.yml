@@ -24,6 +24,16 @@ buildscript: |
   ROOT="$(pwd)"
   SRC="$ROOT/.."
 
+  # --- 懒猫官方「文件选择器 / 下载拦截」注入脚本：随包分发自检 -------------
+  # contentdir: ./content 会把 content/ 原样装到运行时的 /lzcapp/pkg/content/，
+  # 所以 content/lazycat-injects/ 里的官方脚本直接生效。
+  # （quotations 之所以在 buildscript 里再 cp 一次，是因为它的 contentdir 是
+  #  构建产物 .deploy-content，每次都会被重建；CityVeins 的 contentdir 是
+  #  源码目录 content/，无需二次拷贝 —— 这里补一条显式自检，缺文件就立刻失败。）
+  INJECT="$ROOT/content/lazycat-injects/lzc-file-chooser-inject.js"
+  test -s "$INJECT" || { echo "FATAL: 缺少官方注入脚本 $INJECT"; exit 1; }
+  echo "[inject] $(wc -c < "$INJECT") bytes  md5=$(md5sum "$INJECT" | cut -d' ' -f1)  -> /lzcapp/pkg/content/lazycat-injects/"
+
   rm -rf "$ROOT/backend/app"
   mkdir -p "$ROOT/backend/app"
 
