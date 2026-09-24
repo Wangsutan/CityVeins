@@ -167,3 +167,11 @@ checkpoints/
 *.ckpt
 *.pb
 *.onnx
+
+# 懒猫打包时的构建上下文 tar（打包过程再生产物，不入库）
+lazycat/.lzc-cli-buildpbo7LJ/content.tar
+lazycat/backend/lzc-build-image-context.tar
+
+# 实拍/验收截图（审计产物，不入库）
+Screenshot_*
+docs/screenshots/
